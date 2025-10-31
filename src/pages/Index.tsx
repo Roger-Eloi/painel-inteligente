@@ -8,6 +8,7 @@ import { BarChart3, LayoutDashboard } from "lucide-react";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 import { useAsyncFileProcessor } from "@/hooks/useAsyncFileProcessor";
 import { useToast } from "@/hooks/use-toast";
+import rankmyappLogo from "@/assets/rankmyapp-logo.svg";
 
 const Index = () => {
   const [uploadedData, setUploadedData] = useState<Array<{ name: string; data: any }>>([]);
@@ -143,8 +144,14 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t border-border mt-12 py-6">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Desenvolvido por RankMyApp</p>
+        <div className="container mx-auto px-4 flex items-center justify-center gap-2">
+          <span className="text-sm text-muted-foreground">Desenvolvido por</span>
+          <img 
+            src={rankmyappLogo} 
+            alt="RankMyApp" 
+            className="h-6 w-auto brightness-0 saturate-100"
+            style={{ filter: 'invert(45%) sepia(98%) saturate(3027%) hue-rotate(200deg) brightness(99%) contrast(101%)' }}
+          />
         </div>
       </footer>
     </div>
