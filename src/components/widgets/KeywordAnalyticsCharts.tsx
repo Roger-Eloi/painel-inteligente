@@ -1,25 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
-
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 interface KeywordAnalyticsChartsProps {
   data: any[];
 }
-
-export const KeywordAnalyticsCharts = ({ data }: KeywordAnalyticsChartsProps) => {
+export const KeywordAnalyticsCharts = ({
+  data
+}: KeywordAnalyticsChartsProps) => {
   // Mapeamento de competitividade
   const competitivityMap: Record<string, string> = {
     'very low': 'Muito Baixa',
@@ -37,7 +25,6 @@ export const KeywordAnalyticsCharts = ({ data }: KeywordAnalyticsChartsProps) =>
     'Alta': 0,
     'Muito Alta': 0
   };
-
   data.forEach(row => {
     const compColumn = row.columns?.find((col: any) => col.field === 'competitivity');
     const comp = compColumn?.value?.toLowerCase();
@@ -46,7 +33,6 @@ export const KeywordAnalyticsCharts = ({ data }: KeywordAnalyticsChartsProps) =>
       competitivityCounts[mapped]++;
     }
   });
-
   const competitivityData = Object.entries(competitivityCounts).map(([name, value]) => ({
     name,
     value
@@ -63,45 +49,32 @@ export const KeywordAnalyticsCharts = ({ data }: KeywordAnalyticsChartsProps) =>
     'Top 50 (21-50)': 0,
     'Acima de 50': 0
   };
-
   data.forEach(row => {
     const posColumn = row.columns?.find((col: any) => col.field === 'position');
     const pos = Number(posColumn?.value);
-    
     if (!isNaN(pos)) {
-      if (pos <= 3) positionRanges['Top 3 (1-3)']++;
-      else if (pos <= 10) positionRanges['Top 10 (4-10)']++;
-      else if (pos <= 20) positionRanges['Top 20 (11-20)']++;
-      else if (pos <= 50) positionRanges['Top 50 (21-50)']++;
-      else positionRanges['Acima de 50']++;
+      if (pos <= 3) positionRanges['Top 3 (1-3)']++;else if (pos <= 10) positionRanges['Top 10 (4-10)']++;else if (pos <= 20) positionRanges['Top 20 (11-20)']++;else if (pos <= 50) positionRanges['Top 50 (21-50)']++;else positionRanges['Acima de 50']++;
     }
   });
-
-  const positionData = Object.entries(positionRanges)
-    .filter(([_, value]) => value > 0)
-    .map(([name, value]) => ({
-      name,
-      value
-    }));
+  const positionData = Object.entries(positionRanges).filter(([_, value]) => value > 0).map(([name, value]) => ({
+    name,
+    value
+  }));
 
   // Cores para posições (do melhor para o pior)
   const positionColors = ['hsl(var(--success))', '#86efac', '#fbbf24', '#fb923c', 'hsl(var(--destructive))'];
 
   // Calcular métricas totais
   const totalKeywords = data.length;
-
   const averageDifference = data.reduce((sum, row) => {
     const diffColumn = row.columns?.find((col: any) => col.field === 'difference');
     const diff = Number(diffColumn?.value);
     return sum + (isNaN(diff) ? 0 : diff);
   }, 0) / (data.length || 1);
-
   const trend = averageDifference > 0.1 ? 'up' : averageDifference < -0.1 ? 'down' : 'neutral';
   const trendColor = trend === 'up' ? 'text-success' : trend === 'down' ? 'text-destructive' : 'text-muted-foreground';
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
-
-  return (
-    <div className="space-y-6 animate-fade-in">
+  return <div className="space-y-6 animate-fade-in">
       {/* Primeira linha: Resumo + Competitividade */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Card de Resumo */}
@@ -137,26 +110,20 @@ export const KeywordAnalyticsCharts = ({ data }: KeywordAnalyticsChartsProps) =>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={competitivityData} layout="vertical" margin={{ left: 20, right: 20 }}>
+              <BarChart data={competitivityData} layout="vertical" margin={{
+              left: 20,
+              right: 20
+            }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
-                <YAxis 
-                  type="category" 
-                  dataKey="name" 
-                  width={100}
-                  stroke="hsl(var(--muted-foreground))"
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '6px'
-                  }}
-                />
+                <YAxis type="category" dataKey="name" width={100} stroke="hsl(var(--muted-foreground))" />
+                <Tooltip contentStyle={{
+                backgroundColor: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '6px'
+              }} />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                  {competitivityData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={competitivityColors[index]} />
-                  ))}
+                  {competitivityData.map((_, index) => <Cell key={`cell-${index}`} fill={competitivityColors[index]} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -173,27 +140,17 @@ export const KeywordAnalyticsCharts = ({ data }: KeywordAnalyticsChartsProps) =>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie
-                  data={positionData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {positionData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={positionColors[index]} />
-                  ))}
+                <Pie data={positionData} cx="50%" cy="50%" labelLine={false} label={({
+                name,
+                percent
+              }) => `${name}: ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill="#8884d8" dataKey="value">
+                  {positionData.map((_, index) => <Cell key={`cell-${index}`} fill={positionColors[index]} />)}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '6px'
-                  }}
-                />
+                <Tooltip contentStyle={{
+                backgroundColor: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '6px'
+              }} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -201,14 +158,7 @@ export const KeywordAnalyticsCharts = ({ data }: KeywordAnalyticsChartsProps) =>
         </Card>
 
         {/* Espaço para futuro gráfico adicional */}
-        <Card className="border-dashed">
-          <CardContent className="flex items-center justify-center h-full min-h-[300px]">
-            <p className="text-sm text-muted-foreground text-center">
-              Espaço reservado para análises futuras
-            </p>
-          </CardContent>
-        </Card>
+        
       </div>
-    </div>
-  );
+    </div>;
 };
