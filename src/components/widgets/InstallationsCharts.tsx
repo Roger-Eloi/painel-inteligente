@@ -22,6 +22,7 @@ import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { Calendar as CalendarIcon, Check, X, TrendingUp, TrendingDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -311,6 +312,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
 
   const [showAllPeriods, setShowAllPeriods] = useState(true);
   const [useCompactNumbers, setUseCompactNumbers] = useState(true);
+  const [selectedYear, setSelectedYear] = useState<string>('all');
 
   // Estado para tipo de visualização do gráfico
   const [viewMode, setViewMode] = useState<'daily' | 'cumulative' | 'moving-average'>('cumulative');
@@ -441,6 +443,31 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
     ? (filteredTotalInstalls / filteredTimeSeriesData.length) * 7
     : 0;
 
+  // Extrair anos únicos dos dados mensais
+  const availableYears = useMemo(() => {
+    if (!selectedSeries) return [];
+    
+    const years = new Set<string>();
+    getFilteredMonthlyData(filteredTimeSeriesData).forEach(item => {
+      // "mai. de 2025" -> extrair "2025"
+      const yearMatch = item.month.match(/\d{4}/);
+      if (yearMatch) {
+        years.add(yearMatch[0]);
+      }
+    });
+    
+    return ['all', ...Array.from(years).sort()];
+  }, [selectedSeries, filteredTimeSeriesData]);
+
+  // Filtrar dados mensais por ano selecionado
+  const yearFilteredMonthlyData = useMemo(() => {
+    const monthlyData = getFilteredMonthlyData(filteredTimeSeriesData);
+    
+    if (selectedYear === 'all') return monthlyData;
+    
+    return monthlyData.filter(item => item.month.includes(selectedYear));
+  }, [filteredTimeSeriesData, selectedYear]);
+
   // Preparar dados para exibição baseado no modo de visualização
   let displayData: Array<{date: string; installs: number}> = filteredTimeSeriesData;
   let yAxisLabel = 'Instalações';
@@ -551,50 +578,44 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
       {/* Renderizar gráficos apenas da série selecionada */}
       {selectedSeries && (
         <>
-          {/* Card Principal - INSTALAÇÕES ACUMULADAS */}
-          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <CardHeader className="pb-3">
-              <CardDescription className="text-xs uppercase tracking-wider text-muted-foreground">
-                INSTALAÇÕES ACUMULADAS
-              </CardDescription>
-              <CardTitle className="text-5xl font-bold">
-                {formatNumber(selectedSeries.totalInstalls)}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4 text-sm">
-                {selectedSeries.monthlyGrowth !== undefined && selectedSeries.monthlyGrowth !== 0 && (
-                  <div className={`flex items-center gap-1 ${selectedSeries.monthlyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {selectedSeries.monthlyGrowth >= 0 ? (
-                      <TrendingUp className="h-4 w-4" />
-                    ) : (
-                      <TrendingDown className="h-4 w-4" />
-                    )}
-                    <span className="font-semibold">
-                      {Math.abs(selectedSeries.monthlyGrowth).toFixed(2)}%
-                    </span>
-                    <span className="text-muted-foreground">(mês)</span>
-                  </div>
-                )}
-                {selectedSeries.yearlyGrowth !== undefined && selectedSeries.yearlyGrowth !== 0 && (
-                  <div className={`flex items-center gap-1 ${selectedSeries.yearlyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {selectedSeries.yearlyGrowth >= 0 ? (
-                      <TrendingUp className="h-4 w-4" />
-                    ) : (
-                      <TrendingDown className="h-4 w-4" />
-                    )}
-                    <span className="font-semibold">
-                      {Math.abs(selectedSeries.yearlyGrowth).toFixed(2)}%
-                    </span>
-                    <span className="text-muted-foreground">(ano)</span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Cards de Métricas */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription>Instalações Acumuladas</CardDescription>
+                <CardTitle className="text-3xl">{formatNumber(selectedSeries.totalInstalls)}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-3 text-xs text-muted-foreground">
+                  {selectedSeries.monthlyGrowth !== undefined && selectedSeries.monthlyGrowth !== 0 && (
+                    <div className={`flex items-center gap-1 ${selectedSeries.monthlyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {selectedSeries.monthlyGrowth >= 0 ? (
+                        <TrendingUp className="h-3 w-3" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3" />
+                      )}
+                      <span className="font-medium">
+                        {Math.abs(selectedSeries.monthlyGrowth).toFixed(2)}%
+                      </span>
+                      <span className="text-muted-foreground">(mês)</span>
+                    </div>
+                  )}
+                  {selectedSeries.yearlyGrowth !== undefined && selectedSeries.yearlyGrowth !== 0 && (
+                    <div className={`flex items-center gap-1 ${selectedSeries.yearlyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {selectedSeries.yearlyGrowth >= 0 ? (
+                        <TrendingUp className="h-3 w-3" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3" />
+                      )}
+                      <span className="font-medium">
+                        {Math.abs(selectedSeries.yearlyGrowth).toFixed(2)}%
+                      </span>
+                      <span className="text-muted-foreground">(ano)</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Total de Instalações</CardDescription>
@@ -772,7 +793,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                     <YAxis 
                       className="text-xs"
                       domain={[
-                        (dataMin: number) => Math.floor(dataMin * 0.9),
+                        (dataMin: number) => Math.floor(dataMin * 0.99),
                         'auto'
                       ]}
                       tickFormatter={(value) => {
@@ -840,7 +861,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                       color: selectedSeries.color,
                     },
                   }}
-                  className="h-[300px] w-full"
+                  className="h-[390px] w-full"
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart 
@@ -884,17 +905,39 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
             {/* Card Mensal - Tabela */}
             <Card>
               <CardHeader>
-                <CardTitle>Instalações por Mês</CardTitle>
-                <CardDescription>
-                  {showAllPeriods 
-                    ? "Total acumulado mensal (período total)"
-                    : `Período: ${format(dateFilter.start!, "dd/MM/yy")} - ${format(dateFilter.end!, "dd/MM/yy")}`
-                  }
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Instalações por Mês</CardTitle>
+                    <CardDescription>
+                      {showAllPeriods 
+                        ? "Total acumulado mensal (período total)"
+                        : `Período: ${format(dateFilter.start!, "dd/MM/yy")} - ${format(dateFilter.end!, "dd/MM/yy")}`
+                      }
+                    </CardDescription>
+                  </div>
+                  
+                  {/* Filtro de Ano */}
+                  {availableYears.length > 1 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">Ano:</span>
+                      <Select value={selectedYear} onValueChange={setSelectedYear}>
+                        <SelectTrigger className="w-[120px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos</SelectItem>
+                          {availableYears.filter(y => y !== 'all').map(year => (
+                            <SelectItem key={year} value={year}>{year}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </div>
               </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="h-[400px] w-full">
-                  <Table>
+              <CardContent className="p-4">
+                <ScrollArea className="h-[400px] w-full rounded-lg border">
+                  <Table className="rounded-lg overflow-hidden">
                     <TableHeader className="sticky top-0 bg-background z-10">
                       <TableRow>
                         <TableHead className="w-[180px]">Mês</TableHead>
@@ -903,9 +946,9 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {getFilteredMonthlyData(filteredTimeSeriesData).length > 0 ? (
-                        getFilteredMonthlyData(filteredTimeSeriesData).map((item, index) => {
-                          const monthData = getFilteredMonthlyData(filteredTimeSeriesData);
+                      {yearFilteredMonthlyData.length > 0 ? (
+                        yearFilteredMonthlyData.map((item, index) => {
+                          const monthData = yearFilteredMonthlyData;
                           const previousInstalls = index > 0 ? monthData[index - 1].installs : 0;
                           const growth = index > 0 
                             ? ((item.installs - previousInstalls) / previousInstalls * 100)
