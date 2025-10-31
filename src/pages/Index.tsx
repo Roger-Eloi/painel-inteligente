@@ -3,17 +3,62 @@ import { CompactFileUpload } from "@/components/navbar/CompactFileUpload";
 import { FileList } from "@/components/navbar/FileList";
 import { DashboardTabs } from "@/components/layout/DashboardTabs";
 import { FloatingInsightsButton } from "@/components/insights/FloatingInsightsButton";
+import { ProcessingToast } from "@/components/navbar/ProcessingToast";
 import { BarChart3, LayoutDashboard } from "lucide-react";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
+import { useAsyncFileProcessor } from "@/hooks/useAsyncFileProcessor";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [uploadedData, setUploadedData] = useState<Array<{ name: string; data: any }>>([]);
   const [rawJsonStrings, setRawJsonStrings] = useState<string[]>([]);
+  const [showProcessingToast, setShowProcessingToast] = useState(false);
+  const { toast } = useToast();
+
+  // Parse all uploaded JSONs into widgets
+  const allWidgets = useMemo(() => {
+    const widgets: ParsedWidget[] = [];
+    uploadedData.forEach(file => {
+      const parsed = parseJsonData(file.data);
+      widgets.push(...parsed);
+    });
+    return widgets;
+  }, [uploadedData]);
+
+  const { processingState, processFiles, cancelProcessing } = useAsyncFileProcessor(
+    allWidgets,
+    undefined,
+    (results, duplicatesCount) => {
+      // Add processed files to state
+      if (results.length > 0) {
+        const newFiles = results.map(r => ({ name: r.name, data: r.data }));
+        setUploadedData((prev) => [...prev, ...newFiles]);
+        
+        const newRawStrings = results.map(r => JSON.stringify(r.data));
+        setRawJsonStrings((prev) => [...prev, ...newRawStrings]);
+
+        toast({
+          title: "Arquivos processados",
+          description: `${results.length} arquivo(s) adicionado(s)${
+            duplicatesCount > 0 ? `, ${duplicatesCount} duplicata(s) ignorada(s)` : ""
+          }`,
+        });
+      } else if (duplicatesCount > 0) {
+        toast({
+          title: "Duplicatas detectadas",
+          description: `${duplicatesCount} widget(s) duplicado(s) foram ignorados`,
+          variant: "default",
+        });
+      }
+
+      // Auto-dismiss toast after completion
+      setTimeout(() => setShowProcessingToast(false), 3000);
+    }
+  );
 
   const handleFilesUpload = (files: Array<{ name: string; data: any }>) => {
-    setUploadedData((prev) => [...prev, ...files]);
-    const newRawStrings = files.map(f => JSON.stringify(f.data));
-    setRawJsonStrings((prev) => [...prev, ...newRawStrings]);
+    setShowProcessingToast(true);
+    processFiles(files);
   };
 
   const handleRemoveFile = (index: number) => {
@@ -25,16 +70,6 @@ const Index = () => {
     setUploadedData([]);
     setRawJsonStrings([]);
   };
-
-  // Parse all uploaded JSONs into widgets
-  const allWidgets = useMemo(() => {
-    const widgets: ParsedWidget[] = [];
-    uploadedData.forEach(file => {
-      const parsed = parseJsonData(file.data);
-      widgets.push(...parsed);
-    });
-    return widgets;
-  }, [uploadedData]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -63,7 +98,10 @@ const Index = () => {
               onRemoveFile={handleRemoveFile}
               onClearAll={handleClearAll}
             />
-            <CompactFileUpload onFilesUpload={handleFilesUpload} />
+            <CompactFileUpload 
+              onFilesUpload={handleFilesUpload}
+              onProcessingStart={() => setShowProcessingToast(true)}
+            />
           </div>
           </div>
         </div>
@@ -92,6 +130,15 @@ const Index = () => {
       {/* Floating AI Insights Button */}
       {rawJsonStrings.length > 0 && (
         <FloatingInsightsButton rawJsonStrings={rawJsonStrings} />
+      )}
+
+      {/* Processing Toast */}
+      {showProcessingToast && (
+        <ProcessingToast
+          state={processingState}
+          onCancel={cancelProcessing}
+          onDismiss={() => setShowProcessingToast(false)}
+        />
       )}
 
       {/* Footer */}

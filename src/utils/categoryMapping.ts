@@ -3,6 +3,7 @@ export const CATEGORY_NAMES: Record<string, string> = {
   analytics: "Usuários",
   category5: "Keywords",
   satisfaction: "Satisfação",
+  engagement: "Engajamento",
 };
 
 export const getCategoryDisplayName = (categoryName: string): string => {

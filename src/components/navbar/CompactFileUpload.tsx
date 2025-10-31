@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -6,10 +6,10 @@ import { useToast } from "@/hooks/use-toast";
 interface CompactFileUploadProps {
   onFilesUpload: (files: Array<{ name: string; data: any }>) => void;
   onUploadSuccess?: (fileNames: string[]) => void;
+  onProcessingStart?: () => void;
 }
 
-export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess }: CompactFileUploadProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess, onProcessingStart }: CompactFileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -22,7 +22,6 @@ export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess }: CompactFil
   };
 
   const handleFiles = async (fileList: FileList) => {
-    setIsLoading(true);
     const filesArray = Array.from(fileList);
     const validFiles: Array<{ name: string; data: any }> = [];
 
@@ -50,11 +49,11 @@ export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess }: CompactFil
     }
 
     if (validFiles.length > 0) {
+      onProcessingStart?.();
       onFilesUpload(validFiles);
       onUploadSuccess?.(validFiles.map(f => f.name));
     }
 
-    setIsLoading(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -81,11 +80,10 @@ export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess }: CompactFil
         variant="outline"
         size="sm"
         onClick={() => fileInputRef.current?.click()}
-        disabled={isLoading}
         className="gap-2"
       >
         <Upload className="h-4 w-4" />
-        {isLoading ? "Carregando..." : "Carregar Arquivos"}
+        Carregar Arquivos
       </Button>
     </>
   );
