@@ -3,12 +3,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { ParsedWidget } from "@/utils/jsonParser";
 
 interface InsightsPanelProps {
   data: Array<{ name: string; data: any }>;
+  widgets: ParsedWidget[];
 }
 
-export const InsightsPanel = ({ data }: InsightsPanelProps) => {
+export const InsightsPanel = ({ data, widgets }: InsightsPanelProps) => {
   const [insights, setInsights] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,14 +24,31 @@ export const InsightsPanel = ({ data }: InsightsPanelProps) => {
     setInsights("");
 
     try {
-      // Prepare data for N8N
-      const payload = data.map(file => ({
-        filename: file.name,
-        content: file.data
-      }));
+      // Prepare enhanced payload with widget metadata
+      const payload = {
+        files: data.map(file => ({
+          filename: file.name,
+          content: file.data
+        })),
+        summary: {
+          totalWidgets: widgets.length,
+          widgetTypes: {
+            bigNumbers: widgets.filter(w => w.kind === "big_number").length,
+            charts: widgets.filter(w => ["bar", "pie", "area", "line"].includes(w.kind)).length,
+            tables: widgets.filter(w => w.kind === "table").length,
+          },
+          categories: [...new Set(widgets.map(w => w.category?.name).filter(Boolean))],
+          widgets: widgets.map(w => ({
+            name: w.name,
+            type: w.kind,
+            category: w.category?.name,
+            dataPoints: w.data?.length || 0
+          }))
+        }
+      };
 
       // Call N8N webhook with basic auth
-      const username = "produto.rankmyapp.com.br";
+      const username = "produto@rankmyapp.com.br";
       const password = "Mudar123";
       const credentials = btoa(`${username}:${password}`);
 
@@ -41,7 +60,7 @@ export const InsightsPanel = ({ data }: InsightsPanelProps) => {
             "Content-Type": "application/json",
             "Authorization": `Basic ${credentials}`
           },
-          body: JSON.stringify({ files: payload })
+          body: JSON.stringify(payload)
         }
       );
 

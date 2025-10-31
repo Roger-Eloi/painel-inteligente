@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { FileUpload } from "@/components/FileUpload";
-import { DataVisualization } from "@/components/DataVisualization";
+import { useState, useMemo } from "react";
+import { CompactFileUpload } from "@/components/navbar/CompactFileUpload";
+import { FileList } from "@/components/navbar/FileList";
+import { DashboardGrid } from "@/components/layout/DashboardGrid";
 import { InsightsPanel } from "@/components/InsightsPanel";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, LayoutDashboard } from "lucide-react";
+import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 
 const Index = () => {
   const [uploadedData, setUploadedData] = useState<Array<{ name: string; data: any }>>([]);
@@ -11,22 +13,52 @@ const Index = () => {
     setUploadedData((prev) => [...prev, ...files]);
   };
 
+  const handleRemoveFile = (index: number) => {
+    setUploadedData((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleClearAll = () => {
+    setUploadedData([]);
+  };
+
+  // Parse all uploaded JSONs into widgets
+  const allWidgets = useMemo(() => {
+    const widgets: ParsedWidget[] = [];
+    uploadedData.forEach(file => {
+      const parsed = parseJsonData(file.data);
+      widgets.push(...parsed);
+    });
+    return widgets;
+  }, [uploadedData]);
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header with Upload */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-gradient-primary p-2">
-              <BarChart3 className="h-6 w-6 text-white" />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-gradient-primary p-2">
+                <BarChart3 className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  Painel Inteligente
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Visualização e análise de dados com IA
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Painel Inteligente
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Visualização e análise de dados com IA
-              </p>
+
+            {/* Upload and File List */}
+            <div className="flex items-center gap-2">
+              <FileList 
+                files={uploadedData}
+                onRemoveFile={handleRemoveFile}
+                onClearAll={handleClearAll}
+              />
+              <CompactFileUpload onFilesUpload={handleFilesUpload} />
             </div>
           </div>
         </div>
@@ -34,20 +66,25 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Upload Section */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <FileUpload onFilesUpload={handleFilesUpload} />
+        {allWidgets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <div className="rounded-full bg-gradient-primary/10 p-6 mb-4">
+              <LayoutDashboard className="h-12 w-12 text-primary" />
             </div>
+            <h2 className="text-2xl font-bold mb-2">Bem-vindo ao Painel Inteligente</h2>
+            <p className="text-muted-foreground max-w-md mb-6">
+              Faça upload de arquivos JSON no canto superior direito para começar a visualizar seus dados com gráficos dinâmicos e insights de IA.
+            </p>
           </div>
+        ) : (
+          <div className="space-y-8">
+            {/* Dashboard Grid */}
+            <DashboardGrid widgets={allWidgets} />
 
-          {/* Visualization Section */}
-          <div className="lg:col-span-2 space-y-6">
-            <DataVisualization data={uploadedData} />
-            <InsightsPanel data={uploadedData} />
+            {/* AI Insights */}
+            <InsightsPanel data={uploadedData} widgets={allWidgets} />
           </div>
-        </div>
+        )}
       </main>
 
       {/* Footer */}
