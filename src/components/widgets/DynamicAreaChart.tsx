@@ -8,10 +8,27 @@ interface DynamicAreaChartProps {
 }
 
 export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
-  const { config, data, xField } = widget;
+  const { config, data, xField, yField } = widget;
   
   const defaultColor = widget.colors?.default || "#09738a";
-  const yAxisConfig = config?.yAxis || [];
+  
+  // yAxis can be an array of field configs or undefined
+  // If it's not an array, create one from yField
+  let yAxisConfig = config?.yAxis || [];
+  if (!Array.isArray(yAxisConfig)) {
+    yAxisConfig = [];
+  }
+  
+  // If yAxisConfig is empty but we have yField, create config from it
+  if (yAxisConfig.length === 0 && yField) {
+    const fields = yField.toString().split(',').map(f => f.trim());
+    yAxisConfig = fields.map(field => ({
+      field,
+      format: config?.yAxis?.format || "0.000a",
+      label: field.replace(/_/g, ' ').toUpperCase()
+    }));
+  }
+  
   const isLine = config?.kind === "line";
 
   return (

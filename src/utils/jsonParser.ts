@@ -51,7 +51,7 @@ const parseWidget = (widget: any, index: number): ParsedWidget => {
   }
   
   return {
-    id: documentId || `widget-${index}`,
+    id: `${documentId || slug || name}-${index}`, // Ensure unique IDs
     documentId,
     name,
     slug,
