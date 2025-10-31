@@ -5,12 +5,32 @@ import { DynamicPieChart } from "@/components/widgets/DynamicPieChart";
 import { DynamicAreaChart } from "@/components/widgets/DynamicAreaChart";
 import { DynamicTable } from "@/components/widgets/DynamicTable";
 import { StarDistributionContainer } from "@/components/widgets/StarDistributionContainer";
+import { KeywordTable } from "@/components/widgets/KeywordTable";
+import { KeywordAnalyticsCharts } from "@/components/widgets/KeywordAnalyticsCharts";
 
 interface DashboardGridProps {
   widgets: ParsedWidget[];
 }
 
 export const DashboardGrid = ({ widgets }: DashboardGridProps) => {
+  // Detectar se é categoria Keywords
+  const isKeywordsCategory = widgets[0]?.category?.name === 'category5' || 
+                             widgets[0]?.category?.slug === 'category5';
+  
+  // Se for categoria Keywords, usar layout especial
+  if (isKeywordsCategory) {
+    const tableWidget = widgets.find(w => w.kind === 'table');
+    
+    return (
+      <div className="space-y-6 animate-fade-in">
+        {tableWidget && <KeywordTable widget={tableWidget} />}
+        {tableWidget && tableWidget.data.length > 0 && (
+          <KeywordAnalyticsCharts data={tableWidget.data} />
+        )}
+      </div>
+    );
+  }
+  
   // Detectar widgets de distribuição por estrela (categoria satisfaction, slug contém "star")
   const starWidgets = widgets.filter(w => 
     w.category?.name === 'satisfaction' && 
