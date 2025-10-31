@@ -19,7 +19,7 @@ import {
   Cell,
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { Calendar as CalendarIcon, Check, X } from "lucide-react";
+import { Calendar as CalendarIcon, Check, X, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -187,6 +187,28 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
         growthPercentage = firstAvg === 0 ? (lastAvg > 0 ? 100 : 0) : ((lastAvg - firstAvg) / firstAvg) * 100;
       }
 
+      // Calcular crescimento mensal (últimos 30 dias vs 30 dias anteriores)
+      let monthlyGrowth = 0;
+      if (n >= 60) {
+        const last30Days = timeSeriesData.slice(-30);
+        const previous30Days = timeSeriesData.slice(-60, -30);
+        const last30Total = last30Days.reduce((s, i) => s + i.installs, 0);
+        const prev30Total = previous30Days.reduce((s, i) => s + i.installs, 0);
+        monthlyGrowth = prev30Total > 0 ? ((last30Total - prev30Total) / prev30Total) * 100 : 0;
+      }
+
+      // Calcular crescimento anual (se houver dados suficientes)
+      let yearlyGrowth = 0;
+      if (n >= 365) {
+        const last365Days = timeSeriesData.slice(-365);
+        const previous365Days = timeSeriesData.slice(-730, -365);
+        if (previous365Days.length > 0) {
+          const lastYearTotal = last365Days.reduce((s, i) => s + i.installs, 0);
+          const prevYearTotal = previous365Days.reduce((s, i) => s + i.installs, 0);
+          yearlyGrowth = prevYearTotal > 0 ? ((lastYearTotal - prevYearTotal) / prevYearTotal) * 100 : 0;
+        }
+      }
+
       // Agregar por dia da semana
       const byWeekday = timeSeriesData.reduce((acc: any, item) => {
         const date = new Date(item.date);
@@ -237,6 +259,8 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
         totalInstalls,
         averagePerDay,
         growthPercentage,
+        monthlyGrowth,
+        yearlyGrowth,
         timeSeriesData,
         weekdayData,
         monthlyData,
@@ -267,6 +291,9 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   }>({ start: null, end: null });
 
   const [showAllPeriods, setShowAllPeriods] = useState(true);
+
+  // Estado para tipo de visualização do gráfico
+  const [viewMode, setViewMode] = useState<'daily' | 'cumulative' | 'moving-average'>('cumulative');
 
   // Selecionar primeira série por padrão
   useEffect(() => {
@@ -325,12 +352,53 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
     }));
   };
 
+  // Calcular dados acumulados
+  const getCumulativeData = (dailyData: Array<{date: string; installs: number}>) => {
+    let accumulated = 0;
+    return dailyData.map(item => {
+      accumulated += item.installs;
+      return { date: item.date, installs: accumulated };
+    });
+  };
+
+  // Calcular média móvel
+  const getMovingAverageData = (dailyData: Array<{date: string; installs: number}>, days: number = 7) => {
+    return dailyData.map((item, index) => {
+      const start = Math.max(0, index - days + 1);
+      const slice = dailyData.slice(start, index + 1);
+      const average = slice.reduce((sum, d) => sum + d.installs, 0) / slice.length;
+      return { date: item.date, installs: Math.round(average) };
+    });
+  };
+
   // Calcular métricas dos dados filtrados
   const filteredTimeSeriesData = selectedSeries ? getFilteredData(selectedSeries.timeSeriesData) : [];
   const filteredTotalInstalls = filteredTimeSeriesData.reduce((sum, item) => sum + item.installs, 0);
   const filteredAveragePerDay = filteredTimeSeriesData.length 
     ? filteredTotalInstalls / filteredTimeSeriesData.length 
     : 0;
+
+  // Preparar dados para exibição baseado no modo de visualização
+  let displayData: Array<{date: string; installs: number}> = filteredTimeSeriesData;
+  let yAxisLabel = 'Instalações';
+  
+  if (selectedSeries && filteredTimeSeriesData.length > 0) {
+    switch (viewMode) {
+      case 'cumulative':
+        displayData = getCumulativeData(filteredTimeSeriesData);
+        yAxisLabel = 'Instalações Acumuladas';
+        break;
+      case 'moving-average':
+        displayData = getMovingAverageData(filteredTimeSeriesData, 7);
+        yAxisLabel = 'Média Móvel (7 dias)';
+        break;
+      case 'daily':
+      default:
+        displayData = filteredTimeSeriesData;
+        yAxisLabel = 'Instalações Diárias';
+        break;
+    }
+  }
 
   if (!allInstallationsSeries || allInstallationsSeries.length === 0) {
     return (
@@ -404,6 +472,40 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
       {/* Renderizar gráficos apenas da série selecionada */}
       {selectedSeries && (
         <>
+          {/* Card Principal - INSTALAÇÕES ACUMULADAS */}
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardHeader className="pb-3">
+              <CardDescription className="text-xs uppercase tracking-wider text-muted-foreground">
+                Instalações Acumuladas
+              </CardDescription>
+              <CardTitle className="text-5xl font-bold">
+                {selectedSeries.totalInstalls.toLocaleString("pt-BR")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 text-sm">
+                {selectedSeries.monthlyGrowth !== undefined && selectedSeries.monthlyGrowth !== 0 && (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <TrendingUp className="h-4 w-4" />
+                    <span className="font-semibold">
+                      {Math.abs(selectedSeries.monthlyGrowth).toFixed(2)}%
+                    </span>
+                    <span className="text-muted-foreground">(mês)</span>
+                  </div>
+                )}
+                {selectedSeries.yearlyGrowth !== undefined && selectedSeries.yearlyGrowth !== 0 && (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <TrendingUp className="h-4 w-4" />
+                    <span className="font-semibold">
+                      {Math.abs(selectedSeries.yearlyGrowth).toFixed(2)}%
+                    </span>
+                    <span className="text-muted-foreground">(ano)</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Cards de Métricas */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
@@ -445,7 +547,34 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                 </div>
                 
                 {/* Controles de Filtro */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Toggle de Modo de Visualização */}
+                  <div className="flex items-center gap-1 bg-muted p-1 rounded-md">
+                    <Button
+                      variant={viewMode === 'cumulative' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('cumulative')}
+                      className="h-8"
+                    >
+                      Acumulado
+                    </Button>
+                    <Button
+                      variant={viewMode === 'moving-average' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('moving-average')}
+                      className="h-8"
+                    >
+                      Média 7d
+                    </Button>
+                    <Button
+                      variant={viewMode === 'daily' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('daily')}
+                      className="h-8"
+                    >
+                      Diário
+                    </Button>
+                  </div>
                   <Button
                     variant={showAllPeriods ? "default" : "outline"}
                     size="sm"
@@ -478,9 +607,16 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                           to: dateFilter.end || undefined,
                         }}
                         onSelect={(range) => {
-                          if (range?.from && range?.to) {
-                            setDateFilter({ start: range.from, end: range.to });
-                            setShowAllPeriods(false);
+                          if (range?.from) {
+                            if (range?.to) {
+                              // Ambas as datas selecionadas
+                              setDateFilter({ start: range.from, end: range.to });
+                              setShowAllPeriods(false);
+                            } else {
+                              // Apenas data inicial selecionada
+                              setDateFilter({ start: range.from, end: range.from });
+                              setShowAllPeriods(false);
+                            }
                           }
                         }}
                         locale={ptBR}
@@ -509,14 +645,14 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
               <ChartContainer
                 config={{
                   installs: {
-                    label: "Instalações",
+                    label: yAxisLabel,
                     color: selectedSeries.color,
                   },
                 }}
                 className="h-[350px] w-full"
               >
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={filteredTimeSeriesData}>
+                  <AreaChart data={displayData}>
                     <defs>
                       <linearGradient id={`colorInstalls-${selectedSeries.id}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={selectedSeries.color} stopOpacity={0.3} />
@@ -535,8 +671,28 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                         (dataMin: number) => Math.floor(dataMin * 0.9),
                         'auto'
                       ]}
+                      tickFormatter={(value) => {
+                        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                        if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                        return value.toFixed(0);
+                      }}
                     />
-                    <Tooltip content={<ChartTooltipContent />} />
+                    <Tooltip 
+                      content={({ active, payload }) => {
+                        if (!active || !payload?.length) return null;
+                        const data = payload[0];
+                        return (
+                          <div className="bg-background border rounded-lg p-3 shadow-lg">
+                            <p className="text-xs text-muted-foreground mb-1">
+                              {new Date(data.payload.date).toLocaleDateString("pt-BR")}
+                            </p>
+                            <p className="font-semibold">
+                              {data.value?.toLocaleString("pt-BR")} {yAxisLabel.toLowerCase()}
+                            </p>
+                          </div>
+                        );
+                      }}
+                    />
                     <Area 
                       type="monotone" 
                       dataKey="installs" 
@@ -547,6 +703,15 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                   </AreaChart>
                 </ResponsiveContainer>
               </ChartContainer>
+              
+              {/* Descrição do Widget */}
+              {selectedSeries.widget.description && (
+                <div className="mt-4 pt-4 border-t">
+                  <p className="text-sm text-muted-foreground">
+                    {selectedSeries.widget.description}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
