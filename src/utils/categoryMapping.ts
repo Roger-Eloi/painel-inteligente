@@ -1,18 +1,32 @@
 export const CATEGORY_NAMES: Record<string, string> = {
-  Activation: "Instalações",
-  Analytics: "Usuários",
+  activation: "Instalações",
+  analytics: "Usuários",
   category5: "Keywords",
-  Satisfaction: "Satisfação",
+  satisfaction: "Satisfação",
 };
 
 export const getCategoryDisplayName = (categoryName: string): string => {
-  return CATEGORY_NAMES[categoryName] || categoryName;
+  // Try direct lookup
+  if (CATEGORY_NAMES[categoryName]) {
+    return CATEGORY_NAMES[categoryName];
+  }
+  
+  // Try lowercase lookup
+  const lowerCaseName = categoryName.toLowerCase();
+  if (CATEGORY_NAMES[lowerCaseName]) {
+    return CATEGORY_NAMES[lowerCaseName];
+  }
+  
+  return categoryName;
 };
 
 export const shouldShowFilters = (categoryName: string): boolean => {
-  return categoryName === "Keywords" || CATEGORY_NAMES[categoryName] === "Keywords";
+  const normalized = categoryName.toLowerCase();
+  return normalized === 'category5' || 
+         getCategoryDisplayName(categoryName) === 'Keywords';
 };
 
 export const shouldFormatDateInTitle = (categoryName: string): boolean => {
-  return categoryName === "Analytics" || categoryName === "Activation";
+  const normalized = categoryName.toLowerCase();
+  return normalized === 'analytics' || normalized === 'activation';
 };

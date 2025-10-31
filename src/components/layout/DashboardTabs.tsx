@@ -43,8 +43,8 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
     const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
     const displayName = getCategoryDisplayName(categoryName);
     
-    // Usar função específica para Keywords
-    if (categoryName === 'category5') {
+    // Usar função específica para Keywords (normalizar para lowercase)
+    if (categoryName.toLowerCase() === 'category5') {
       await exportKeywordsToPDF(widgetsToExport, displayName);
     } else {
       await exportDashboardToPDF(widgetsToExport, displayName);
@@ -55,8 +55,8 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
     const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
     const displayName = getCategoryDisplayName(categoryName).toLowerCase().replace(/\s+/g, '-');
     
-    // Usar função específica para Keywords
-    if (categoryName === 'category5') {
+    // Usar função específica para Keywords (normalizar para lowercase)
+    if (categoryName.toLowerCase() === 'category5') {
       exportKeywordsToCSV(widgetsToExport, `keywords-${Date.now()}`);
     } else {
       exportAllTablesToCSV(widgetsToExport, `${displayName}-data`);

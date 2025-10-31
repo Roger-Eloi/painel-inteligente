@@ -31,6 +31,12 @@ export const parseJsonData = (jsonContent: any): ParsedWidget[] => {
 const parseWidget = (widget: any, index: number): ParsedWidget => {
   const { documentId, name, slug, kind, description, category, config, data, exampleData, xField, yField, colors, labels } = widget;
   
+  // Normalize category name to lowercase for consistent mapping
+  const normalizedCategory = category ? {
+    ...category,
+    name: category.name.toLowerCase()
+  } : category;
+  
   // Extract actual data - use data if available, otherwise use exampleData
   let extractedData: any[] = [];
   
@@ -57,7 +63,7 @@ const parseWidget = (widget: any, index: number): ParsedWidget => {
     slug,
     kind,
     description,
-    category,
+    category: normalizedCategory,
     config,
     data: extractedData,
     xField,
