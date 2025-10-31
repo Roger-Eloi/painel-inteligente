@@ -4,11 +4,12 @@ import { FileList } from "@/components/navbar/FileList";
 import { DashboardTabs } from "@/components/layout/DashboardTabs";
 import { FloatingInsightsButton } from "@/components/insights/FloatingInsightsButton";
 import { ProcessingToast } from "@/components/navbar/ProcessingToast";
-import { BarChart3, LayoutDashboard } from "lucide-react";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 import { useAsyncFileProcessor } from "@/hooks/useAsyncFileProcessor";
 import { useToast } from "@/hooks/use-toast";
 import rankmyappLogo from "@/assets/rankmyapp-logo.svg";
+import rankmyappIcon from "@/assets/rankmyapp-icon.jpg";
+import chartIcon from "@/assets/chart-icon.png";
 
 const Index = () => {
   const [uploadedData, setUploadedData] = useState<Array<{ name: string; data: any }>>([]);
@@ -80,7 +81,11 @@ const Index = () => {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-gradient-primary p-2">
-                <BarChart3 className="h-6 w-6 text-white" />
+                <img 
+                  src={rankmyappIcon} 
+                  alt="RankMyApp" 
+                  className="h-6 w-6 object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
@@ -113,7 +118,11 @@ const Index = () => {
         {allWidgets.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
             <div className="rounded-full bg-gradient-primary/10 p-6 mb-4">
-              <LayoutDashboard className="h-12 w-12 text-primary" />
+              <img 
+                src={chartIcon} 
+                alt="Dashboard" 
+                className="h-12 w-12 object-contain"
+              />
             </div>
             <h2 className="text-2xl font-bold mb-2">Bem-vindo ao Painel Inteligente</h2>
             <p className="text-muted-foreground max-w-md mb-6">
