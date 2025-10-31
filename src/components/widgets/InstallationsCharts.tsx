@@ -27,21 +27,9 @@ interface InstallationsChartsProps {
 
 export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   const installationsData = useMemo(() => {
-    // DEBUG: Log dos widgets recebidos
-    console.log('[InstallationsCharts] Widgets recebidos:', widgets);
     console.log('[InstallationsCharts] Total de widgets:', widgets.length);
-    
-    widgets.forEach((w, idx) => {
-      console.log(`[InstallationsCharts] Widget ${idx}:`, {
-        name: w.name,
-        slug: w.slug,
-        category: w.category,
-        dataLength: w.data?.length,
-        sampleData: w.data?.[0]
-      });
-    });
-    
-    // Buscar widget com critérios mais flexíveis
+
+    // Buscar widget com critérios flexíveis
     const installationsWidget = widgets.find(
       (w) =>
         w.name?.toUpperCase().includes("INSTALAÇÕES") ||
@@ -51,79 +39,135 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
         w.slug?.toLowerCase().includes("activation") ||
         w.category?.slug === 'activation'
     );
-    
-    console.log('[InstallationsCharts] Widget encontrado:', installationsWidget);
-    
+
     if (!installationsWidget?.data || installationsWidget.data.length === 0) {
-      console.warn('[InstallationsCharts] Nenhum dado encontrado no widget');
+      console.warn('[InstallationsCharts] Nenhum dado encontrado');
       return null;
     }
+
+    const sample = installationsWidget.data[0] || {};
     
-    console.log('[InstallationsCharts] Primeiros 3 registros:', installationsWidget.data.slice(0, 3));
+    // Priorizar xField/yField do widget, depois tentar alternativas
+    const dateCandidates = [
+      installationsWidget.xField,
+      'createdAt',
+      'date',
+      'x',
+      'time',
+      'datetime',
+      'day',
+      'period'
+    ].filter(Boolean);
+    
+    const valueCandidates = [
+      installationsWidget.yField,
+      'maxinstalls',
+      'new_installs',
+      'installs',
+      'installation',
+      'installations',
+      'y',
+      'value',
+      'count',
+      'total',
+      'amount'
+    ].filter(Boolean);
 
-    // Detectar automaticamente os campos de data e valor
-    const detectFields = (data: any[]) => {
-      const sample = data[0];
-      
-      // Possíveis nomes de campo de data
-      const dateFields = ['date', 'x', 'time', 'datetime', 'day', 'period'];
-      const dateField = dateFields.find(f => sample[f] !== undefined);
-      
-      // Possíveis nomes de campo de valor
-      const valueFields = ['y', 'value', 'installs', 'installations', 'count', 'total', 'amount'];
-      const valueField = valueFields.find(f => sample[f] !== undefined && !isNaN(Number(sample[f])));
-      
-      console.log('[InstallationsCharts] Campos detectados:', { dateField, valueField, sample });
-      
-      return { dateField, valueField };
-    };
+    let dateField = dateCandidates.find(f => sample[f as string] !== undefined) as string;
+    let valueField = valueCandidates.find(f => 
+      sample[f as string] !== undefined && !isNaN(Number(sample[f as string]))
+    ) as string;
 
-    const { dateField, valueField } = detectFields(installationsWidget.data);
+    // Heurística: procurar por tipo
+    if (!dateField) {
+      dateField = Object.keys(sample).find(k => {
+        const v = sample[k];
+        return typeof v === 'string' && !isNaN(Date.parse(v));
+      }) || '';
+    }
+    if (!valueField) {
+      valueField = Object.keys(sample).find(k => !isNaN(Number(sample[k]))) || '';
+    }
+
+    console.log('[InstallationsCharts] Campos detectados:', { dateField, valueField });
 
     if (!dateField || !valueField) {
-      console.error('[InstallationsCharts] Não foi possível detectar campos de data ou valor');
+      console.error('[InstallationsCharts] Campos não detectados');
       return null;
     }
 
-    // Agregar e processar dados por data usando os campos detectados
-    const aggregatedByDate = installationsWidget.data.reduce((acc: any, item: any) => {
-      const date = item[dateField];
-      if (!date) return acc;
+    // Ordenar por data
+    const sorted = [...installationsWidget.data]
+      .filter(it => it[dateField] && !isNaN(Date.parse(it[dateField])))
+      .sort((a, b) => new Date(a[dateField]).getTime() - new Date(b[dateField]).getTime());
 
-      if (!acc[date]) {
-        acc[date] = { date, total: 0, count: 0 };
+    // Detectar se é série acumulada
+    const nameHint = String(valueField).toLowerCase().includes('max') || 
+                     String(installationsWidget?.config?.yAxis?.label || '').toLowerCase().includes('acumulad');
+    const monotonic = sorted.every((it, i) => 
+      i === 0 || Number(it[valueField]) >= Number(sorted[i - 1][valueField])
+    );
+    const isCumulative = nameHint || monotonic;
+
+    console.log('[InstallationsCharts] Série acumulada:', isCumulative);
+
+    // Agregar por data (desduplicar)
+    const byDate = new Map<string, { date: string; value: number }>();
+    for (const it of sorted) {
+      const d = it[dateField] as string;
+      const v = Number(it[valueField] ?? 0);
+      
+      if (!byDate.has(d)) {
+        byDate.set(d, { date: d, value: isCumulative ? v : 0 });
+      } else {
+        const existing = byDate.get(d)!;
+        if (isCumulative) {
+          // Para acumulado: manter o MAIOR valor do dia
+          byDate.set(d, { date: d, value: Math.max(existing.value, v) });
+        } else {
+          // Para não acumulado: somar valores do dia
+          byDate.set(d, { date: d, value: existing.value + v });
+        }
       }
+    }
 
-      // Somar valores usando o campo detectado
-      const value = Number(item[valueField] || 0);
-      acc[date].total += value;
-      acc[date].count++;
+    const datesAsc = [...byDate.values()].sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
 
-      return acc;
-    }, {});
+    // Converter para série diária
+    let timeSeriesData: { date: string; installs: number }[] = [];
+    
+    if (isCumulative) {
+      // Calcular instalações diárias via diferença
+      for (let i = 0; i < datesAsc.length; i++) {
+        const curr = datesAsc[i].value;
+        const prev = i > 0 ? datesAsc[i - 1].value : 0;
+        const daily = Math.max(0, curr - prev); // Proteger contra valores negativos
+        timeSeriesData.push({ date: datesAsc[i].date, installs: daily });
+      }
+    } else {
+      timeSeriesData = datesAsc.map(d => ({ date: d.date, installs: d.value }));
+    }
 
-    console.log('[InstallationsCharts] Dados agregados por data:', Object.keys(aggregatedByDate).length, 'datas únicas');
-
-    // Converter para array e ordenar por data
-    const timeSeriesData = Object.values(aggregatedByDate)
-      .map((item: any) => ({
-        date: item.date,
-        installs: item.total,
-      }))
-      .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    console.log('[InstallationsCharts] Série diária (primeiros 3):', timeSeriesData.slice(0, 3));
 
     // Calcular métricas
-    const totalInstalls = timeSeriesData.reduce((sum: number, item: any) => sum + item.installs, 0);
-    const averagePerDay = totalInstalls / timeSeriesData.length;
+    const totalInstalls = timeSeriesData.reduce((sum, item) => sum + item.installs, 0);
+    const averagePerDay = timeSeriesData.length ? totalInstalls / timeSeriesData.length : 0;
 
-    // Calcular crescimento (comparar primeira e última semana)
-    const weekData = timeSeriesData.slice(-7);
-    const firstWeekAvg = timeSeriesData.slice(0, 7).reduce((sum: any, item: any) => sum + item.installs, 0) / 7;
-    const lastWeekAvg = weekData.reduce((sum: any, item: any) => sum + item.installs, 0) / 7;
-    const growthPercentage = ((lastWeekAvg - firstWeekAvg) / firstWeekAvg) * 100;
+    // Calcular crescimento semanal
+    const n = timeSeriesData.length;
+    let growthPercentage = 0;
+    if (n >= 2) {
+      const span = n >= 14 ? 7 : Math.max(1, Math.floor(n / 2));
+      const firstAvg = timeSeriesData.slice(0, span).reduce((s, i) => s + i.installs, 0) / span;
+      const lastAvg = timeSeriesData.slice(-span).reduce((s, i) => s + i.installs, 0) / span;
+      growthPercentage = firstAvg === 0 ? (lastAvg > 0 ? 100 : 0) : ((lastAvg - firstAvg) / firstAvg) * 100;
+    }
 
     // Agregar por dia da semana
-    const byWeekday = timeSeriesData.reduce((acc: any, item: any) => {
+    const byWeekday = timeSeriesData.reduce((acc: any, item) => {
       const date = new Date(item.date);
       const weekday = date.toLocaleDateString("pt-BR", { weekday: "short" });
 
@@ -138,19 +182,15 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
     }, {});
 
     const weekdayOrder = ["dom.", "seg.", "ter.", "qua.", "qui.", "sex.", "sáb."];
-    const weekdayData = weekdayOrder
-      .map((day) => {
-        const data = byWeekday[day];
-        return data
-          ? {
-              weekday: day,
-              average: Math.round(data.total / data.count),
-            }
-          : { weekday: day, average: 0 };
-      });
+    const weekdayData = weekdayOrder.map((day) => {
+      const data = byWeekday[day];
+      return data
+        ? { weekday: day, average: Math.round(data.total / data.count) }
+        : { weekday: day, average: 0 };
+    });
 
     // Agregar por mês
-    const byMonth = timeSeriesData.reduce((acc: any, item: any) => {
+    const byMonth = timeSeriesData.reduce((acc: any, item) => {
       const date = new Date(item.date);
       const month = date.toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
 
