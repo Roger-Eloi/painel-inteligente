@@ -46,7 +46,7 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
   return (
     <Card id={`widget-${widget.id}`}>
       <CardHeader>
-        <CardTitle><strong>Nota Maior</strong></CardTitle>
+        <CardTitle><strong>{enhancedTitle}</strong></CardTitle>
         {widget.description && (
           <CardDescription className="text-xs line-clamp-2">
             {widget.description}
@@ -72,11 +72,10 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
                 borderRadius: "6px",
               }}
             />
-            {config?.legend && <Legend {...config.legend} />}
-            <Bar 
+            <Bar
               dataKey={yField} 
               radius={[4, 4, 0, 0]}
-              label={{ position: 'top', fill: 'hsl(var(--foreground))', fontSize: 14, fontWeight: 'bold' }}
+              label={{ position: 'bottom', fill: 'hsl(var(--foreground))', fontSize: 14, fontWeight: 'bold' }}
             >
               {sortedData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={getBarColor(entry)} />
