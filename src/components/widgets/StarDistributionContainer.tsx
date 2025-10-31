@@ -28,8 +28,23 @@ export const StarDistributionContainer = ({ widgets }: StarDistributionContainer
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {barWidget && <DynamicBarChart widget={barWidget} hideTitle />}
-          {pieWidget && <DynamicPieChart widget={pieWidget} hideTitle />}
+          {barWidget && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-foreground text-center">
+                Quantidade de Reviews por Nota
+              </h3>
+              <DynamicBarChart widget={barWidget} hideTitle />
+            </div>
+          )}
+          
+          {pieWidget && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-foreground text-center">
+                Percentual de Avaliações
+              </h3>
+              <DynamicPieChart widget={pieWidget} hideTitle />
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

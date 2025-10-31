@@ -34,12 +34,26 @@ export const DynamicPieChart = ({ widget, hideTitle = false }: DynamicPieChartPr
     return '⭐'.repeat(score);
   };
 
+  // Detectar se é gráfico de distribuição por estrela
+  const isStarDistribution = widget.name?.toLowerCase().includes('estrela') || 
+                             widget.name?.toLowerCase().includes('star') ||
+                             widget.slug?.toLowerCase().includes('star');
+
   // Calculate percentages
   const total = data.reduce((sum, item) => sum + (item[yField!] || 0), 0);
-  const dataWithPercentage = data.map(item => ({
+  let dataWithPercentage = data.map(item => ({
     ...item,
     percentage: ((item[yField!] / total) * 100).toFixed(1)
   }));
+
+  // Se for distribuição por estrela, ordenar de 5 para 1 (decrescente)
+  if (isStarDistribution) {
+    dataWithPercentage = dataWithPercentage.sort((a, b) => {
+      const scoreA = Number(a.score || a[xField!]);
+      const scoreB = Number(b.score || b[xField!]);
+      return scoreB - scoreA; // Ordem decrescente: 5, 4, 3, 2, 1
+    });
+  }
 
   // Custom Legend para mostrar estrelas emoji
   const renderLegend = (props: any) => {
