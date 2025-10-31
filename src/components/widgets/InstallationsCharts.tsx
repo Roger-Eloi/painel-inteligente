@@ -19,7 +19,12 @@ import {
   Cell,
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { TrendingUp, TrendingDown, Calendar, Check } from "lucide-react";
+import { Calendar as CalendarIcon, Check, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface InstallationsChartsProps {
   widgets: ParsedWidget[];
@@ -255,6 +260,14 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   // Estado para controlar qual série está selecionada
   const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
 
+  // Estados para filtros de data
+  const [dateFilter, setDateFilter] = useState<{
+    start: Date | null;
+    end: Date | null;
+  }>({ start: null, end: null });
+
+  const [showAllPeriods, setShowAllPeriods] = useState(true);
+
   // Selecionar primeira série por padrão
   useEffect(() => {
     if (allInstallationsSeries && allInstallationsSeries.length > 0 && !selectedSeriesId) {
@@ -264,6 +277,60 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
 
   // Obter série selecionada
   const selectedSeries = allInstallationsSeries?.find(s => s.id === selectedSeriesId);
+
+  // Funções de filtragem de dados por data
+  const getFilteredData = (data: Array<{date: string; installs: number}>) => {
+    if (showAllPeriods || !dateFilter.start || !dateFilter.end) {
+      return data;
+    }
+
+    const startTime = dateFilter.start.getTime();
+    const endTime = dateFilter.end.getTime();
+
+    return data.filter(item => {
+      const itemTime = new Date(item.date).getTime();
+      return itemTime >= startTime && itemTime <= endTime;
+    });
+  };
+
+  const getFilteredWeekdayData = (filteredTimeSeries: Array<{date: string; installs: number}>) => {
+    const byWeekday = filteredTimeSeries.reduce((acc: any, item) => {
+      const date = new Date(item.date);
+      const weekday = date.toLocaleDateString("pt-BR", { weekday: "short" });
+      if (!acc[weekday]) acc[weekday] = { weekday, total: 0, count: 0 };
+      acc[weekday].total += item.installs;
+      acc[weekday].count++;
+      return acc;
+    }, {});
+
+    const weekdayOrder = ["dom.", "seg.", "ter.", "qua.", "qui.", "sex.", "sáb."];
+    return weekdayOrder.map((day) => {
+      const data = byWeekday[day];
+      return data ? { weekday: day, average: Math.round(data.total / data.count) } : { weekday: day, average: 0 };
+    });
+  };
+
+  const getFilteredMonthlyData = (filteredTimeSeries: Array<{date: string; installs: number}>) => {
+    const byMonth = filteredTimeSeries.reduce((acc: any, item) => {
+      const date = new Date(item.date);
+      const month = date.toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
+      if (!acc[month]) acc[month] = { month, total: 0 };
+      acc[month].total += item.installs;
+      return acc;
+    }, {});
+
+    return Object.values(byMonth).map((item: any) => ({
+      month: item.month,
+      installs: item.total,
+    }));
+  };
+
+  // Calcular métricas dos dados filtrados
+  const filteredTimeSeriesData = selectedSeries ? getFilteredData(selectedSeries.timeSeriesData) : [];
+  const filteredTotalInstalls = filteredTimeSeriesData.reduce((sum, item) => sum + item.installs, 0);
+  const filteredAveragePerDay = filteredTimeSeriesData.length 
+    ? filteredTotalInstalls / filteredTimeSeriesData.length 
+    : 0;
 
   if (!allInstallationsSeries || allInstallationsSeries.length === 0) {
     return (
@@ -328,12 +395,6 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                   )}
                 </div>
                 
-                <div className="mt-3 pt-3 border-t">
-                  <p className="text-xs text-muted-foreground">Total Acumulado</p>
-                  <p className="text-2xl font-bold mt-1" style={{ color: series.color }}>
-                    {series.totalInstalls.toLocaleString("pt-BR")}
-                  </p>
-                </div>
               </button>
             ))}
           </div>
@@ -344,17 +405,19 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
       {selectedSeries && (
         <>
           {/* Cards de Métricas */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Total de Instalações</CardDescription>
-                <CardTitle className="text-3xl">{selectedSeries.totalInstalls.toLocaleString("pt-BR")}</CardTitle>
+                <CardTitle className="text-3xl">{filteredTotalInstalls.toLocaleString("pt-BR")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {new Date(selectedSeries.dateRange.start).toLocaleDateString("pt-BR")} -{" "}
-                  {new Date(selectedSeries.dateRange.end).toLocaleDateString("pt-BR")}
+                  <CalendarIcon className="h-3 w-3" />
+                  {showAllPeriods
+                    ? `${new Date(selectedSeries.dateRange.start).toLocaleDateString("pt-BR")} - ${new Date(selectedSeries.dateRange.end).toLocaleDateString("pt-BR")}`
+                    : `${format(dateFilter.start!, "dd/MM/yyyy")} - ${format(dateFilter.end!, "dd/MM/yyyy")}`
+                  }
                 </p>
               </CardContent>
             </Card>
@@ -362,23 +425,12 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Média por Dia</CardDescription>
-                <CardTitle className="text-3xl">{Math.round(selectedSeries.averagePerDay).toLocaleString("pt-BR")}</CardTitle>
+                <CardTitle className="text-3xl">{Math.round(filteredAveragePerDay).toLocaleString("pt-BR")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xs text-muted-foreground">Instalações diárias em média</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription>Crescimento Semanal</CardDescription>
-                <CardTitle className={`text-3xl flex items-center gap-2 ${selectedSeries.growthPercentage >= 0 ? "text-success" : "text-destructive"}`}>
-                  {selectedSeries.growthPercentage >= 0 ? <TrendingUp className="h-6 w-6" /> : <TrendingDown className="h-6 w-6" />}
-                  {Math.abs(selectedSeries.growthPercentage).toFixed(1)}%
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs text-muted-foreground">Comparação última vs. primeira semana</p>
+                <p className="text-xs text-muted-foreground">
+                  {showAllPeriods ? "Período total" : "Período filtrado"}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -386,8 +438,72 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
           {/* Gráfico de Área - Evolução Temporal */}
           <Card>
             <CardHeader>
-              <CardTitle>Evolução das Instalações - {selectedSeries.name}</CardTitle>
-              <CardDescription>Acompanhamento diário de novas instalações</CardDescription>
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <CardTitle>Evolução das Instalações - {selectedSeries.name}</CardTitle>
+                  <CardDescription>Acompanhamento diário de novas instalações</CardDescription>
+                </div>
+                
+                {/* Controles de Filtro */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={showAllPeriods ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setShowAllPeriods(true);
+                      setDateFilter({ start: null, end: null });
+                    }}
+                  >
+                    Período Total
+                  </Button>
+                  
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={!showAllPeriods ? "default" : "outline"}
+                        size="sm"
+                        className="gap-2"
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                        {dateFilter.start && dateFilter.end
+                          ? `${format(dateFilter.start, "dd/MM/yy", { locale: ptBR })} - ${format(dateFilter.end, "dd/MM/yy", { locale: ptBR })}`
+                          : "Filtrar por Data"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="end">
+                      <Calendar
+                        mode="range"
+                        selected={{
+                          from: dateFilter.start || undefined,
+                          to: dateFilter.end || undefined,
+                        }}
+                        onSelect={(range) => {
+                          if (range?.from && range?.to) {
+                            setDateFilter({ start: range.from, end: range.to });
+                            setShowAllPeriods(false);
+                          }
+                        }}
+                        locale={ptBR}
+                        numberOfMonths={2}
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  
+                  {!showAllPeriods && dateFilter.start && dateFilter.end && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setDateFilter({ start: null, end: null });
+                        setShowAllPeriods(true);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <ChartContainer
@@ -400,7 +516,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                 className="h-[350px] w-full"
               >
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={selectedSeries.timeSeriesData}>
+                  <AreaChart data={filteredTimeSeriesData}>
                     <defs>
                       <linearGradient id={`colorInstalls-${selectedSeries.id}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={selectedSeries.color} stopOpacity={0.3} />
@@ -440,7 +556,12 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
             <Card>
               <CardHeader>
                 <CardTitle>Distribuição por Dia da Semana</CardTitle>
-                <CardDescription>Média de instalações por dia</CardDescription>
+                <CardDescription>
+                  {showAllPeriods 
+                    ? "Média de instalações por dia (período total)"
+                    : `Período: ${format(dateFilter.start!, "dd/MM/yy")} - ${format(dateFilter.end!, "dd/MM/yy")}`
+                  }
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer
@@ -453,7 +574,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                   className="h-[300px] w-full"
                 >
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={selectedSeries.weekdayData}>
+                    <BarChart data={getFilteredWeekdayData(filteredTimeSeriesData)}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                       <XAxis dataKey="weekday" className="text-xs" />
                       <YAxis 
@@ -475,7 +596,12 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
             <Card>
               <CardHeader>
                 <CardTitle>Instalações por Mês</CardTitle>
-                <CardDescription>Total acumulado mensal</CardDescription>
+                <CardDescription>
+                  {showAllPeriods 
+                    ? "Total acumulado mensal (período total)"
+                    : `Período: ${format(dateFilter.start!, "dd/MM/yy")} - ${format(dateFilter.end!, "dd/MM/yy")}`
+                  }
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer
@@ -488,7 +614,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                   className="h-[300px] w-full"
                 >
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={selectedSeries.monthlyData}>
+                    <BarChart data={getFilteredMonthlyData(filteredTimeSeriesData)}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                       <XAxis dataKey="month" className="text-xs" />
                       <YAxis 
