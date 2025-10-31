@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DashboardGrid } from "./DashboardGrid";
 import { DashboardFilters } from "@/components/filters/DashboardFilters";
 import { ParsedWidget } from "@/utils/jsonParser";
-import { exportDashboardToPDF, exportAllTablesToCSV } from "@/utils/exportHelpers";
+import { exportDashboardToPDF, exportAllTablesToCSV, exportKeywordsToPDF, exportKeywordsToCSV } from "@/utils/exportHelpers";
 import { getCategoryDisplayName } from "@/utils/categoryMapping";
 import { FileDown, FileSpreadsheet } from "lucide-react";
 
@@ -42,13 +42,25 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
   const handleExportPDF = async (categoryName: string) => {
     const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
     const displayName = getCategoryDisplayName(categoryName);
-    await exportDashboardToPDF(widgetsToExport, displayName);
+    
+    // Usar função específica para Keywords
+    if (categoryName === 'category5') {
+      await exportKeywordsToPDF(widgetsToExport, displayName);
+    } else {
+      await exportDashboardToPDF(widgetsToExport, displayName);
+    }
   };
 
   const handleExportCSV = (categoryName: string) => {
     const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
     const displayName = getCategoryDisplayName(categoryName).toLowerCase().replace(/\s+/g, '-');
-    exportAllTablesToCSV(widgetsToExport, `${displayName}-data`);
+    
+    // Usar função específica para Keywords
+    if (categoryName === 'category5') {
+      exportKeywordsToCSV(widgetsToExport, `keywords-${Date.now()}`);
+    } else {
+      exportAllTablesToCSV(widgetsToExport, `${displayName}-data`);
+    }
   };
 
   const handleExportAllPDF = async () => {

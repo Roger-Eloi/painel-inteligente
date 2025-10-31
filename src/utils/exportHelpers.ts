@@ -175,3 +175,117 @@ export const exportAllTablesToCSV = (widgets: ParsedWidget[], filename: string) 
   link.download = `${filename}.csv`;
   link.click();
 };
+
+// Exportar keywords completas em PDF (TODAS as keywords, sem limite)
+export const exportKeywordsToPDF = async (
+  widgets: ParsedWidget[],
+  categoryName: string
+) => {
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  
+  pdf.setFontSize(18);
+  pdf.text(`Relatório: ${categoryName}`, pageWidth / 2, 15, { align: 'center' });
+  pdf.setFontSize(10);
+  pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, 22, { align: 'center' });
+
+  let yPosition = 30;
+
+  for (const widget of widgets) {
+    // Focar apenas em tabelas de keywords
+    if (widget.kind === 'table') {
+      if (yPosition + 30 > pdf.internal.pageSize.getHeight() - 20) {
+        pdf.addPage();
+        yPosition = 15;
+      }
+      
+      pdf.setFontSize(12);
+      pdf.text(widget.config?.title?.text || widget.name, 15, yPosition);
+      yPosition += 7;
+
+      const headers = widget.config?.yAxis?.map((axis: any) => axis.label) || [];
+      
+      // INCLUIR TODAS as keywords (sem slice)
+      const rows = widget.data.map(row => {
+        return widget.config?.yAxis?.map((axis: any) => {
+          const value = row.columns?.find((col: any) => col.field === axis.field)?.value;
+          return value !== undefined ? value : '';
+        }) || [];
+      });
+
+      autoTable(pdf, {
+        startY: yPosition,
+        head: [headers],
+        body: rows,
+        theme: 'grid',
+        styles: { fontSize: 7 },  // Fonte menor para caber mais dados
+        headStyles: { 
+          fillColor: [9, 115, 138],
+          fontSize: 8,
+          fontStyle: 'bold'
+        },
+        margin: { left: 10, right: 10 },
+        tableWidth: 'auto',
+        showHead: 'everyPage',
+        didDrawPage: (data) => {
+          // Adicionar número de página
+          const pageCount = (pdf as any).internal.getNumberOfPages();
+          const currentPage = (pdf as any).internal.getCurrentPageInfo().pageNumber;
+          pdf.setFontSize(8);
+          pdf.text(
+            `Página ${currentPage} de ${pageCount}`,
+            pageWidth - 30,
+            pdf.internal.pageSize.getHeight() - 10
+          );
+        }
+      });
+
+      yPosition = (pdf as any).lastAutoTable.finalY + 10;
+    }
+
+    // Adicionar nova página se necessário
+    if (yPosition > pdf.internal.pageSize.getHeight() - 30) {
+      pdf.addPage();
+      yPosition = 15;
+    }
+  }
+
+  pdf.save(`keywords-completo-${Date.now()}.pdf`);
+};
+
+// Exportar keywords para CSV (sem campo widget, UTF-8 com BOM)
+export const exportKeywordsToCSV = (widgets: ParsedWidget[], filename: string) => {
+  const allData: any[] = [];
+
+  widgets.forEach(widget => {
+    if (widget.kind === 'table') {
+      const headers = widget.config?.yAxis?.map((axis: any) => axis.field) || [];
+      widget.data.forEach(row => {
+        const rowData: any = {}; // SEM campo widget
+        headers.forEach(field => {
+          const value = row.columns?.find((col: any) => col.field === field)?.value;
+          rowData[field] = value;
+        });
+        allData.push(rowData);
+      });
+    }
+  });
+
+  if (allData.length === 0) {
+    console.warn('No keyword data to export');
+    return;
+  }
+
+  // Gerar CSV com UTF-8 BOM para compatibilidade com Excel
+  const csv = Papa.unparse(allData);
+  
+  // Adicionar BOM (Byte Order Mark) para UTF-8
+  const BOM = '\uFEFF';
+  const csvWithBOM = BOM + csv;
+  
+  const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${filename}.csv`;
+  link.click();
+};

@@ -17,6 +17,7 @@ interface DashboardFiltersProps {
 export const DashboardFilters = ({ category, widgets, onFilterChange }: DashboardFiltersProps) => {
   const [keywordSearch, setKeywordSearch] = useState('');
   const [competitivityFilter, setCompetitivityFilter] = useState<string>('all');
+  const [sortByPosition, setSortByPosition] = useState<'asc' | 'desc' | 'none'>('none');
 
   useEffect(() => {
     let filtered = [...widgets];
@@ -25,7 +26,7 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
     if (shouldShowFilters(category)) {
       filtered = filtered.map(widget => {
         if (widget.kind === 'table') {
-          const filteredData = widget.data.filter(row => {
+          let filteredData = widget.data.filter(row => {
             // Buscar keyword
             const keywordColumn = row.columns?.find((col: any) => col.field === 'keyword');
             const keyword = keywordColumn?.value || '';
@@ -45,6 +46,18 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
             return true;
           });
 
+          // Aplicar ordenação por posição
+          if (sortByPosition !== 'none') {
+            filteredData = [...filteredData].sort((a, b) => {
+              const posA = a.columns?.find((col: any) => col.field === 'position')?.value || 0;
+              const posB = b.columns?.find((col: any) => col.field === 'position')?.value || 0;
+              
+              return sortByPosition === 'asc' 
+                ? posA - posB  // Menor para maior
+                : posB - posA; // Maior para menor
+            });
+          }
+
           return { ...widget, data: filteredData };
         }
         return widget;
@@ -52,19 +65,19 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
     }
 
     onFilterChange(filtered);
-  }, [keywordSearch, competitivityFilter, widgets, category]);
+  }, [keywordSearch, competitivityFilter, sortByPosition, widgets, category]);
 
   // Só mostrar filtros para Acompanhamento de Keywords
   if (!shouldShowFilters(category)) {
     return null;
   }
 
-  const hasFilters = keywordSearch || competitivityFilter !== 'all';
+  const hasFilters = keywordSearch || competitivityFilter !== 'all' || sortByPosition !== 'none';
 
   return (
     <Card className="mb-6">
       <CardContent className="pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Busca por Keyword */}
           <div>
             <Label htmlFor="keyword-search" className="text-sm font-medium mb-2 block">
@@ -105,6 +118,26 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
             </Select>
           </div>
 
+          {/* Ordenação por Posição */}
+          <div>
+            <Label className="text-sm font-medium mb-2 block">
+              Ordenar por Posição
+            </Label>
+            <Select
+              value={sortByPosition}
+              onValueChange={(value: 'asc' | 'desc' | 'none') => setSortByPosition(value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sem ordenação" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sem ordenação</SelectItem>
+                <SelectItem value="asc">Menor → Maior (1, 2, 3...)</SelectItem>
+                <SelectItem value="desc">Maior → Menor (...3, 2, 1)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Botão de Limpar */}
           <div className="flex items-end">
             <Button
@@ -112,6 +145,7 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
               onClick={() => {
                 setKeywordSearch('');
                 setCompetitivityFilter('all');
+                setSortByPosition('none');
               }}
               className="w-full"
               disabled={!hasFilters}
