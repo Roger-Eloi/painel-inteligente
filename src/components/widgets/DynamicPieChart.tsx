@@ -66,11 +66,8 @@ export const DynamicPieChart = ({ widget }: DynamicPieChartProps) => {
     );
   };
 
-  // Enhanced title with date range
-  const dateRangeText = getDateRangeDescription(data);
-  const enhancedTitle = dateRangeText 
-    ? `${config?.title?.text || widget.name} - ${dateRangeText}`
-    : config?.title?.text || widget.name;
+  // Title without date range for pie charts
+  const enhancedTitle = config?.title?.text || widget.name;
 
   return (
     <Card id={`widget-${widget.id}`}>

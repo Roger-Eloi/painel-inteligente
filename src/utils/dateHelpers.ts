@@ -1,6 +1,6 @@
-export const getDateRangeDescription = (data: any[]): string => {
+export const getDateRangeDescription = (data: any[], titleText?: string): string => {
   if (!data || data.length === 0 || !data[0]?.date) {
-    return '';
+    return titleText || '';
   }
 
   const dates = data
@@ -8,29 +8,31 @@ export const getDateRangeDescription = (data: any[]): string => {
     .filter(date => !isNaN(date.getTime()))
     .sort((a, b) => a.getTime() - b.getTime());
 
-  if (dates.length === 0) return '';
+  if (dates.length === 0) return titleText || '';
 
   const startDate = dates[0];
   const endDate = dates[dates.length - 1];
 
-  const diffDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+  const formatDateWithoutYear = (date: Date) => {
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
   };
 
-  let periodDescription = '';
-  if (diffDays <= 7) {
-    periodDescription = 'Última semana';
-  } else if (diffDays <= 31) {
-    periodDescription = 'Último mês';
-  } else if (diffDays <= 90) {
-    periodDescription = 'Últimos 3 meses';
-  } else if (diffDays <= 180) {
-    periodDescription = 'Últimos 6 meses';
+  const startYear = startDate.getFullYear();
+  const endYear = endDate.getFullYear();
+
+  let dateRangeText = '';
+  
+  if (startYear === endYear) {
+    // Mesmo ano: "25/jun à 29/jun, 2025"
+    dateRangeText = `${formatDateWithoutYear(startDate)} à ${formatDateWithoutYear(endDate)}, ${startYear}`;
   } else {
-    periodDescription = 'Período analisado';
+    // Anos diferentes: "25/jun/2024 à 29/jun/2025"
+    dateRangeText = `${startDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })} à ${endDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}`;
   }
 
-  return `${periodDescription} (${formatDate(startDate)} - ${formatDate(endDate)})`;
+  if (titleText) {
+    return `${titleText} (${dateRangeText})`;
+  }
+  
+  return `(${dateRangeText})`;
 };

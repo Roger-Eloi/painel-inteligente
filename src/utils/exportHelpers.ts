@@ -86,25 +86,49 @@ export const exportDashboardToPDF = async (
       yPosition = (pdf as any).lastAutoTable.finalY + 10;
     }
 
-    // Gráficos (captura de tela)
+    // Gráficos (captura de tela com 300 DPI)
     if (['bar', 'pie', 'area', 'line'].includes(widget.kind)) {
       const element = document.getElementById(`widget-${widget.id}`);
       if (element) {
         try {
+          // Capturar com alta resolução (300 DPI = scale 4.17 para 72 DPI base)
           const canvas = await html2canvas(element, { 
-            scale: 2,
+            scale: 4.17,  // 300 DPI / 72 DPI = 4.17
             logging: false,
-            useCORS: true
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            windowWidth: element.scrollWidth,
+            windowHeight: element.scrollHeight,
           });
+          
           const imgData = canvas.toDataURL('image/png');
           
-          if (yPosition + 80 > pdf.internal.pageSize.getHeight() - 20) {
+          // Calcular dimensões reais mantendo proporção
+          const imgWidth = element.offsetWidth * 0.264583;  // Converter px para mm (1px = 0.264583mm)
+          const imgHeight = element.offsetHeight * 0.264583;
+          
+          // Verificar se cabe na página
+          const maxWidth = pageWidth - 30; // Margens de 15mm de cada lado
+          const maxHeight = pdf.internal.pageSize.getHeight() - yPosition - 20;
+          
+          let finalWidth = imgWidth;
+          let finalHeight = imgHeight;
+          
+          // Redimensionar se necessário, mantendo proporção
+          if (imgWidth > maxWidth) {
+            finalWidth = maxWidth;
+            finalHeight = (imgHeight * maxWidth) / imgWidth;
+          }
+          
+          if (finalHeight > maxHeight) {
             pdf.addPage();
             yPosition = 15;
+            finalHeight = Math.min(finalHeight, pdf.internal.pageSize.getHeight() - 40);
+            finalWidth = (imgWidth * finalHeight) / imgHeight;
           }
-
-          pdf.addImage(imgData, 'PNG', 15, yPosition, 180, 80);
-          yPosition += 90;
+          
+          pdf.addImage(imgData, 'PNG', 15, yPosition, finalWidth, finalHeight);
+          yPosition += finalHeight + 10;
         } catch (error) {
           console.error('Error capturing chart:', error);
         }

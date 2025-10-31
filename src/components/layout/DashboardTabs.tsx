@@ -5,22 +5,12 @@ import { DashboardGrid } from "./DashboardGrid";
 import { DashboardFilters } from "@/components/filters/DashboardFilters";
 import { ParsedWidget } from "@/utils/jsonParser";
 import { exportDashboardToPDF, exportAllTablesToCSV } from "@/utils/exportHelpers";
+import { getCategoryDisplayName } from "@/utils/categoryMapping";
 import { FileDown, FileSpreadsheet } from "lucide-react";
 
 interface DashboardTabsProps {
   widgets: ParsedWidget[];
 }
-
-// Mapeamento de nomes de categorias
-const categoryNameMapping: Record<string, string> = {
-  "Activation": "Instalações",
-  "Analytics": "Keywords",
-  "Satisfaction": "Satisfação",
-};
-
-const getCategoryDisplayName = (categoryName: string): string => {
-  return categoryNameMapping[categoryName] || categoryName;
-};
 
 export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
   // Agrupar widgets por categoria
@@ -131,26 +121,6 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
       
       {/* Aba "Todos" */}
       <TabsContent value="todos" className="animate-fade-in mt-0">
-        <div className="flex justify-end items-center mb-4">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportAllPDF}
-            >
-              <FileDown className="h-4 w-4 mr-2" />
-              Exportar PDF
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportAllCSV}
-            >
-              <FileSpreadsheet className="h-4 w-4 mr-2" />
-              Exportar CSV
-            </Button>
-          </div>
-        </div>
         <DashboardGrid widgets={widgets} />
       </TabsContent>
       

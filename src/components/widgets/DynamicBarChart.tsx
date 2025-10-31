@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { ParsedWidget } from "@/utils/jsonParser";
 import { calculateYAxisDomain } from "@/utils/chartHelpers";
 import { getDateRangeDescription } from "@/utils/dateHelpers";
+import { shouldFormatDateInTitle } from "@/utils/categoryMapping";
 
 interface DynamicBarChartProps {
   widget: ParsedWidget;
@@ -29,11 +30,13 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
   const yFields = [yField].filter(Boolean) as string[];
   const [minDomain, maxDomain] = calculateYAxisDomain(sortedData, yFields);
 
-  // Enhanced title with date range
-  const dateRangeText = getDateRangeDescription(sortedData);
-  const enhancedTitle = dateRangeText 
-    ? `${config?.title?.text || widget.name} - ${dateRangeText}`
-    : config?.title?.text || widget.name;
+  // Enhanced title with date range (only for Usuários and Instalações)
+  const titleText = config?.title?.text || widget.name;
+  const categoryName = widget.category?.name || '';
+  
+  const enhancedTitle = shouldFormatDateInTitle(categoryName)
+    ? getDateRangeDescription(sortedData, titleText)
+    : titleText;
 
   const getBarColor = (entry: any) => {
     const colorByField = config?.color?.byField;

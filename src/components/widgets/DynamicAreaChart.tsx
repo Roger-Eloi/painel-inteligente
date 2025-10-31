@@ -4,6 +4,7 @@ import { ParsedWidget } from "@/utils/jsonParser";
 import { formatDate } from "@/utils/formatters";
 import { calculateYAxisDomain } from "@/utils/chartHelpers";
 import { getDateRangeDescription } from "@/utils/dateHelpers";
+import { shouldFormatDateInTitle } from "@/utils/categoryMapping";
 
 interface DynamicAreaChartProps {
   widget: ParsedWidget;
@@ -35,11 +36,13 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   const yFields = yAxisConfig.map((axis: any) => axis.field);
   const [minDomain, maxDomain] = calculateYAxisDomain(data, yFields);
 
-  // Enhanced title with date range
-  const dateRangeText = getDateRangeDescription(data);
-  const enhancedTitle = dateRangeText 
-    ? `${config?.title?.text || widget.name} - ${dateRangeText}`
-    : config?.title?.text || widget.name;
+  // Enhanced title with date range (only for Usuários and Instalações)
+  const titleText = config?.title?.text || widget.name;
+  const categoryName = widget.category?.name || '';
+  
+  const enhancedTitle = shouldFormatDateInTitle(categoryName)
+    ? getDateRangeDescription(data, titleText)
+    : titleText;
   
   const isLine = config?.kind === "line";
 

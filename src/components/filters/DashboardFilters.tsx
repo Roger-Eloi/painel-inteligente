@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ParsedWidget } from "@/utils/jsonParser";
+import { shouldShowFilters } from "@/utils/categoryMapping";
 import { Search, X } from "lucide-react";
 
 interface DashboardFiltersProps {
@@ -20,8 +21,8 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
   useEffect(() => {
     let filtered = [...widgets];
 
-    // Filtros específicos para Keywords (Analytics)
-    if (category === 'Analytics' || category === 'Keywords') {
+    // Filtros específicos para Keywords (category5)
+    if (shouldShowFilters(category)) {
       filtered = filtered.map(widget => {
         if (widget.kind === 'table') {
           const filteredData = widget.data.filter(row => {
@@ -53,8 +54,8 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
     onFilterChange(filtered);
   }, [keywordSearch, competitivityFilter, widgets, category]);
 
-  // Não mostrar filtros para categorias sem suporte específico
-  if (category !== 'Analytics' && category !== 'Keywords') {
+  // Só mostrar filtros para Acompanhamento de Keywords
+  if (!shouldShowFilters(category)) {
     return null;
   }
 
