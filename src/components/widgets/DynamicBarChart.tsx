@@ -68,7 +68,7 @@ export const DynamicBarChart = ({
             border: '1px solid hsl(var(--border))',
             borderRadius: '6px'
           }} />
-            {config?.legend && <Legend {...config.legend} />}
+            {config?.legend}
             <Bar dataKey={yField} radius={[4, 4, 0, 0]}>
               {sortedData.map((entry, index) => <Cell key={`cell-${index}`} fill={getBarColor(entry)} />)}
             </Bar>
