@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { ParsedWidget } from "@/utils/jsonParser";
@@ -5,6 +6,7 @@ import { formatDate } from "@/utils/formatters";
 import { calculateYAxisDomain } from "@/utils/chartHelpers";
 import { getDateRangeDescription } from "@/utils/dateHelpers";
 import { shouldFormatDateInTitle } from "@/utils/categoryMapping";
+import { Switch } from "@/components/ui/switch";
 
 interface DynamicAreaChartProps {
   widget: ParsedWidget;
@@ -12,6 +14,10 @@ interface DynamicAreaChartProps {
 
 export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   const { config, data, xField, yField } = widget;
+  
+  // Estados para alternar visualização (apenas para gráficos com múltiplas séries)
+  const [showCombined, setShowCombined] = useState(true);
+  const [selectedSeriesIndex, setSelectedSeriesIndex] = useState(0);
   
   // Cores predefinidas para múltiplas séries
   const defaultColors = ["#09738a", "#f97316", "#8b5cf6", "#10b981", "#ef4444"];
@@ -47,6 +53,9 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   const yFields = yAxisConfig.map((axis: any) => axis.field);
   const [minDomain, maxDomain] = calculateYAxisDomain(data, yFields);
 
+  // Mostrar toggle apenas para gráficos com múltiplas séries
+  const hasMultipleSeries = yAxisConfig.length > 1;
+
   // Enhanced title with date range (only for Usuários and Instalações)
   const categoryName = widget.category?.name || '';
   
@@ -59,12 +68,43 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   return (
     <Card id={`widget-${widget.id}`}>
       <CardHeader>
-        <CardTitle>{titleText}</CardTitle>
-        {widget.description && !isSatisfactionCategory && (
-          <CardDescription className="text-xs line-clamp-2">
-            {widget.description}
-          </CardDescription>
-        )}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <CardTitle>{titleText}</CardTitle>
+            {widget.description && !isSatisfactionCategory && (
+              <CardDescription className="text-xs line-clamp-2">
+                {widget.description}
+              </CardDescription>
+            )}
+          </div>
+          
+          {/* Toggle e Seletor para múltiplas séries */}
+          {hasMultipleSeries && (
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {!showCombined && (
+                <select
+                  value={selectedSeriesIndex}
+                  onChange={(e) => setSelectedSeriesIndex(Number(e.target.value))}
+                  className="text-sm border rounded px-2 py-1 bg-background"
+                >
+                  {yAxisConfig.map((axis: any, idx: number) => (
+                    <option key={idx} value={idx}>
+                      {axis.label || axis.field}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                {showCombined ? 'Combinado' : 'Individual'}
+              </span>
+              <Switch
+                checked={showCombined}
+                onCheckedChange={setShowCombined}
+                aria-label="Alternar visualização"
+              />
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
@@ -121,7 +161,7 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
                 ];
               }}
             />
-            {yAxisConfig.length > 1 && (
+            {yAxisConfig.length > 1 && showCombined && (
               <Legend 
                 wrapperStyle={{ paddingTop: '20px' }}
                 iconType="line"
@@ -136,6 +176,12 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
             )}
             {yAxisConfig.map((axis: any, index: number) => {
               const seriesColor = getSeriesColor(index, axis.color);
+              
+              // Se showCombined estiver desativado, mostrar apenas a série selecionada
+              if (hasMultipleSeries && !showCombined && index !== selectedSeriesIndex) {
+                return null;
+              }
+              
               return (
                 <Area
                   key={axis.field}
