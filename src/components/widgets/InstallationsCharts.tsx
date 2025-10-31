@@ -20,6 +20,7 @@ import {
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { Calendar as CalendarIcon, Check, X, TrendingUp, TrendingDown } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -291,9 +292,29 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   }>({ start: null, end: null });
 
   const [showAllPeriods, setShowAllPeriods] = useState(true);
+  const [useCompactNumbers, setUseCompactNumbers] = useState(true);
 
   // Estado para tipo de visualização do gráfico
   const [viewMode, setViewMode] = useState<'daily' | 'cumulative' | 'moving-average'>('cumulative');
+
+  // Função para formatar números de forma compacta
+  const formatNumber = (value: number, compact: boolean = useCompactNumbers): string => {
+    if (!compact) {
+      return value.toLocaleString('pt-BR');
+    }
+    
+    // Formato compacto
+    if (value >= 1000000000) {
+      return `${(value / 1000000000).toFixed(1)}B`;
+    }
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M`;
+    }
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}K`;
+    }
+    return value.toLocaleString('pt-BR');
+  };
 
   // Selecionar primeira série por padrão
   useEffect(() => {
@@ -428,11 +449,31 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Card de Seleção de Arquivo */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Selecione o Período</CardTitle>
-          <CardDescription>Escolha qual arquivo de instalações deseja visualizar</CardDescription>
-        </CardHeader>
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle>Selecione o Período</CardTitle>
+                <CardDescription>Escolha qual arquivo de instalações deseja visualizar</CardDescription>
+              </div>
+              
+              {/* Toggle de Formatação Compacta */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  {useCompactNumbers ? 'Compacto' : 'Completo'}
+                </span>
+                <Toggle
+                  pressed={useCompactNumbers}
+                  onPressedChange={setUseCompactNumbers}
+                  variant="outline"
+                  size="sm"
+                  aria-label="Alternar formatação de números"
+                >
+                  {useCompactNumbers ? '110.3M' : '110.334.586'}
+                </Toggle>
+              </div>
+            </div>
+          </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {allInstallationsSeries.map((series) => (
@@ -478,9 +519,9 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
               <CardDescription className="text-xs uppercase tracking-wider text-muted-foreground">
                 Instalações Acumuladas
               </CardDescription>
-              <CardTitle className="text-5xl font-bold">
-                {selectedSeries.totalInstalls.toLocaleString("pt-BR")}
-              </CardTitle>
+            <CardTitle className="text-5xl font-bold">
+              {formatNumber(selectedSeries.totalInstalls)}
+            </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex gap-4 text-sm">
@@ -511,7 +552,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Total de Instalações</CardDescription>
-                <CardTitle className="text-3xl">{filteredTotalInstalls.toLocaleString("pt-BR")}</CardTitle>
+                <CardTitle className="text-3xl">{formatNumber(filteredTotalInstalls)}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -527,7 +568,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Média por Dia</CardDescription>
-                <CardTitle className="text-3xl">{Math.round(filteredAveragePerDay).toLocaleString("pt-BR")}</CardTitle>
+                <CardTitle className="text-3xl">{formatNumber(Math.round(filteredAveragePerDay))}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-muted-foreground">
@@ -686,9 +727,9 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                             <p className="text-xs text-muted-foreground mb-1">
                               {new Date(data.payload.date).toLocaleDateString("pt-BR")}
                             </p>
-                            <p className="font-semibold">
-                              {data.value?.toLocaleString("pt-BR")} {yAxisLabel.toLowerCase()}
-                            </p>
+                  <p className="font-semibold">
+                    {formatNumber(Number(data.value) || 0)} {yAxisLabel.toLowerCase()}
+                  </p>
                           </div>
                         );
                       }}
@@ -765,11 +806,11 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                         dataKey="average" 
                         fill="url(#weekdayGradient)"
                         radius={[0, 8, 8, 0]}
-                        label={{
-                          position: 'right',
-                          formatter: (value: number) => value.toLocaleString('pt-BR'),
-                          style: { fontSize: '11px', fontWeight: 'bold', fill: selectedSeries.color }
-                        }}
+                  label={{
+                    position: 'right',
+                    formatter: (value: number) => formatNumber(value),
+                    style: { fontSize: '11px', fontWeight: 'bold', fill: selectedSeries.color }
+                  }}
                       />
                     </BarChart>
                   </ResponsiveContainer>
@@ -806,9 +847,9 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                           <p className="text-sm font-medium text-muted-foreground">
                             {item.month}
                           </p>
-                          <p className="text-2xl font-bold" style={{ color: selectedSeries.color }}>
-                            {item.installs.toLocaleString('pt-BR')}
-                          </p>
+                <p className="text-2xl font-bold" style={{ color: selectedSeries.color }}>
+                  {formatNumber(item.installs)}
+                </p>
                         </div>
                         {growth !== null && (
                           <div className={`flex items-center gap-1 text-sm font-medium ${
