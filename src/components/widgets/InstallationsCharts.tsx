@@ -285,11 +285,20 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   // Estado para controlar qual série está selecionada
   const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
 
-  // Estados para filtros de data
+  // Estados para filtros de data - inicializar com período total pré-selecionado
   const [dateFilter, setDateFilter] = useState<{
     start: Date | null;
     end: Date | null;
-  }>({ start: null, end: null });
+  }>(() => {
+    if (allInstallationsSeries && allInstallationsSeries.length > 0) {
+      const firstSeries = allInstallationsSeries[0];
+      return {
+        start: new Date(firstSeries.dateRange.start),
+        end: new Date(firstSeries.dateRange.end)
+      };
+    }
+    return { start: null, end: null };
+  });
 
   const [showAllPeriods, setShowAllPeriods] = useState(true);
   const [useCompactNumbers, setUseCompactNumbers] = useState(true);
@@ -325,6 +334,26 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
 
   // Obter série selecionada
   const selectedSeries = allInstallationsSeries?.find(s => s.id === selectedSeriesId);
+
+  // Calcular range de datas disponíveis no JSON
+  const availableDateRange = useMemo(() => {
+    if (!selectedSeries?.timeSeriesData || selectedSeries.timeSeriesData.length === 0) {
+      return { minDate: new Date(), maxDate: new Date() };
+    }
+    
+    const dates = selectedSeries.timeSeriesData
+      .map(item => new Date(item.date))
+      .filter(date => !isNaN(date.getTime()));
+    
+    if (dates.length === 0) {
+      return { minDate: new Date(), maxDate: new Date() };
+    }
+    
+    const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+    const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+    
+    return { minDate, maxDate };
+  }, [selectedSeries]);
 
   // Funções de filtragem de dados por data
   const getFilteredData = (data: Array<{date: string; installs: number}>) => {
@@ -513,40 +542,6 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
       {/* Renderizar gráficos apenas da série selecionada */}
       {selectedSeries && (
         <>
-          {/* Card Principal - INSTALAÇÕES ACUMULADAS */}
-          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <CardHeader className="pb-3">
-              <CardDescription className="text-xs uppercase tracking-wider text-muted-foreground">
-                Instalações Acumuladas
-              </CardDescription>
-            <CardTitle className="text-5xl font-bold">
-              {formatNumber(selectedSeries.totalInstalls)}
-            </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4 text-sm">
-                {selectedSeries.monthlyGrowth !== undefined && selectedSeries.monthlyGrowth !== 0 && (
-                  <div className="flex items-center gap-1 text-green-600">
-                    <TrendingUp className="h-4 w-4" />
-                    <span className="font-semibold">
-                      {Math.abs(selectedSeries.monthlyGrowth).toFixed(2)}%
-                    </span>
-                    <span className="text-muted-foreground">(mês)</span>
-                  </div>
-                )}
-                {selectedSeries.yearlyGrowth !== undefined && selectedSeries.yearlyGrowth !== 0 && (
-                  <div className="flex items-center gap-1 text-green-600">
-                    <TrendingUp className="h-4 w-4" />
-                    <span className="font-semibold">
-                      {Math.abs(selectedSeries.yearlyGrowth).toFixed(2)}%
-                    </span>
-                    <span className="text-muted-foreground">(ano)</span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Cards de Métricas */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
@@ -660,6 +655,11 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                             }
                           }
                         }}
+                        disabled={(date) => {
+                          // Desabilitar datas fora do range do JSON
+                          return date < availableDateRange.minDate || date > availableDateRange.maxDate;
+                        }}
+                        defaultMonth={availableDateRange.minDate}
                         locale={ptBR}
                         numberOfMonths={2}
                         className="pointer-events-auto"
