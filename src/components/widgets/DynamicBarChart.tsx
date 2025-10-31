@@ -46,7 +46,7 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
   return (
     <Card id={`widget-${widget.id}`}>
       <CardHeader>
-        <CardTitle>{enhancedTitle}</CardTitle>
+        <CardTitle><strong>Nota Maior</strong></CardTitle>
         {widget.description && (
           <CardDescription className="text-xs line-clamp-2">
             {widget.description}
@@ -59,22 +59,11 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
               dataKey={xField}
-              className="text-xs"
-              label={{
-                value: config?.xAxis?.label,
-                position: "insideBottom",
-                offset: -5,
-              }}
+              hide={true}
             />
             <YAxis
-              className="text-xs"
-              label={{
-                value: config?.yAxis?.label,
-                angle: -90,
-                position: "insideLeft",
-              }}
+              hide={true}
               domain={[minDomain, maxDomain]}
-              tickFormatter={(value) => value.toLocaleString("pt-BR")}
             />
             <Tooltip
               contentStyle={{
@@ -84,7 +73,11 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
               }}
             />
             {config?.legend && <Legend {...config.legend} />}
-            <Bar dataKey={yField} radius={[4, 4, 0, 0]}>
+            <Bar 
+              dataKey={yField} 
+              radius={[4, 4, 0, 0]}
+              label={{ position: 'top', fill: 'hsl(var(--foreground))', fontSize: 14, fontWeight: 'bold' }}
+            >
               {sortedData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={getBarColor(entry)} />
               ))}
