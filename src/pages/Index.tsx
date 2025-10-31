@@ -1,24 +1,30 @@
 import { useState, useMemo } from "react";
 import { CompactFileUpload } from "@/components/navbar/CompactFileUpload";
 import { FileList } from "@/components/navbar/FileList";
-import { DashboardGrid } from "@/components/layout/DashboardGrid";
-import { InsightsPanel } from "@/components/InsightsPanel";
+import { DashboardTabs } from "@/components/layout/DashboardTabs";
+import { FloatingInsightsButton } from "@/components/insights/FloatingInsightsButton";
 import { BarChart3, LayoutDashboard } from "lucide-react";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 
 const Index = () => {
   const [uploadedData, setUploadedData] = useState<Array<{ name: string; data: any }>>([]);
+  const [rawJsonStrings, setRawJsonStrings] = useState<string[]>([]);
 
   const handleFilesUpload = (files: Array<{ name: string; data: any }>) => {
     setUploadedData((prev) => [...prev, ...files]);
+    
+    const jsonStrings = files.map(file => JSON.stringify(file.data));
+    setRawJsonStrings((prev) => [...prev, ...jsonStrings]);
   };
 
   const handleRemoveFile = (index: number) => {
     setUploadedData((prev) => prev.filter((_, i) => i !== index));
+    setRawJsonStrings((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleClearAll = () => {
     setUploadedData([]);
+    setRawJsonStrings([]);
   };
 
   // Parse all uploaded JSONs into widgets
@@ -78,11 +84,8 @@ const Index = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Dashboard Grid */}
-            <DashboardGrid widgets={allWidgets} />
-
-            {/* AI Insights */}
-            <InsightsPanel data={uploadedData} widgets={allWidgets} />
+            {/* Dashboard Tabs */}
+            <DashboardTabs widgets={allWidgets} />
           </div>
         )}
       </main>
@@ -93,6 +96,11 @@ const Index = () => {
           <p>Desenvolvido por RankMyApp</p>
         </div>
       </footer>
+
+      {/* Floating AI Insights Button */}
+      {rawJsonStrings.length > 0 && (
+        <FloatingInsightsButton rawJsonStrings={rawJsonStrings} />
+      )}
     </div>
   );
 };
