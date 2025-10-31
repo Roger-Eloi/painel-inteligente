@@ -80,13 +80,11 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-gradient-primary p-2">
-                <img 
-                  src={rankmyappIcon} 
-                  alt="RankMyApp" 
-                  className="h-6 w-6 object-contain"
-                />
-              </div>
+              <img 
+                src={rankmyappIcon} 
+                alt="RankMyApp" 
+                className="h-8 w-8 object-contain rounded-lg"
+              />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                   Painel Inteligente
