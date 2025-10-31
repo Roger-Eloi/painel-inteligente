@@ -15,6 +15,12 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   
   const defaultColor = widget.colors?.default || "#09738a";
   
+  // Detectar se é categoria Satisfação
+  const isSatisfactionCategory = widget.category?.name?.toLowerCase() === 'satisfaction';
+  const titleText = isSatisfactionCategory && config?.title?.text
+    ? config.title.text
+    : (config?.title?.text || widget.name);
+  
   // yAxis can be an array of field configs or undefined
   // If it's not an array, create one from yField
   let yAxisConfig = config?.yAxis || [];
@@ -37,10 +43,9 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   const [minDomain, maxDomain] = calculateYAxisDomain(data, yFields);
 
   // Enhanced title with date range (only for Usuários and Instalações)
-  const titleText = config?.title?.text || widget.name;
   const categoryName = widget.category?.name || '';
   
-  const enhancedTitle = shouldFormatDateInTitle(categoryName)
+  const enhancedTitle = shouldFormatDateInTitle(categoryName) && !isSatisfactionCategory
     ? getDateRangeDescription(data, titleText)
     : titleText;
   
@@ -49,8 +54,8 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   return (
     <Card id={`widget-${widget.id}`}>
       <CardHeader>
-        <CardTitle>{enhancedTitle}</CardTitle>
-        {widget.description && (
+        <CardTitle>{titleText}</CardTitle>
+        {widget.description && !isSatisfactionCategory && (
           <CardDescription className="text-xs line-clamp-2">
             {widget.description}
           </CardDescription>

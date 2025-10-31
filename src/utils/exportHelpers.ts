@@ -289,3 +289,178 @@ export const exportKeywordsToCSV = (widgets: ParsedWidget[], filename: string) =
   link.download = `${filename}.csv`;
   link.click();
 };
+
+// Exportar relatório de Satisfação com cabeçalho, corpo e rodapé profissional
+export const exportSatisfactionToPDF = async (
+  widgets: ParsedWidget[],
+  categoryName: string
+) => {
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  
+  // CABEÇALHO - Primeira página
+  pdf.setFillColor(9, 115, 138);
+  pdf.rect(0, 0, pageWidth, 40, 'F');
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(24);
+  pdf.text('Relatório de Satisfação', pageWidth / 2, 20, { align: 'center' });
+  pdf.setFontSize(11);
+  pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, 30, { align: 'center' });
+  
+  // Função auxiliar para adicionar rodapé
+  const addFooter = (pageNum: number) => {
+    pdf.setDrawColor(9, 115, 138);
+    pdf.line(15, pageHeight - 20, pageWidth - 15, pageHeight - 20);
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFontSize(9);
+    pdf.text(`Página ${pageNum}`, 15, pageHeight - 12);
+    pdf.setFontSize(10);
+    pdf.setTextColor(9, 115, 138);
+    pdf.text('Desenvolvido pela MyRankApp', pageWidth - 15, pageHeight - 12, { align: 'right' });
+  };
+
+  let yPosition = 50;
+  let currentPage = 1;
+
+  for (const widget of widgets) {
+    // Big Numbers
+    if (widget.kind === 'big_number') {
+      const data = widget.data[0];
+      if (yPosition + 25 > pageHeight - 30) {
+        addFooter(currentPage);
+        pdf.addPage();
+        currentPage++;
+        yPosition = 20;
+      }
+      
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(widget.config?.title?.text || widget.name, 15, yPosition);
+      
+      if (widget.description) {
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(widget.description, 15, yPosition + 5);
+      }
+      
+      pdf.setFontSize(22);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(9, 115, 138);
+      pdf.text(`${data.big_number}`, 15, yPosition + 15);
+      yPosition += 30;
+    }
+
+    // Tabelas
+    if (widget.kind === 'table') {
+      if (yPosition + 35 > pageHeight - 30) {
+        addFooter(currentPage);
+        pdf.addPage();
+        currentPage++;
+        yPosition = 20;
+      }
+      
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(widget.config?.title?.text || widget.name, 15, yPosition);
+      
+      if (widget.description) {
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(widget.description, 15, yPosition + 5);
+        yPosition += 7;
+      }
+      
+      yPosition += 7;
+
+      const headers = widget.config?.yAxis?.map((axis: any) => axis.label) || [];
+      const rows = widget.data.map(row => {
+        return widget.config?.yAxis?.map((axis: any) => {
+          const value = row.columns?.find((col: any) => col.field === axis.field)?.value;
+          return value !== undefined ? value : '';
+        }) || [];
+      });
+
+      autoTable(pdf, {
+        startY: yPosition,
+        head: [headers],
+        body: rows,
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        headStyles: { 
+          fillColor: [9, 115, 138],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        margin: { left: 15, right: 15 },
+        didDrawPage: (data) => {
+          if (data.pageNumber > currentPage) {
+            currentPage = data.pageNumber;
+          }
+        }
+      });
+
+      yPosition = (pdf as any).lastAutoTable.finalY + 15;
+    }
+
+    // Gráficos (captura de tela com 300 DPI)
+    if (['bar', 'pie', 'area', 'line'].includes(widget.kind)) {
+      const element = document.getElementById(`widget-${widget.id}`);
+      if (element) {
+        try {
+          const canvas = await html2canvas(element, { 
+            scale: 4.17,
+            logging: false,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+          });
+          
+          const imgData = canvas.toDataURL('image/png');
+          const imgWidth = element.offsetWidth * 0.264583;
+          const imgHeight = element.offsetHeight * 0.264583;
+          
+          const maxWidth = pageWidth - 30;
+          const maxHeight = pageHeight - yPosition - 30;
+          
+          let finalWidth = imgWidth;
+          let finalHeight = imgHeight;
+          
+          if (imgWidth > maxWidth) {
+            finalWidth = maxWidth;
+            finalHeight = (imgHeight * maxWidth) / imgWidth;
+          }
+          
+          if (finalHeight > maxHeight) {
+            addFooter(currentPage);
+            pdf.addPage();
+            currentPage++;
+            yPosition = 20;
+            finalHeight = Math.min(finalHeight, pageHeight - 50);
+            finalWidth = (imgWidth * finalHeight) / imgHeight;
+          }
+          
+          pdf.addImage(imgData, 'PNG', 15, yPosition, finalWidth, finalHeight);
+          yPosition += finalHeight + 15;
+        } catch (error) {
+          console.error('Error capturing chart:', error);
+        }
+      }
+    }
+
+    if (yPosition > pageHeight - 40) {
+      addFooter(currentPage);
+      pdf.addPage();
+      currentPage++;
+      yPosition = 20;
+    }
+  }
+
+  // Adicionar rodapé na última página
+  addFooter(currentPage);
+
+  pdf.save(`relatorio-satisfacao-${Date.now()}.pdf`);
+};

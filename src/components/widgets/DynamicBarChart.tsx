@@ -15,6 +15,12 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
   // Get color mapping
   const colorMapping = config?.color?.mapping || {};
   const defaultColor = widget.colors?.default || "#09738a";
+  
+  // Detectar se é categoria Satisfação
+  const isSatisfactionCategory = widget.category?.name?.toLowerCase() === 'satisfaction';
+  const titleText = isSatisfactionCategory && config?.title?.text
+    ? config.title.text
+    : (config?.title?.text || widget.name);
 
   // Sort data if needed
   const sortedData = config?.sort
@@ -29,9 +35,8 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
   const [minDomain, maxDomain] = calculateYAxisDomain(sortedData, yFields);
 
   // Enhanced title with date range (only for Usuários and Instalações)
-  const titleText = config?.title?.text || widget.name;
   const categoryName = widget.category?.name || "";
-  const enhancedTitle = shouldFormatDateInTitle(categoryName)
+  const enhancedTitle = shouldFormatDateInTitle(categoryName) && !isSatisfactionCategory
     ? getDateRangeDescription(sortedData, titleText)
     : titleText;
 
@@ -47,7 +52,7 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
     <Card id={`widget-${widget.id}`}>
       <CardHeader>
         <CardTitle><strong>{enhancedTitle}</strong></CardTitle>
-        {widget.description && (
+        {widget.description && !isSatisfactionCategory && (
           <CardDescription className="text-xs line-clamp-2">
             {widget.description}
           </CardDescription>
@@ -59,7 +64,9 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
               dataKey={xField}
-              hide={true}
+              hide={false}
+              tick={{ fontSize: 12, fontWeight: 'bold', fill: 'hsl(var(--foreground))' }}
+              tickLine={false}
             />
             <YAxis
               hide={true}
@@ -75,7 +82,7 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
             <Bar
               dataKey={yField} 
               radius={[4, 4, 0, 0]}
-              label={{ position: 'bottom', fill: 'hsl(var(--foreground))', fontSize: 14, fontWeight: 'bold' }}
+              label={{ position: 'top', fill: 'hsl(var(--foreground))', fontSize: 14, fontWeight: 'bold' }}
             >
               {sortedData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={getBarColor(entry)} />

@@ -13,6 +13,12 @@ export const DynamicPieChart = ({ widget }: DynamicPieChartProps) => {
   const colorMapping = config?.color?.mapping || {};
   const defaultColor = widget.colors?.default || "#09738a";
   const isDonut = config?.kind === "donut";
+  
+  // Detectar se é categoria Satisfação
+  const isSatisfactionCategory = widget.category?.name?.toLowerCase() === 'satisfaction';
+  const titleText = isSatisfactionCategory && config?.title?.text
+    ? config.title.text
+    : (config?.title?.text || widget.name);
 
   const getColor = (entry: any) => {
     const colorByField = config?.color?.byField;
@@ -66,14 +72,11 @@ export const DynamicPieChart = ({ widget }: DynamicPieChartProps) => {
     );
   };
 
-  // Title without date range for pie charts
-  const enhancedTitle = config?.title?.text || widget.name;
-
   return (
     <Card id={`widget-${widget.id}`}>
       <CardHeader>
-        <CardTitle>{enhancedTitle}</CardTitle>
-        {widget.description && (
+        <CardTitle>{titleText}</CardTitle>
+        {widget.description && !isSatisfactionCategory && (
           <CardDescription className="text-xs line-clamp-2">
             {widget.description}
           </CardDescription>

@@ -19,6 +19,12 @@ export const DynamicTable = ({ widget }: DynamicTableProps) => {
   
   const yAxisConfig = config?.yAxis || [];
   const colorRules = config?.labelColorRules || [];
+  
+  // Detectar se é categoria Satisfação
+  const isSatisfactionCategory = widget.category?.name?.toLowerCase() === 'satisfaction';
+  const titleText = isSatisfactionCategory && config?.title?.text
+    ? config.title.text
+    : (config?.title?.text || widget.name);
 
   const getCellValue = (row: any, field: string) => {
     // Handle column structure
@@ -48,8 +54,8 @@ export const DynamicTable = ({ widget }: DynamicTableProps) => {
   return (
     <Card id={`widget-${widget.id}`}>
       <CardHeader>
-        <CardTitle>{config?.title?.text || widget.name}</CardTitle>
-        {widget.description && (
+        <CardTitle>{titleText}</CardTitle>
+        {widget.description && !isSatisfactionCategory && (
           <CardDescription className="text-xs line-clamp-2">
             {widget.description}
           </CardDescription>

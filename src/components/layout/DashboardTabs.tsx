@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DashboardGrid } from "./DashboardGrid";
 import { DashboardFilters } from "@/components/filters/DashboardFilters";
 import { ParsedWidget } from "@/utils/jsonParser";
-import { exportDashboardToPDF, exportAllTablesToCSV, exportKeywordsToPDF, exportKeywordsToCSV } from "@/utils/exportHelpers";
+import { exportDashboardToPDF, exportAllTablesToCSV, exportKeywordsToPDF, exportKeywordsToCSV, exportSatisfactionToPDF } from "@/utils/exportHelpers";
 import { getCategoryDisplayName } from "@/utils/categoryMapping";
 import { FileDown, FileSpreadsheet } from "lucide-react";
 
@@ -42,10 +42,13 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
   const handleExportPDF = async (categoryName: string) => {
     const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
     const displayName = getCategoryDisplayName(categoryName);
+    const normalizedCategory = categoryName.toLowerCase();
     
-    // Usar função específica para Keywords (normalizar para lowercase)
-    if (categoryName.toLowerCase() === 'category5') {
+    // Usar função específica para cada categoria
+    if (normalizedCategory === 'category5') {
       await exportKeywordsToPDF(widgetsToExport, displayName);
+    } else if (normalizedCategory === 'satisfaction' || displayName === 'Satisfação') {
+      await exportSatisfactionToPDF(widgetsToExport, displayName);
     } else {
       await exportDashboardToPDF(widgetsToExport, displayName);
     }
@@ -54,10 +57,13 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
   const handleExportCSV = (categoryName: string) => {
     const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
     const displayName = getCategoryDisplayName(categoryName).toLowerCase().replace(/\s+/g, '-');
+    const normalizedCategory = categoryName.toLowerCase();
     
-    // Usar função específica para Keywords (normalizar para lowercase)
-    if (categoryName.toLowerCase() === 'category5') {
+    // Usar função específica para cada categoria
+    if (normalizedCategory === 'category5') {
       exportKeywordsToCSV(widgetsToExport, `keywords-${Date.now()}`);
+    } else if (normalizedCategory === 'satisfaction' || displayName === 'satisfação') {
+      exportAllTablesToCSV(widgetsToExport, `satisfacao-${Date.now()}`);
     } else {
       exportAllTablesToCSV(widgetsToExport, `${displayName}-data`);
     }

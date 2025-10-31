@@ -16,6 +16,12 @@ export const BigNumberCard = ({ widget }: BigNumberCardProps) => {
   const variations = data?.variations || {};
   const format = config?.bigNumber?.format || "0";
   const suffix = config?.bigNumber?.suffix || "";
+  
+  // Detectar se é categoria Satisfação
+  const isSatisfactionCategory = widget.category?.name?.toLowerCase() === 'satisfaction';
+  const titleText = isSatisfactionCategory && config?.title?.text 
+    ? config.title.text 
+    : (config?.title?.text || widget.name);
 
   const monthVariation = variations.month;
   const yearVariation = variations.year;
@@ -41,8 +47,13 @@ export const BigNumberCard = ({ widget }: BigNumberCardProps) => {
     <Card className="hover-scale" id={`widget-${widget.id}`}>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium text-muted-foreground">
-          {config?.title?.text || widget.name}
+          {titleText}
         </CardTitle>
+        {isSatisfactionCategory && widget.description && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {widget.description}
+          </p>
+        )}
       </CardHeader>
       <CardContent>
         <div className="text-3xl font-bold mb-4">
