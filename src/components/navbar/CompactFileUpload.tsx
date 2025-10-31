@@ -87,7 +87,7 @@ export const CompactFileUpload = ({ onFilesUpload }: CompactFileUploadProps) => 
         className="gap-2"
       >
         <Upload className="h-4 w-4" />
-        {isLoading ? "Carregando..." : "Carregar JSON"}
+        {isLoading ? "Carregando..." : "Carregar Arquivos"}
       </Button>
     </>
   );
