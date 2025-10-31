@@ -45,8 +45,8 @@ export const BigNumberCard = ({ widget }: BigNumberCardProps) => {
 
   return (
     <Card className="hover-scale" id={`widget-${widget.id}`}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
           {titleText}
         </CardTitle>
         {isSatisfactionCategory && widget.description && (
@@ -56,8 +56,8 @@ export const BigNumberCard = ({ widget }: BigNumberCardProps) => {
         )}
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-bold mb-4">
-          {formatNumber(bigNumber, format)}
+        <div className="text-3xl font-bold mb-4 flex items-baseline min-h-[2.5rem]">
+          <span>{formatNumber(bigNumber, format)}</span>
           {suffix && <span className="text-xl ml-1">{suffix}</span>}
         </div>
         

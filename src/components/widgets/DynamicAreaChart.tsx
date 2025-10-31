@@ -13,7 +13,12 @@ interface DynamicAreaChartProps {
 export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   const { config, data, xField, yField } = widget;
   
-  const defaultColor = widget.colors?.default || "#09738a";
+  // Cores predefinidas para múltiplas séries
+  const defaultColors = ["#09738a", "#f97316", "#8b5cf6", "#10b981", "#ef4444"];
+  const getSeriesColor = (index: number, customColor?: string) => {
+    if (customColor) return customColor;
+    return defaultColors[index % defaultColors.length];
+  };
   
   // Detectar se é categoria Satisfação
   const isSatisfactionCategory = widget.category?.name?.toLowerCase() === 'satisfaction';
@@ -65,12 +70,15 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data}>
             <defs>
-              {yAxisConfig.map((axis: any, index: number) => (
-                <linearGradient key={axis.field} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={defaultColor} stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor={defaultColor} stopOpacity={0.1}/>
-                </linearGradient>
-              ))}
+              {yAxisConfig.map((axis: any, index: number) => {
+                const seriesColor = getSeriesColor(index, axis.color);
+                return (
+                  <linearGradient key={axis.field} id={`gradient-${widget.id}-${index}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={seriesColor} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={seriesColor} stopOpacity={0}/>
+                  </linearGradient>
+                );
+              })}
             </defs>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis 
@@ -83,8 +91,15 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
             />
             <YAxis 
               className="text-xs" 
-              domain={[minDomain, maxDomain]}
-              tickFormatter={(value) => value.toLocaleString('pt-BR')}
+              domain={[
+                (dataMin: number) => Math.floor(dataMin * 0.99),
+                'auto'
+              ]}
+              tickFormatter={(value) => {
+                if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+                return value.toLocaleString('pt-BR');
+              }}
             />
             <Tooltip 
               labelFormatter={(value) => formatDate(value, config?.tooltip?.xDateFormat)}
@@ -93,19 +108,47 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '6px'
               }}
+              formatter={(value: any, name: any, props: any) => {
+                const index = yAxisConfig.findIndex((axis: any) => 
+                  (axis.label || axis.field) === name
+                );
+                const seriesColor = getSeriesColor(index);
+                return [
+                  <span style={{ color: seriesColor, fontWeight: 'bold' }}>
+                    {typeof value === 'number' ? value.toLocaleString('pt-BR') : value}
+                  </span>,
+                  name
+                ];
+              }}
             />
-            {config?.legend && <Legend {...config.legend} />}
-            {yAxisConfig.map((axis: any, index: number) => (
-              <Area
-                key={axis.field}
-                type="monotone"
-                dataKey={axis.field}
-                stroke={defaultColor}
-                fillOpacity={isLine ? 0 : 1}
-                fill={`url(#gradient-${index})`}
-                name={axis.label}
+            {yAxisConfig.length > 1 && (
+              <Legend 
+                wrapperStyle={{ paddingTop: '20px' }}
+                iconType="line"
+                formatter={(value, entry: any) => {
+                  const index = yAxisConfig.findIndex((axis: any) => 
+                    (axis.label || axis.field) === value
+                  );
+                  const seriesColor = getSeriesColor(index);
+                  return <span style={{ color: seriesColor }}>{value}</span>;
+                }}
               />
-            ))}
+            )}
+            {yAxisConfig.map((axis: any, index: number) => {
+              const seriesColor = getSeriesColor(index, axis.color);
+              return (
+                <Area
+                  key={axis.field}
+                  type="monotone"
+                  dataKey={axis.field}
+                  stroke={seriesColor}
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill={`url(#gradient-${widget.id}-${index})`}
+                  name={axis.label || axis.field}
+                />
+              );
+            })}
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>
