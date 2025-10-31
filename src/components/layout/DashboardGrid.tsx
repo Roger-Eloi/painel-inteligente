@@ -7,6 +7,7 @@ import { DynamicTable } from "@/components/widgets/DynamicTable";
 import { StarDistributionContainer } from "@/components/widgets/StarDistributionContainer";
 import { KeywordTable } from "@/components/widgets/KeywordTable";
 import { KeywordAnalyticsCharts } from "@/components/widgets/KeywordAnalyticsCharts";
+import { InstallationsCharts } from "@/components/widgets/InstallationsCharts";
 
 interface DashboardGridProps {
   widgets: ParsedWidget[];
@@ -27,6 +28,19 @@ export const DashboardGrid = ({ widgets }: DashboardGridProps) => {
         {tableWidget && tableWidget.data.length > 0 && (
           <KeywordAnalyticsCharts data={tableWidget.data} />
         )}
+      </div>
+    );
+  }
+  
+  // Detectar se é categoria Instalações (activation)
+  const isInstallationsCategory = widgets[0]?.category?.name === 'activation' || 
+                                  widgets[0]?.category?.slug === 'activation';
+  
+  // Se for categoria Instalações, usar layout especial com gráficos analíticos
+  if (isInstallationsCategory) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <InstallationsCharts widgets={widgets} />
       </div>
     );
   }

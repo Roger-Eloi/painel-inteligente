@@ -21,6 +21,16 @@ export const checkDuplicate = (
   newWidget: ParsedWidget,
   existingWidgets: ParsedWidget[]
 ): DuplicateCheckResult => {
+  // EXCEÇÃO: Categoria "activation" (Instalações) permite múltiplos arquivos
+  // pois cada arquivo representa um período de tempo diferente
+  const isActivationCategory = newWidget.category?.name === 'activation' || 
+                               newWidget.category?.slug === 'activation';
+  
+  if (isActivationCategory) {
+    // Para instalações, não verificar duplicatas - permitir agregação de múltiplos períodos
+    return { isDuplicate: false };
+  }
+  
   // Check by documentId
   if (newWidget.documentId) {
     const duplicateById = existingWidgets.find(
