@@ -89,7 +89,7 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
                 borderRadius: '6px'
               }}
             />
-            {config?.legend && <Legend />}
+            {config?.legend && <Legend {...config.legend} />}
             {yAxisConfig.map((axis: any, index: number) => (
               <Area
                 key={axis.field}
