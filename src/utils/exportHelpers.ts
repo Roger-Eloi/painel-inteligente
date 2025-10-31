@@ -299,6 +299,12 @@ export const exportSatisfactionToPDF = async (
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   
+  // Detectar widgets de estrela para não duplicar
+  const starWidgets = widgets.filter(w => 
+    w.slug?.toLowerCase().includes('star') || 
+    w.name?.toLowerCase().includes('estrela')
+  );
+  
   // CABEÇALHO - Primeira página
   pdf.setFillColor(9, 115, 138);
   pdf.rect(0, 0, pageWidth, 40, 'F');
@@ -323,7 +329,40 @@ export const exportSatisfactionToPDF = async (
   let yPosition = 50;
   let currentPage = 1;
 
-  for (const widget of widgets) {
+  // Renderizar Star Distribution Container se existir
+  if (starWidgets.length > 0) {
+    const containerElement = document.getElementById('star-distribution-container');
+    if (containerElement) {
+      try {
+        const canvas = await html2canvas(containerElement as HTMLElement, { 
+          scale: 3,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = pageWidth - 30;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        if (yPosition + imgHeight > pageHeight - 30) {
+          addFooter(currentPage);
+          pdf.addPage();
+          currentPage++;
+          yPosition = 20;
+        }
+
+        pdf.addImage(imgData, 'PNG', 15, yPosition, imgWidth, imgHeight);
+        yPosition += imgHeight + 15;
+      } catch (error) {
+        console.error('Erro ao capturar container de estrelas:', error);
+      }
+    }
+  }
+
+  // Filtrar widgets para não duplicar os de estrela
+  const filteredWidgets = widgets.filter(w => !starWidgets.some(sw => sw.id === w.id));
+
+  for (const widget of filteredWidgets) {
     // Big Numbers
     if (widget.kind === 'big_number') {
       const data = widget.data[0];

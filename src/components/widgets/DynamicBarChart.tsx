@@ -7,9 +7,10 @@ import { shouldFormatDateInTitle } from "@/utils/categoryMapping";
 
 interface DynamicBarChartProps {
   widget: ParsedWidget;
+  hideTitle?: boolean;
 }
 
-export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
+export const DynamicBarChart = ({ widget, hideTitle = false }: DynamicBarChartProps) => {
   const { config, data, xField, yField } = widget;
 
   // Get color mapping
@@ -50,15 +51,17 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
 
   return (
     <Card id={`widget-${widget.id}`}>
-      <CardHeader>
-        <CardTitle><strong>{enhancedTitle}</strong></CardTitle>
-        {widget.description && !isSatisfactionCategory && (
-          <CardDescription className="text-xs line-clamp-2">
-            {widget.description}
-          </CardDescription>
-        )}
-      </CardHeader>
-      <CardContent>
+      {!hideTitle && (
+        <CardHeader>
+          <CardTitle><strong>{enhancedTitle}</strong></CardTitle>
+          {widget.description && !isSatisfactionCategory && (
+            <CardDescription className="text-xs line-clamp-2">
+              {widget.description}
+            </CardDescription>
+          )}
+        </CardHeader>
+      )}
+      <CardContent className={hideTitle ? "pt-6" : ""}>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={sortedData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />

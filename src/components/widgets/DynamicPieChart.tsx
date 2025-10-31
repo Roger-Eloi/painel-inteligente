@@ -5,9 +5,10 @@ import { getDateRangeDescription } from "@/utils/dateHelpers";
 
 interface DynamicPieChartProps {
   widget: ParsedWidget;
+  hideTitle?: boolean;
 }
 
-export const DynamicPieChart = ({ widget }: DynamicPieChartProps) => {
+export const DynamicPieChart = ({ widget, hideTitle = false }: DynamicPieChartProps) => {
   const { config, data, xField, yField } = widget;
   
   const colorMapping = config?.color?.mapping || {};
@@ -74,15 +75,19 @@ export const DynamicPieChart = ({ widget }: DynamicPieChartProps) => {
 
   return (
     <Card id={`widget-${widget.id}`}>
-      <CardHeader>
-        <CardTitle>{titleText}</CardTitle>
-        {widget.description && !isSatisfactionCategory && (
-          <CardDescription className="text-xs line-clamp-2">
-            {widget.description}
-          </CardDescription>
-        )}
-      </CardHeader>
-      <CardContent>
+      {!hideTitle && (
+        <CardHeader>
+          <CardTitle>
+            <strong>{titleText}</strong>
+          </CardTitle>
+          {widget.description && !isSatisfactionCategory && (
+            <CardDescription className="text-xs line-clamp-2">
+              {widget.description}
+            </CardDescription>
+          )}
+        </CardHeader>
+      )}
+      <CardContent className={hideTitle ? "pt-6" : ""}>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
