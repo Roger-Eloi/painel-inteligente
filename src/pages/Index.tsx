@@ -2,23 +2,31 @@ import { useState, useMemo } from "react";
 import { CompactFileUpload } from "@/components/navbar/CompactFileUpload";
 import { FileList } from "@/components/navbar/FileList";
 import { DashboardGrid } from "@/components/layout/DashboardGrid";
-import { InsightsPanel } from "@/components/InsightsPanel";
+import { FloatingInsightsButton } from "@/components/insights/FloatingInsightsButton";
 import { BarChart3, LayoutDashboard } from "lucide-react";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 
 const Index = () => {
   const [uploadedData, setUploadedData] = useState<Array<{ name: string; data: any }>>([]);
+  const [rawJsonStrings, setRawJsonStrings] = useState<string[]>([]);
 
   const handleFilesUpload = (files: Array<{ name: string; data: any }>) => {
+    // Armazenar dados parseados (para visualização)
     setUploadedData((prev) => [...prev, ...files]);
+    
+    // Armazenar JSONs como strings (para N8N)
+    const jsonStrings = files.map(file => JSON.stringify(file.data));
+    setRawJsonStrings((prev) => [...prev, ...jsonStrings]);
   };
 
   const handleRemoveFile = (index: number) => {
     setUploadedData((prev) => prev.filter((_, i) => i !== index));
+    setRawJsonStrings((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleClearAll = () => {
     setUploadedData([]);
+    setRawJsonStrings([]);
   };
 
   // Parse all uploaded JSONs into widgets
@@ -80,12 +88,14 @@ const Index = () => {
           <div className="space-y-8">
             {/* Dashboard Grid */}
             <DashboardGrid widgets={allWidgets} />
-
-            {/* AI Insights */}
-            <InsightsPanel data={uploadedData} widgets={allWidgets} />
           </div>
         )}
       </main>
+
+      {/* Floating Insights Button */}
+      {rawJsonStrings.length > 0 && (
+        <FloatingInsightsButton rawJsonStrings={rawJsonStrings} />
+      )}
 
       {/* Footer */}
       <footer className="border-t border-border mt-12 py-6">
