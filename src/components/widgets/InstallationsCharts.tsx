@@ -20,8 +20,17 @@ import {
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { Calendar as CalendarIcon, Check, X, TrendingUp, TrendingDown } from "lucide-react";
-import { Toggle } from "@/components/ui/toggle";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -427,6 +436,10 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   const filteredAveragePerDay = filteredTimeSeriesData.length 
     ? filteredTotalInstalls / filteredTimeSeriesData.length 
     : 0;
+  
+  const filteredAveragePerWeek = filteredTimeSeriesData.length 
+    ? (filteredTotalInstalls / filteredTimeSeriesData.length) * 7
+    : 0;
 
   // Preparar dados para exibição baseado no modo de visualização
   let displayData: Array<{date: string; installs: number}> = filteredTimeSeriesData;
@@ -487,20 +500,16 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
               </div>
               
               {/* Toggle de Formatação Compacta */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">
-                  {useCompactNumbers ? 'Compacto' : 'Completo'}
-                </span>
-                <Toggle
-                  pressed={useCompactNumbers}
-                  onPressedChange={setUseCompactNumbers}
-                  variant="outline"
-                  size="sm"
-                  aria-label="Alternar formatação de números"
-                >
-                  {useCompactNumbers ? '110.3M' : '110.334.586'}
-                </Toggle>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">
+                {useCompactNumbers ? 'Compacto' : 'Completo'}
+              </span>
+              <Switch
+                checked={useCompactNumbers}
+                onCheckedChange={setUseCompactNumbers}
+                aria-label="Alternar formatação de números"
+              />
+            </div>
             </div>
           </CardHeader>
         <CardContent>
@@ -542,8 +551,50 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
       {/* Renderizar gráficos apenas da série selecionada */}
       {selectedSeries && (
         <>
+          {/* Card Principal - INSTALAÇÕES ACUMULADAS */}
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardHeader className="pb-3">
+              <CardDescription className="text-xs uppercase tracking-wider text-muted-foreground">
+                INSTALAÇÕES ACUMULADAS
+              </CardDescription>
+              <CardTitle className="text-5xl font-bold">
+                {formatNumber(selectedSeries.totalInstalls)}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 text-sm">
+                {selectedSeries.monthlyGrowth !== undefined && selectedSeries.monthlyGrowth !== 0 && (
+                  <div className={`flex items-center gap-1 ${selectedSeries.monthlyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {selectedSeries.monthlyGrowth >= 0 ? (
+                      <TrendingUp className="h-4 w-4" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4" />
+                    )}
+                    <span className="font-semibold">
+                      {Math.abs(selectedSeries.monthlyGrowth).toFixed(2)}%
+                    </span>
+                    <span className="text-muted-foreground">(mês)</span>
+                  </div>
+                )}
+                {selectedSeries.yearlyGrowth !== undefined && selectedSeries.yearlyGrowth !== 0 && (
+                  <div className={`flex items-center gap-1 ${selectedSeries.yearlyGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {selectedSeries.yearlyGrowth >= 0 ? (
+                      <TrendingUp className="h-4 w-4" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4" />
+                    )}
+                    <span className="font-semibold">
+                      {Math.abs(selectedSeries.yearlyGrowth).toFixed(2)}%
+                    </span>
+                    <span className="text-muted-foreground">(ano)</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Cards de Métricas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Total de Instalações</CardDescription>
@@ -556,6 +607,18 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                     ? `${new Date(selectedSeries.dateRange.start).toLocaleDateString("pt-BR")} - ${new Date(selectedSeries.dateRange.end).toLocaleDateString("pt-BR")}`
                     : `${format(dateFilter.start!, "dd/MM/yyyy")} - ${format(dateFilter.end!, "dd/MM/yyyy")}`
                   }
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription>Média por Semana</CardDescription>
+                <CardTitle className="text-3xl">{formatNumber(Math.round(filteredAveragePerWeek))}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">
+                  {showAllPeriods ? "Período total" : "Período filtrado"}
                 </p>
               </CardContent>
             </Card>
@@ -818,7 +881,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
               </CardContent>
             </Card>
 
-            {/* Card Mensal */}
+            {/* Card Mensal - Tabela */}
             <Card>
               <CardHeader>
                 <CardTitle>Instalações por Mês</CardTitle>
@@ -829,50 +892,64 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                   }
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {getFilteredMonthlyData(filteredTimeSeriesData).map((item, index) => {
-                    const monthData = getFilteredMonthlyData(filteredTimeSeriesData);
-                    const previousInstalls = index > 0 ? monthData[index - 1].installs : 0;
-                    const growth = index > 0 
-                      ? ((item.installs - previousInstalls) / previousInstalls * 100)
-                      : null;
-                    
-                    return (
-                      <div 
-                        key={item.month} 
-                        className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-muted-foreground">
-                            {item.month}
-                          </p>
-                <p className="text-2xl font-bold" style={{ color: selectedSeries.color }}>
-                  {formatNumber(item.installs)}
-                </p>
-                        </div>
-                        {growth !== null && (
-                          <div className={`flex items-center gap-1 text-sm font-medium ${
-                            growth >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {growth >= 0 ? (
-                              <TrendingUp className="h-4 w-4" />
-                            ) : (
-                              <TrendingDown className="h-4 w-4" />
-                            )}
-                            <span>{Math.abs(growth).toFixed(1)}%</span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                
-                {getFilteredMonthlyData(filteredTimeSeriesData).length === 0 && (
-                  <div className="text-center text-muted-foreground py-8">
-                    Nenhum dado mensal disponível para o período selecionado
-                  </div>
-                )}
+              <CardContent className="p-0">
+                <ScrollArea className="h-[400px] w-full">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-background z-10">
+                      <TableRow>
+                        <TableHead className="w-[180px]">Mês</TableHead>
+                        <TableHead className="text-right">Instalações</TableHead>
+                        <TableHead className="text-right w-[120px]">Variação</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {getFilteredMonthlyData(filteredTimeSeriesData).length > 0 ? (
+                        getFilteredMonthlyData(filteredTimeSeriesData).map((item, index) => {
+                          const monthData = getFilteredMonthlyData(filteredTimeSeriesData);
+                          const previousInstalls = index > 0 ? monthData[index - 1].installs : 0;
+                          const growth = index > 0 
+                            ? ((item.installs - previousInstalls) / previousInstalls * 100)
+                            : null;
+                          
+                          return (
+                            <TableRow key={item.month} className="hover:bg-accent/50">
+                              <TableCell className="font-medium">
+                                {item.month}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <span className="text-lg font-bold" style={{ color: selectedSeries.color }}>
+                                  {formatNumber(item.installs)}
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {growth !== null ? (
+                                  <div className={`inline-flex items-center gap-1 text-sm font-medium ${
+                                    growth >= 0 ? 'text-green-600' : 'text-red-600'
+                                  }`}>
+                                    {growth >= 0 ? (
+                                      <TrendingUp className="h-3.5 w-3.5" />
+                                    ) : (
+                                      <TrendingDown className="h-3.5 w-3.5" />
+                                    )}
+                                    <span>{Math.abs(growth).toFixed(1)}%</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">—</span>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                            Nenhum dado mensal disponível para o período selecionado
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
