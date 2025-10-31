@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { CompactFileUpload } from "@/components/navbar/CompactFileUpload";
 import { FileList } from "@/components/navbar/FileList";
-import { DashboardGrid } from "@/components/layout/DashboardGrid";
+import { DashboardTabs } from "@/components/layout/DashboardTabs";
 import { FloatingInsightsButton } from "@/components/insights/FloatingInsightsButton";
 import { BarChart3, LayoutDashboard } from "lucide-react";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
@@ -87,7 +87,7 @@ const Index = () => {
         ) : (
           <div className="space-y-8">
             {/* Dashboard Grid */}
-            <DashboardGrid widgets={allWidgets} />
+            <DashboardTabs widgets={allWidgets} />
           </div>
         )}
       </main>

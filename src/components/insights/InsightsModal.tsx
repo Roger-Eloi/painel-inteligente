@@ -27,7 +27,7 @@ export const InsightsModal = ({
 }: InsightsModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl h-[80vh] flex flex-col sm:max-w-[50vw] md:max-w-[50vw] lg:max-w-[50vw]">
+      <DialogContent className="max-w-[75vw] h-[80vh] flex flex-col sm:max-w-[85vw] md:max-w-[85vw] lg:max-w-[75vw]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Sparkles className="h-5 w-5 text-primary" />
@@ -39,8 +39,8 @@ export const InsightsModal = ({
         </DialogHeader>
 
         <ScrollArea className="flex-1 py-4">
-          <div className="prose prose-sm max-w-none dark:prose-invert">
-            <div className="bg-muted/50 rounded-lg p-4 whitespace-pre-wrap text-sm leading-relaxed">
+          <div className="prose max-w-none dark:prose-invert">
+            <div className="bg-muted/50 rounded-lg p-6 whitespace-pre-wrap text-base leading-relaxed">
               {insights || "Nenhum insight disponível."}
             </div>
           </div>

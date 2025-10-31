@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { InsightsModal } from "./InsightsModal";
+import { AITooltip } from "./AITooltip";
 
 interface FloatingInsightsButtonProps {
   rawJsonStrings: string[];
@@ -12,7 +13,19 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
   const { toast } = useToast();
+
+  // Timer para esconder o tooltip após 15 segundos
+  useEffect(() => {
+    if (rawJsonStrings.length > 0 && showTooltip) {
+      const timer = setTimeout(() => {
+        setShowTooltip(false);
+      }, 15000); // 15 segundos
+
+      return () => clearTimeout(timer);
+    }
+  }, [rawJsonStrings.length, showTooltip]);
 
   const generateInsights = async () => {
     if (!rawJsonStrings || rawJsonStrings.length === 0) {
@@ -95,6 +108,12 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
 
   return (
     <>
+      {/* Tooltip animado */}
+      <AITooltip 
+        isVisible={showTooltip && !isLoading && !isModalOpen} 
+        onDismiss={() => setShowTooltip(false)} 
+      />
+
       <Button
         onClick={generateInsights}
         disabled={isLoading}
