@@ -32,9 +32,19 @@ export const DashboardGrid = ({ widgets }: DashboardGridProps) => {
     );
   }
   
-  // Detectar se é categoria Instalações (activation)
-  const isInstallationsCategory = widgets[0]?.category?.name === 'activation' || 
-                                  widgets[0]?.category?.slug === 'activation';
+  // Detectar se é categoria Instalações (activation) - critérios mais flexíveis
+  const isInstallationsCategory = widgets.some(w => 
+    w.category?.name === 'activation' || 
+    w.category?.slug === 'activation' ||
+    w.category?.name?.toLowerCase().includes('activation') ||
+    w.category?.name?.toLowerCase().includes('instalações') ||
+    w.category?.name?.toLowerCase().includes('instalacoes') ||
+    w.name?.toLowerCase().includes('novas instalações') ||
+    w.name?.toLowerCase().includes('new install')
+  );
+
+  console.log('[DashboardGrid] É categoria Instalações?', isInstallationsCategory);
+  console.log('[DashboardGrid] Categoria do primeiro widget:', widgets[0]?.category);
   
   // Se for categoria Instalações, usar layout especial com gráficos analíticos
   if (isInstallationsCategory) {

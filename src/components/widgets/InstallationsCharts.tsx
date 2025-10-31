@@ -27,35 +27,82 @@ interface InstallationsChartsProps {
 
 export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   const installationsData = useMemo(() => {
-    // Buscar widget que contém "TOTAL DE NOVAS INSTALAÇÕES" ou similar
+    // DEBUG: Log dos widgets recebidos
+    console.log('[InstallationsCharts] Widgets recebidos:', widgets);
+    console.log('[InstallationsCharts] Total de widgets:', widgets.length);
+    
+    widgets.forEach((w, idx) => {
+      console.log(`[InstallationsCharts] Widget ${idx}:`, {
+        name: w.name,
+        slug: w.slug,
+        category: w.category,
+        dataLength: w.data?.length,
+        sampleData: w.data?.[0]
+      });
+    });
+    
+    // Buscar widget com critérios mais flexíveis
     const installationsWidget = widgets.find(
       (w) =>
-        w.name?.toUpperCase().includes("NOVAS INSTALAÇÕES") ||
-        w.name?.toUpperCase().includes("NEW INSTALL") ||
-        w.slug?.includes("new_install") ||
-        w.slug?.includes("activation")
+        w.name?.toUpperCase().includes("INSTALAÇÕES") ||
+        w.name?.toUpperCase().includes("INSTALACOES") ||
+        w.name?.toUpperCase().includes("INSTALL") ||
+        w.slug?.toLowerCase().includes("install") ||
+        w.slug?.toLowerCase().includes("activation") ||
+        w.category?.slug === 'activation'
     );
-
+    
+    console.log('[InstallationsCharts] Widget encontrado:', installationsWidget);
+    
     if (!installationsWidget?.data || installationsWidget.data.length === 0) {
+      console.warn('[InstallationsCharts] Nenhum dado encontrado no widget');
+      return null;
+    }
+    
+    console.log('[InstallationsCharts] Primeiros 3 registros:', installationsWidget.data.slice(0, 3));
+
+    // Detectar automaticamente os campos de data e valor
+    const detectFields = (data: any[]) => {
+      const sample = data[0];
+      
+      // Possíveis nomes de campo de data
+      const dateFields = ['date', 'x', 'time', 'datetime', 'day', 'period'];
+      const dateField = dateFields.find(f => sample[f] !== undefined);
+      
+      // Possíveis nomes de campo de valor
+      const valueFields = ['y', 'value', 'installs', 'installations', 'count', 'total', 'amount'];
+      const valueField = valueFields.find(f => sample[f] !== undefined && !isNaN(Number(sample[f])));
+      
+      console.log('[InstallationsCharts] Campos detectados:', { dateField, valueField, sample });
+      
+      return { dateField, valueField };
+    };
+
+    const { dateField, valueField } = detectFields(installationsWidget.data);
+
+    if (!dateField || !valueField) {
+      console.error('[InstallationsCharts] Não foi possível detectar campos de data ou valor');
       return null;
     }
 
-    // Agregar e processar dados por data
+    // Agregar e processar dados por data usando os campos detectados
     const aggregatedByDate = installationsWidget.data.reduce((acc: any, item: any) => {
-      const date = item.date || item.x;
+      const date = item[dateField];
       if (!date) return acc;
 
       if (!acc[date]) {
         acc[date] = { date, total: 0, count: 0 };
       }
 
-      // Somar valores (pode ser 'y', 'value', ou o campo numérico)
-      const value = Number(item.y || item.value || item.installs || 0);
+      // Somar valores usando o campo detectado
+      const value = Number(item[valueField] || 0);
       acc[date].total += value;
       acc[date].count++;
 
       return acc;
     }, {});
+
+    console.log('[InstallationsCharts] Dados agregados por data:', Object.keys(aggregatedByDate).length, 'datas únicas');
 
     // Converter para array e ordenar por data
     const timeSeriesData = Object.values(aggregatedByDate)
@@ -136,7 +183,28 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
   }, [widgets]);
 
   if (!installationsData) {
-    return null;
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Seção de Instalações</CardTitle>
+          <CardDescription>Nenhum dado disponível para exibir</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-muted-foreground text-sm space-y-2">
+            <p>⚠️ Os gráficos não puderam ser renderizados.</p>
+            <p className="text-xs">Possíveis causas:</p>
+            <ul className="list-disc list-inside text-xs pl-2">
+              <li>Nenhum widget com dados de instalações foi encontrado</li>
+              <li>Os dados não têm a estrutura esperada (campos de data/valor)</li>
+              <li>Nenhum arquivo foi carregado nesta categoria</li>
+            </ul>
+            <p className="text-xs mt-4">
+              <strong>Dica:</strong> Abra o console do navegador (F12) para ver logs de debug detalhados.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
