@@ -26,25 +26,24 @@ export const InsightsPanel = ({ data, widgets }: InsightsPanelProps) => {
     try {
       // Prepare enhanced payload with widget metadata
       const payload = {
-        files: data.map(file => ({
+        files: data.map((file) => ({
           filename: file.name,
-          content: file.data
+          content: file.data,
         })),
         summary: {
-          totalWidgets: widgets.length,
           widgetTypes: {
-            bigNumbers: widgets.filter(w => w.kind === "big_number").length,
-            charts: widgets.filter(w => ["bar", "pie", "area", "line"].includes(w.kind)).length,
-            tables: widgets.filter(w => w.kind === "table").length,
+            bigNumbers: widgets.filter((w) => w.kind === "big_number").length,
+            charts: widgets.filter((w) => ["bar", "pie", "area", "line"].includes(w.kind)).length,
+            tables: widgets.filter((w) => w.kind === "table").length,
           },
-          categories: [...new Set(widgets.map(w => w.category?.name).filter(Boolean))],
-          widgets: widgets.map(w => ({
+          categories: [...new Set(widgets.map((w) => w.category?.name).filter(Boolean))],
+          widgets: widgets.map((w) => ({
             name: w.name,
             type: w.kind,
             category: w.category?.name,
-            dataPoints: w.data?.length || 0
-          }))
-        }
+            dataPoints: w.data?.length || 0,
+          })),
+        },
       };
 
       // Call N8N webhook with basic auth
@@ -52,17 +51,14 @@ export const InsightsPanel = ({ data, widgets }: InsightsPanelProps) => {
       const password = "Mudar123";
       const credentials = btoa(`${username}:${password}`);
 
-      const response = await fetch(
-        "https://formulaativa.app.n8n.cloud/webhook/projeto-1-lovable-painel-inteligente",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Basic ${credentials}`
-          },
-          body: JSON.stringify(payload)
-        }
-      );
+      const response = await fetch("https://formulaativa.app.n8n.cloud/webhook/projeto-1-lovable-painel-inteligente", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${credentials}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         throw new Error(`Erro na requisição: ${response.status}`);
@@ -74,9 +70,7 @@ export const InsightsPanel = ({ data, widgets }: InsightsPanelProps) => {
     } catch (error) {
       console.error("Error generating insights:", error);
       toast.error(
-        error instanceof Error 
-          ? `Erro ao gerar insights: ${error.message}`
-          : "Erro desconhecido ao gerar insights"
+        error instanceof Error ? `Erro ao gerar insights: ${error.message}` : "Erro desconhecido ao gerar insights",
       );
     } finally {
       setIsLoading(false);
@@ -129,17 +123,13 @@ export const InsightsPanel = ({ data, widgets }: InsightsPanelProps) => {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-[200px]">
             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-            <p className="text-sm text-muted-foreground">
-              Analisando seus dados...
-            </p>
+            <p className="text-sm text-muted-foreground">Analisando seus dados...</p>
           </div>
         )}
 
         {insights && !isLoading && (
           <div className="prose prose-sm max-w-none">
-            <div className="bg-muted/50 rounded-lg p-4 whitespace-pre-wrap animate-fade-in">
-              {insights}
-            </div>
+            <div className="bg-muted/50 rounded-lg p-4 whitespace-pre-wrap animate-fade-in">{insights}</div>
           </div>
         )}
       </div>
