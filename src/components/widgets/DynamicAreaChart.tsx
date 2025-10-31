@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { ParsedWidget } from "@/utils/jsonParser";
 import { formatDate } from "@/utils/formatters";
+import { calculateYAxisDomain } from "@/utils/chartHelpers";
 
 interface DynamicAreaChartProps {
   widget: ParsedWidget;
@@ -28,6 +29,10 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
       label: field.replace(/_/g, ' ').toUpperCase()
     }));
   }
+  
+  // Calculate dynamic Y-axis domain
+  const yFields = yAxisConfig.map((axis: any) => axis.field);
+  const [minDomain, maxDomain] = calculateYAxisDomain(data, yFields);
   
   const isLine = config?.kind === "line";
 
@@ -61,7 +66,11 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
               textAnchor={config?.xAxis?.rotateLabels ? "end" : "middle"}
               height={config?.xAxis?.rotateLabels ? 60 : 30}
             />
-            <YAxis className="text-xs" />
+            <YAxis 
+              className="text-xs" 
+              domain={[minDomain, maxDomain]}
+              tickFormatter={(value) => value.toLocaleString('pt-BR')}
+            />
             <Tooltip 
               labelFormatter={(value) => formatDate(value, config?.tooltip?.xDateFormat)}
               contentStyle={{ 

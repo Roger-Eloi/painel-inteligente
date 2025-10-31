@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { CompactFileUpload } from "@/components/navbar/CompactFileUpload";
 import { FileList } from "@/components/navbar/FileList";
+import { FileUploadNotification } from "@/components/navbar/FileUploadNotification";
 import { DashboardTabs } from "@/components/layout/DashboardTabs";
 import { FloatingInsightsButton } from "@/components/insights/FloatingInsightsButton";
 import { BarChart3, LayoutDashboard } from "lucide-react";
@@ -9,11 +10,13 @@ import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 const Index = () => {
   const [uploadedData, setUploadedData] = useState<Array<{ name: string; data: any }>>([]);
   const [rawJsonStrings, setRawJsonStrings] = useState<string[]>([]);
+  const [recentlyUploadedFiles, setRecentlyUploadedFiles] = useState<string[]>([]);
 
   const handleFilesUpload = (files: Array<{ name: string; data: any }>) => {
     setUploadedData((prev) => [...prev, ...files]);
     const newRawStrings = files.map(f => JSON.stringify(f.data));
     setRawJsonStrings((prev) => [...prev, ...newRawStrings]);
+    setRecentlyUploadedFiles(files.map(f => f.name));
   };
 
   const handleRemoveFile = (index: number) => {
@@ -57,13 +60,19 @@ const Index = () => {
             </div>
 
             {/* Upload and File List */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 relative">
               <FileList 
                 files={uploadedData}
                 onRemoveFile={handleRemoveFile}
                 onClearAll={handleClearAll}
               />
               <CompactFileUpload onFilesUpload={handleFilesUpload} />
+              
+              {/* Notificação Inline */}
+              <FileUploadNotification 
+                files={recentlyUploadedFiles}
+                onDismiss={() => setRecentlyUploadedFiles([])}
+              />
             </div>
           </div>
         </div>

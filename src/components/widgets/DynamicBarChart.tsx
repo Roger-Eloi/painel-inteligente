@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from "recharts";
 import { ParsedWidget } from "@/utils/jsonParser";
+import { calculateYAxisDomain } from "@/utils/chartHelpers";
 
 interface DynamicBarChartProps {
   widget: ParsedWidget;
@@ -22,6 +23,10 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
           : b[field] - a[field];
       })
     : data;
+
+  // Calculate dynamic Y-axis domain
+  const yFields = [yField].filter(Boolean) as string[];
+  const [minDomain, maxDomain] = calculateYAxisDomain(sortedData, yFields);
 
   const getBarColor = (entry: any) => {
     const colorByField = config?.color?.byField;
@@ -53,6 +58,8 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
             <YAxis 
               className="text-xs"
               label={{ value: config?.yAxis?.label, angle: -90, position: 'insideLeft' }}
+              domain={[minDomain, maxDomain]}
+              tickFormatter={(value) => value.toLocaleString('pt-BR')}
             />
             <Tooltip 
               contentStyle={{ 

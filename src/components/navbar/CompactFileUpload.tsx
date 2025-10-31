@@ -5,9 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface CompactFileUploadProps {
   onFilesUpload: (files: Array<{ name: string; data: any }>) => void;
+  onUploadSuccess?: (fileNames: string[]) => void;
 }
 
-export const CompactFileUpload = ({ onFilesUpload }: CompactFileUploadProps) => {
+export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess }: CompactFileUploadProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -50,10 +51,7 @@ export const CompactFileUpload = ({ onFilesUpload }: CompactFileUploadProps) => 
 
     if (validFiles.length > 0) {
       onFilesUpload(validFiles);
-      toast({
-        title: "Sucesso",
-        description: `${validFiles.length} arquivo(s) carregado(s)`,
-      });
+      onUploadSuccess?.(validFiles.map(f => f.name));
     }
 
     setIsLoading(false);

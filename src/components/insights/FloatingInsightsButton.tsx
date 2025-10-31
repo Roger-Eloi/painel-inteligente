@@ -89,11 +89,6 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
       const result = await response.text();
       setInsights(result);
       setIsModalOpen(true);
-      
-      toast({
-        title: "Insights gerados!",
-        description: "Os insights de IA foram gerados com sucesso.",
-      });
     } catch (error) {
       console.error("Error generating insights:", error);
       toast({
