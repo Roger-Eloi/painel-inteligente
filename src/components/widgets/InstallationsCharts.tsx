@@ -19,7 +19,7 @@ import {
   Cell,
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { Calendar as CalendarIcon, Check, X, TrendingUp } from "lucide-react";
+import { Calendar as CalendarIcon, Check, X, TrendingUp, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -739,25 +739,45 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                   className="h-[300px] w-full"
                 >
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={getFilteredWeekdayData(filteredTimeSeriesData)}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="weekday" className="text-xs" />
+                    <BarChart 
+                      data={getFilteredWeekdayData(filteredTimeSeriesData)}
+                      layout="vertical"
+                      margin={{ top: 5, right: 60, left: 0, bottom: 5 }}
+                    >
+                      <defs>
+                        <linearGradient id="weekdayGradient" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="5%" stopColor={selectedSeries.color} stopOpacity={0.8} />
+                          <stop offset="95%" stopColor={selectedSeries.color} stopOpacity={0.3} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
+                      <XAxis 
+                        type="number" 
+                        hide={true}
+                      />
                       <YAxis 
+                        type="category"
+                        dataKey="weekday" 
                         className="text-xs"
-                        domain={[
-                          (dataMin: number) => Math.floor(dataMin * 0.9),
-                          'auto'
-                        ]}
                       />
                       <Tooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="average" fill={selectedSeries.color} radius={[8, 8, 0, 0]} />
+                      <Bar 
+                        dataKey="average" 
+                        fill="url(#weekdayGradient)"
+                        radius={[0, 8, 8, 0]}
+                        label={{
+                          position: 'right',
+                          formatter: (value: number) => value.toLocaleString('pt-BR'),
+                          style: { fontSize: '11px', fontWeight: 'bold', fill: selectedSeries.color }
+                        }}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
               </CardContent>
             </Card>
 
-            {/* Gráfico Mensal */}
+            {/* Card Mensal */}
             <Card>
               <CardHeader>
                 <CardTitle>Instalações por Mês</CardTitle>
@@ -769,31 +789,49 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer
-                  config={{
-                    installs: {
-                      label: "Instalações",
-                      color: selectedSeries.color,
-                    },
-                  }}
-                  className="h-[300px] w-full"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={getFilteredMonthlyData(filteredTimeSeriesData)}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="month" className="text-xs" />
-                      <YAxis 
-                        className="text-xs"
-                        domain={[
-                          (dataMin: number) => Math.floor(dataMin * 0.9),
-                          'auto'
-                        ]}
-                      />
-                      <Tooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="installs" fill={selectedSeries.color} radius={[8, 8, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
+                <div className="space-y-4">
+                  {getFilteredMonthlyData(filteredTimeSeriesData).map((item, index) => {
+                    const monthData = getFilteredMonthlyData(filteredTimeSeriesData);
+                    const previousInstalls = index > 0 ? monthData[index - 1].installs : 0;
+                    const growth = index > 0 
+                      ? ((item.installs - previousInstalls) / previousInstalls * 100)
+                      : null;
+                    
+                    return (
+                      <div 
+                        key={item.month} 
+                        className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            {item.month}
+                          </p>
+                          <p className="text-2xl font-bold" style={{ color: selectedSeries.color }}>
+                            {item.installs.toLocaleString('pt-BR')}
+                          </p>
+                        </div>
+                        {growth !== null && (
+                          <div className={`flex items-center gap-1 text-sm font-medium ${
+                            growth >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {growth >= 0 ? (
+                              <TrendingUp className="h-4 w-4" />
+                            ) : (
+                              <TrendingDown className="h-4 w-4" />
+                            )}
+                            <span>{Math.abs(growth).toFixed(1)}%</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {getFilteredMonthlyData(filteredTimeSeriesData).length === 0 && (
+                  <div className="text-center text-muted-foreground py-8">
+                    Nenhum dado mensal disponível para o período selecionado
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
