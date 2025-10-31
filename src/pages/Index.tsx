@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { CompactFileUpload } from "@/components/navbar/CompactFileUpload";
 import { FileList } from "@/components/navbar/FileList";
 import { DashboardGrid } from "@/components/layout/DashboardGrid";
-import { InsightsPanel } from "@/components/InsightsPanel";
+//import { InsightsPanel } from "@/components/InsightsPanel";
 import { BarChart3, LayoutDashboard } from "lucide-react";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 
@@ -90,7 +90,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border mt-12 py-6">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Painel de Visualização de Dados • Desenvolvido com Lovable</p>
+          <p>Desenvolvido por RankMyApp</p>
         </div>
       </footer>
     </div>
