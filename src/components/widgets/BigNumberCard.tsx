@@ -38,7 +38,7 @@ export const BigNumberCard = ({ widget }: BigNumberCardProps) => {
   };
 
   return (
-    <Card className="hover-scale">
+    <Card className="hover-scale" id={`widget-${widget.id}`}>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {config?.title?.text || widget.name}

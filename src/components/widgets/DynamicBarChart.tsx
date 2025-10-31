@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from "recharts";
 import { ParsedWidget } from "@/utils/jsonParser";
 import { calculateYAxisDomain } from "@/utils/chartHelpers";
+import { getDateRangeDescription } from "@/utils/dateHelpers";
 
 interface DynamicBarChartProps {
   widget: ParsedWidget;
@@ -28,6 +29,12 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
   const yFields = [yField].filter(Boolean) as string[];
   const [minDomain, maxDomain] = calculateYAxisDomain(sortedData, yFields);
 
+  // Enhanced title with date range
+  const dateRangeText = getDateRangeDescription(sortedData);
+  const enhancedTitle = dateRangeText 
+    ? `${config?.title?.text || widget.name} - ${dateRangeText}`
+    : config?.title?.text || widget.name;
+
   const getBarColor = (entry: any) => {
     const colorByField = config?.color?.byField;
     if (colorByField && colorMapping[entry[colorByField]]) {
@@ -37,9 +44,9 @@ export const DynamicBarChart = ({ widget }: DynamicBarChartProps) => {
   };
 
   return (
-    <Card>
+    <Card id={`widget-${widget.id}`}>
       <CardHeader>
-        <CardTitle>{config?.title?.text || widget.name}</CardTitle>
+        <CardTitle>{enhancedTitle}</CardTitle>
         {widget.description && (
           <CardDescription className="text-xs line-clamp-2">
             {widget.description}

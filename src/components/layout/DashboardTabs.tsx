@@ -1,11 +1,26 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { DashboardGrid } from "./DashboardGrid";
+import { DashboardFilters } from "@/components/filters/DashboardFilters";
 import { ParsedWidget } from "@/utils/jsonParser";
+import { exportDashboardToPDF, exportAllTablesToCSV } from "@/utils/exportHelpers";
+import { FileDown, FileSpreadsheet } from "lucide-react";
 
 interface DashboardTabsProps {
   widgets: ParsedWidget[];
 }
+
+// Mapeamento de nomes de categorias
+const categoryNameMapping: Record<string, string> = {
+  "Activation": "Instalações",
+  "Analytics": "Keywords",
+  "Satisfaction": "Satisfação",
+};
+
+const getCategoryDisplayName = (categoryName: string): string => {
+  return categoryNameMapping[categoryName] || categoryName;
+};
 
 export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
   // Agrupar widgets por categoria
@@ -23,6 +38,9 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
     return grouped;
   }, [widgets]);
 
+  // Estado para widgets filtrados
+  const [filteredCategories, setFilteredCategories] = useState<Record<string, ParsedWidget[]>>({});
+
   const categoryKeys = Object.keys(categories).sort();
 
   // Se não houver widgets, não renderizar nada
@@ -30,9 +48,65 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
     return null;
   }
 
+  // Handlers de exportação
+  const handleExportPDF = async (categoryName: string) => {
+    const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
+    const displayName = getCategoryDisplayName(categoryName);
+    await exportDashboardToPDF(widgetsToExport, displayName);
+  };
+
+  const handleExportCSV = (categoryName: string) => {
+    const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
+    const displayName = getCategoryDisplayName(categoryName).toLowerCase().replace(/\s+/g, '-');
+    exportAllTablesToCSV(widgetsToExport, `${displayName}-data`);
+  };
+
+  const handleExportAllPDF = async () => {
+    await exportDashboardToPDF(widgets, "Todos-os-Dados");
+  };
+
+  const handleExportAllCSV = () => {
+    exportAllTablesToCSV(widgets, "todos-os-dados");
+  };
+
   // Se houver apenas uma categoria, renderizar sem tabs
   if (categoryKeys.length === 1) {
-    return <DashboardGrid widgets={widgets} />;
+    const category = categoryKeys[0];
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">
+            {getCategoryDisplayName(category)}
+          </h2>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleExportPDF(category)}
+            >
+              <FileDown className="h-4 w-4 mr-2" />
+              Exportar PDF
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleExportCSV(category)}
+            >
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              Exportar CSV
+            </Button>
+          </div>
+        </div>
+        <DashboardFilters
+          category={category}
+          widgets={categories[category]}
+          onFilterChange={(filtered) => {
+            setFilteredCategories(prev => ({ ...prev, [category]: filtered }));
+          }}
+        />
+        <DashboardGrid widgets={filteredCategories[category] || categories[category]} />
+      </div>
+    );
   }
 
   return (
@@ -50,13 +124,33 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
             value={category}
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
-            {category} ({categories[category].length})
+            {getCategoryDisplayName(category)} ({categories[category].length})
           </TabsTrigger>
         ))}
       </TabsList>
       
       {/* Aba "Todos" */}
       <TabsContent value="todos" className="animate-fade-in mt-0">
+        <div className="flex justify-end items-center mb-4">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportAllPDF}
+            >
+              <FileDown className="h-4 w-4 mr-2" />
+              Exportar PDF
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportAllCSV}
+            >
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              Exportar CSV
+            </Button>
+          </div>
+        </div>
         <DashboardGrid widgets={widgets} />
       </TabsContent>
       
@@ -67,7 +161,34 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
           value={category}
           className="animate-fade-in mt-0"
         >
-          <DashboardGrid widgets={categories[category]} />
+          <div className="flex justify-end items-center mb-4">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleExportPDF(category)}
+              >
+                <FileDown className="h-4 w-4 mr-2" />
+                Exportar PDF
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleExportCSV(category)}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Exportar CSV
+              </Button>
+            </div>
+          </div>
+          <DashboardFilters
+            category={category}
+            widgets={categories[category]}
+            onFilterChange={(filtered) => {
+              setFilteredCategories(prev => ({ ...prev, [category]: filtered }));
+            }}
+          />
+          <DashboardGrid widgets={filteredCategories[category] || categories[category]} />
         </TabsContent>
       ))}
     </Tabs>

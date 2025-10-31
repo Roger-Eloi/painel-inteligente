@@ -3,6 +3,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { ParsedWidget } from "@/utils/jsonParser";
 import { formatDate } from "@/utils/formatters";
 import { calculateYAxisDomain } from "@/utils/chartHelpers";
+import { getDateRangeDescription } from "@/utils/dateHelpers";
 
 interface DynamicAreaChartProps {
   widget: ParsedWidget;
@@ -33,13 +34,19 @@ export const DynamicAreaChart = ({ widget }: DynamicAreaChartProps) => {
   // Calculate dynamic Y-axis domain
   const yFields = yAxisConfig.map((axis: any) => axis.field);
   const [minDomain, maxDomain] = calculateYAxisDomain(data, yFields);
+
+  // Enhanced title with date range
+  const dateRangeText = getDateRangeDescription(data);
+  const enhancedTitle = dateRangeText 
+    ? `${config?.title?.text || widget.name} - ${dateRangeText}`
+    : config?.title?.text || widget.name;
   
   const isLine = config?.kind === "line";
 
   return (
-    <Card>
+    <Card id={`widget-${widget.id}`}>
       <CardHeader>
-        <CardTitle>{config?.title?.text || widget.name}</CardTitle>
+        <CardTitle>{enhancedTitle}</CardTitle>
         {widget.description && (
           <CardDescription className="text-xs line-clamp-2">
             {widget.description}

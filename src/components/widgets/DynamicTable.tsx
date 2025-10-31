@@ -46,7 +46,7 @@ export const DynamicTable = ({ widget }: DynamicTableProps) => {
   };
 
   return (
-    <Card>
+    <Card id={`widget-${widget.id}`}>
       <CardHeader>
         <CardTitle>{config?.title?.text || widget.name}</CardTitle>
         {widget.description && (
