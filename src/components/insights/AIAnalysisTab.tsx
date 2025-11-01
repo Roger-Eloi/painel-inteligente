@@ -3,6 +3,7 @@ import { Loader2, FileText, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { exportInsightsToPDF } from "@/utils/exportHelpers";
 import { shareToWhatsApp, shareToTelegram } from "@/utils/shareHelpers";
@@ -19,6 +20,8 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
   const [fullText, setFullText] = useState("");
   const [displayedText, setDisplayedText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [userPrompt, setUserPrompt] = useState("");
+  const [hasGeneratedOnce, setHasGeneratedOnce] = useState(false);
   const streamingIndexRef = useRef(0);
 
   useEffect(() => {
@@ -31,14 +34,13 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
     }
   }, [fullText]);
 
-  const fetchAIAnalysis = async () => {
+  const fetchAIAnalysis = async (customPrompt?: string) => {
     setIsLoading(true);
     
     try {
       const payload = {
         DADOS: rawJsonStrings,
-        PERGUNTA: "Gere uma análise completa dos dados em formato Markdown",
-        PROMPT_USER: ""
+        PROMPT_USER: customPrompt || ""
       };
 
       const username = "produto.rankmyapp.com.br";
@@ -68,6 +70,7 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
       
       setFullText(analysisText);
       setIsLoading(false);
+      setHasGeneratedOnce(true);
     } catch (error) {
       console.error("Error fetching AI analysis:", error);
       toast.error("Erro ao gerar análise", {
@@ -91,7 +94,27 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
         clearInterval(streamInterval);
         setIsStreaming(false);
       }
-    }, 20);
+    }, 3);
+  };
+
+  const handleGenerateAnalysis = async () => {
+    if (!userPrompt.trim()) {
+      toast.error("Digite um prompt", {
+        description: "Por favor, insira uma pergunta ou instrução para a IA.",
+      });
+      return;
+    }
+    
+    // Reset states
+    setFullText("");
+    setDisplayedText("");
+    streamingIndexRef.current = 0;
+    
+    // Fetch com prompt customizado
+    await fetchAIAnalysis(userPrompt);
+    
+    // Limpar textarea após envio
+    setUserPrompt("");
   };
 
   const handleExportPDF = async () => {
@@ -179,7 +202,7 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
       </div>
 
       <div className="bg-card border border-border rounded-lg overflow-hidden">
-        <ScrollArea className="h-[600px] p-6">
+        <ScrollArea className="min-h-[400px] max-h-[800px] p-6">
           <div className="prose prose-slate dark:prose-invert max-w-none">
             <ReactMarkdown
               components={{
@@ -225,6 +248,37 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
           </div>
         </ScrollArea>
       </div>
+
+      {/* Seção de Prompt Customizado - Aparece após primeira análise */}
+      {hasGeneratedOnce && (
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Textarea
+              value={userPrompt}
+              onChange={(e) => setUserPrompt(e.target.value)}
+              placeholder="Faça uma nova pergunta ou peça uma análise específica..."
+              className="flex-1 min-h-[80px] resize-none"
+              disabled={isLoading}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.ctrlKey) {
+                  handleGenerateAnalysis();
+                }
+              }}
+            />
+            <Button 
+              onClick={handleGenerateAnalysis} 
+              disabled={isLoading || !userPrompt.trim()}
+              className="h-[80px] px-6 whitespace-nowrap"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              Gerar Análise
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Dica: Pressione Ctrl+Enter para enviar
+          </p>
+        </div>
+      )}
     </div>
   );
 };
