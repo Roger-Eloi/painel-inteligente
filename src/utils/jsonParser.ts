@@ -37,23 +37,38 @@ const parseWidget = (widget: any, index: number): ParsedWidget => {
     name: category.name.toLowerCase()
   } : category;
   
-  // Extract actual data - use data if available, otherwise use exampleData
+  // Extract actual data - prefer the dataset with more data points
   let extractedData: any[] = [];
+  let dataFromData: any[] = [];
+  let dataFromExample: any[] = [];
   
+  // Extract from 'data' field
   if (data && typeof data === 'object') {
-    // data can be an object with appId keys
     const appIds = Object.keys(data);
     if (appIds.length > 0) {
-      extractedData = data[appIds[0]]; // Use first appId data
+      dataFromData = data[appIds[0]] || [];
     }
   }
   
-  // Fallback to exampleData
-  if (extractedData.length === 0 && exampleData && typeof exampleData === 'object') {
+  // Extract from 'exampleData' field
+  if (exampleData && typeof exampleData === 'object') {
     const appIds = Object.keys(exampleData);
     if (appIds.length > 0) {
-      extractedData = exampleData[appIds[0]];
+      dataFromExample = exampleData[appIds[0]] || [];
     }
+  }
+  
+  // Prefer the dataset with more data points
+  // This ensures we use the most complete dataset available
+  if (dataFromData.length > 0 && dataFromExample.length > 0) {
+    // Both exist - use the one with more data points
+    extractedData = dataFromData.length >= dataFromExample.length ? dataFromData : dataFromExample;
+  } else if (dataFromData.length > 0) {
+    // Only data exists
+    extractedData = dataFromData;
+  } else if (dataFromExample.length > 0) {
+    // Only exampleData exists
+    extractedData = dataFromExample;
   }
   
   return {
