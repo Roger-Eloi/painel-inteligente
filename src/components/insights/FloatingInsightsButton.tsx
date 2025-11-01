@@ -50,17 +50,14 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
       const password = "Mudar123";
       const credentials = btoa(`${username}:${password}`);
 
-      const response = await fetch(
-        "https://formulaativa.app.n8n.cloud/webhook/projeto-1-lovable-painel-inteligente",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Basic ${credentials}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch("https://webhook.digital-ai.tech/webhook/projeto-1-lovable-painel-inteligente", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${credentials}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (response.status === 403) {
         toast({
@@ -104,10 +101,7 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
   return (
     <>
       {/* Tooltip animado */}
-      <AITooltip 
-        isVisible={showTooltip && !isLoading && !isModalOpen} 
-        onDismiss={() => setShowTooltip(false)} 
-      />
+      <AITooltip isVisible={showTooltip && !isLoading && !isModalOpen} onDismiss={() => setShowTooltip(false)} />
 
       <Button
         onClick={generateInsights}
