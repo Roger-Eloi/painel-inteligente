@@ -28,7 +28,7 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
     }
   }, [rawJsonStrings.length, showTooltip]);
 
-  const generateInsights = async () => {
+  const generateInsights = async (promptUser?: string) => {
     if (!rawJsonStrings || rawJsonStrings.length === 0) {
       toast.error("Nenhum dado disponível", {
         description: "Faça upload de arquivos JSON primeiro.",
@@ -42,7 +42,8 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
       // Payload simplificado com JSONs como strings
       const payload = {
         DADOS: rawJsonStrings,
-        PERGUNTA: customQuestion || "Gere insights gerais dos dados"
+        PERGUNTA: customQuestion || "Gere insights gerais dos dados",
+        PROMPT_USER: promptUser || ""
       };
 
       // Credenciais corretas (sem @)
@@ -114,7 +115,7 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
             
             {/* Botão Gerar Análise */}
             <Button
-              onClick={generateInsights}
+              onClick={() => generateInsights()}
               disabled={isLoading || rawJsonStrings.length === 0}
               className="bg-primary hover:bg-primary/90 px-8 py-6 whitespace-nowrap"
             >
@@ -139,7 +140,7 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
         onClose={() => setIsModalOpen(false)}
         insights={insights}
         question={customQuestion}
-        onRegenerate={generateInsights}
+        onRegenerate={(promptUser) => generateInsights(promptUser)}
         isLoading={isLoading}
       />
     </>

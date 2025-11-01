@@ -1,4 +1,5 @@
 import { Sparkles, FileText } from "lucide-react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { exportInsightsToPDF } from "@/utils/exportHelpers";
 import { shareToWhatsApp, shareToTelegram } from "@/utils/shareHelpers";
 import { toast } from "sonner";
@@ -21,7 +23,7 @@ interface InsightsModalProps {
   onClose: () => void;
   insights: string;
   question?: string;
-  onRegenerate: () => void;
+  onRegenerate: (promptUser?: string) => void;
   isLoading: boolean;
 }
 
@@ -33,6 +35,8 @@ export const InsightsModal = ({
   onRegenerate,
   isLoading,
 }: InsightsModalProps) => {
+  const [userPrompt, setUserPrompt] = useState("");
+
   const handleExportPDF = async () => {
     await exportInsightsToPDF({
       insights,
@@ -47,6 +51,10 @@ export const InsightsModal = ({
     toast.success("Texto copiado!", {
       description: "Cole a análise no LinkedIn",
     });
+  };
+
+  const handleRegenerate = () => {
+    onRegenerate(userPrompt);
   };
 
   return (
@@ -86,56 +94,67 @@ export const InsightsModal = ({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="flex-col sm:flex-row gap-4">
-          {/* Seção de compartilhamento */}
-          <div className="flex items-center gap-2 mr-auto">
-            <span className="text-sm text-muted-foreground">Compartilhar:</span>
+        <DialogFooter className="flex-col gap-4">
+          {/* Linha 1: Seção de compartilhamento */}
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Compartilhar:</span>
+              
+              {/* WhatsApp */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => shareToWhatsApp(insights)}
+                disabled={!insights}
+                title="Compartilhar no WhatsApp"
+                className="h-9 w-9 hover:bg-[#25D366]/10"
+              >
+                <img src={WhatsAppIcon} alt="WhatsApp" className="h-6 w-6" />
+              </Button>
+              
+              {/* Telegram */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => shareToTelegram(insights)}
+                disabled={!insights}
+                title="Compartilhar no Telegram"
+                className="h-9 w-9 hover:bg-[#29B6F6]/10"
+              >
+                <img src={TelegramIcon} alt="Telegram" className="h-6 w-6" />
+              </Button>
+              
+              {/* LinkedIn */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleShareLinkedIn(insights)}
+                disabled={!insights}
+                title="Compartilhar no LinkedIn"
+                className="h-9 w-9 hover:bg-[#0288D1]/10"
+              >
+                <img src={LinkedInIcon} alt="LinkedIn" className="h-6 w-6" />
+              </Button>
+            </div>
             
-            {/* WhatsApp */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => shareToWhatsApp(insights)}
-              disabled={!insights}
-              title="Compartilhar no WhatsApp"
-              className="h-9 w-9 hover:bg-[#25D366]/10"
-            >
-              <img src={WhatsAppIcon} alt="WhatsApp" className="h-6 w-6" />
-            </Button>
-            
-            {/* Telegram */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => shareToTelegram(insights)}
-              disabled={!insights}
-              title="Compartilhar no Telegram"
-              className="h-9 w-9 hover:bg-[#29B6F6]/10"
-            >
-              <img src={TelegramIcon} alt="Telegram" className="h-6 w-6" />
-            </Button>
-            
-            {/* LinkedIn */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleShareLinkedIn(insights)}
-              disabled={!insights}
-              title="Compartilhar no LinkedIn"
-              className="h-9 w-9 hover:bg-[#0288D1]/10"
-            >
-              <img src={LinkedInIcon} alt="LinkedIn" className="h-6 w-6" />
-            </Button>
-          </div>
-          
-          {/* Botões de ação */}
-          <div className="flex gap-2">
+            {/* Botão Fechar */}
             <Button variant="outline" onClick={onClose}>
               Fechar
             </Button>
-            <Button onClick={onRegenerate} disabled={isLoading}>
+          </div>
+          
+          {/* Linha 2: Textarea + Botão Gerar Análise */}
+          <div className="flex items-center gap-2 w-full">
+            <Textarea
+              value={userPrompt}
+              onChange={(e) => setUserPrompt(e.target.value)}
+              placeholder="Refine sua pergunta ou adicione mais detalhes..."
+              className="flex-1 min-h-[60px] resize-none"
+              disabled={isLoading}
+            />
+            <Button onClick={handleRegenerate} disabled={isLoading} className="px-6 h-[60px] whitespace-nowrap">
               <Sparkles className="mr-2 h-4 w-4" />
-              Gerar Novamente
+              Gerar Análise
             </Button>
           </div>
         </DialogFooter>
