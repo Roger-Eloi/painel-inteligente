@@ -383,6 +383,130 @@ export const exportKeywordsToCSV = (widgets: ParsedWidget[], filename: string) =
   link.click();
 };
 
+// Interface para dados de insights
+interface InsightsExportData {
+  insights: string;
+  question?: string;
+  generatedAt: string;
+}
+
+// Exportar insights de IA para PDF
+export const exportInsightsToPDF = async (data: InsightsExportData) => {
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 15;
+  const maxWidth = pageWidth - (margin * 2);
+  
+  // Carregar logo
+  let logoBase64: string;
+  try {
+    logoBase64 = await svgToBase64('#1A89FF');
+  } catch (error) {
+    console.error('Error loading logo:', error);
+    logoBase64 = '';
+  }
+  
+  // Função para adicionar rodapé
+  const addFooter = (pageNum: number, totalPages: number) => {
+    pdf.setDrawColor(26, 137, 255);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFontSize(9);
+    pdf.text(`Página ${pageNum} de ${totalPages}`, margin, pageHeight - 12);
+    if (logoBase64) {
+      pdf.addImage(logoBase64, 'PNG', pageWidth - 50, pageHeight - 18, 35, 6.5);
+    }
+  };
+  
+  let yPosition = 20;
+  
+  // ========== CABEÇALHO ==========
+  pdf.setFillColor(26, 137, 255);
+  pdf.rect(0, 0, pageWidth, 35, 'F');
+  
+  if (logoBase64) {
+    pdf.addImage(logoBase64, 'PNG', margin, 10, 40, 7.5);
+  }
+  
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(20);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('Análise de IA', pageWidth - margin, 17, { align: 'right' });
+  
+  pdf.setFontSize(10);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text(`Gerado em: ${data.generatedAt}`, pageWidth - margin, 28, { align: 'right' });
+  
+  yPosition = 45;
+  
+  // ========== PERGUNTA (se houver) ==========
+  if (data.question && data.question.trim()) {
+    pdf.setTextColor(26, 137, 255);
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Pergunta:', margin, yPosition);
+    yPosition += 6;
+    
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    const questionLines = pdf.splitTextToSize(data.question, maxWidth);
+    pdf.text(questionLines, margin, yPosition);
+    yPosition += (questionLines.length * 5) + 10;
+  }
+  
+  // ========== RESPOSTA ==========
+  pdf.setTextColor(26, 137, 255);
+  pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('Resposta:', margin, yPosition);
+  yPosition += 6;
+  
+  pdf.setDrawColor(26, 137, 255);
+  pdf.setLineWidth(0.3);
+  pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+  yPosition += 8;
+  
+  // Processar texto da resposta
+  pdf.setTextColor(50, 50, 50);
+  pdf.setFontSize(10);
+  pdf.setFont('helvetica', 'normal');
+  
+  const insightsParagraphs = data.insights.split('\n');
+  
+  for (const paragraph of insightsParagraphs) {
+    if (paragraph.trim()) {
+      const lines = pdf.splitTextToSize(paragraph.trim(), maxWidth);
+      
+      for (const line of lines) {
+        // Verificar se precisa de nova página
+        if (yPosition > pageHeight - 30) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        
+        pdf.text(line, margin, yPosition);
+        yPosition += 5;
+      }
+      
+      yPosition += 3; // Espaço entre parágrafos
+    }
+  }
+  
+  // Adicionar rodapés
+  const totalPages = (pdf as any).internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    pdf.setPage(i);
+    addFooter(i, totalPages);
+  }
+  
+  // Salvar
+  const filename = `analise-ia-${Date.now()}.pdf`;
+  pdf.save(filename);
+};
+
 // Exportar relatório de Satisfação com cabeçalho, corpo e rodapé profissional
 export const exportSatisfactionToPDF = async (
   widgets: ParsedWidget[],

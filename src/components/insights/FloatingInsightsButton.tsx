@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { InsightsModal } from "./InsightsModal";
 import { AITooltip } from "./AITooltip";
 
@@ -14,7 +15,7 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
   const [insights, setInsights] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
-  const { toast } = useToast();
+  const [customQuestion, setCustomQuestion] = useState("");
 
   // Timer para esconder o tooltip após 15 segundos
   useEffect(() => {
@@ -29,10 +30,8 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
 
   const generateInsights = async () => {
     if (!rawJsonStrings || rawJsonStrings.length === 0) {
-      toast({
-        title: "Nenhum dado disponível",
+      toast.error("Nenhum dado disponível", {
         description: "Faça upload de arquivos JSON primeiro.",
-        variant: "destructive",
       });
       return;
     }
@@ -43,6 +42,7 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
       // Payload simplificado com JSONs como strings
       const payload = {
         DADOS: rawJsonStrings,
+        PERGUNTA: customQuestion || "Gere insights gerais dos dados"
       };
 
       // Credenciais corretas (sem @)
@@ -60,20 +60,16 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
       });
 
       if (response.status === 403) {
-        toast({
-          title: "Erro de autenticação",
+        toast.error("Erro de autenticação", {
           description: "Credenciais inválidas para o webhook N8N.",
-          variant: "destructive",
         });
         setIsLoading(false);
         return;
       }
 
       if (response.status === 500) {
-        toast({
-          title: "Erro no servidor",
+        toast.error("Erro no servidor", {
           description: "O servidor N8N encontrou um erro. Tente novamente.",
-          variant: "destructive",
         });
         setIsLoading(false);
         return;
@@ -88,10 +84,8 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
       setIsModalOpen(true);
     } catch (error) {
       console.error("Error generating insights:", error);
-      toast({
-        title: "Erro ao gerar insights",
+      toast.error("Erro ao gerar insights", {
         description: "Não foi possível conectar ao servidor N8N. Tente novamente.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -100,26 +94,51 @@ export const FloatingInsightsButton = ({ rawJsonStrings }: FloatingInsightsButto
 
   return (
     <>
-      {/* Tooltip animado */}
-      <AITooltip isVisible={showTooltip && !isLoading && !isModalOpen} onDismiss={() => setShowTooltip(false)} />
-
-      <Button
-        onClick={generateInsights}
-        disabled={isLoading}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full p-0 shadow-2xl bg-gradient-primary hover:bg-gradient-primary hover:scale-110 transition-all duration-300"
-        title="Gerar Insights de IA"
-      >
-        {isLoading ? (
-          <Loader2 className="h-6 w-6 animate-spin text-white" />
-        ) : (
-          <Sparkles className="h-6 w-6 text-white animate-pulse" />
-        )}
-      </Button>
+      <AITooltip 
+        isVisible={showTooltip && !isLoading && !isModalOpen} 
+        onDismiss={() => setShowTooltip(false)} 
+      />
+      
+      {/* Barra fixa no rodapé */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-4 max-w-6xl mx-auto">
+            {/* Textarea para pergunta */}
+            <Textarea
+              value={customQuestion}
+              onChange={(e) => setCustomQuestion(e.target.value)}
+              placeholder="Faça uma pergunta sobre seus dados ou deixe em branco para análise geral..."
+              className="flex-1 min-h-[60px] max-h-[120px] resize-none"
+              disabled={isLoading}
+            />
+            
+            {/* Botão Gerar Análise */}
+            <Button
+              onClick={generateInsights}
+              disabled={isLoading || rawJsonStrings.length === 0}
+              className="bg-primary hover:bg-primary/90 px-8 py-6 whitespace-nowrap"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Gerando...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Gerar Análise
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <InsightsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         insights={insights}
+        question={customQuestion}
         onRegenerate={generateInsights}
         isLoading={isLoading}
       />
