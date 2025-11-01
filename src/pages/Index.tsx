@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { CompactFileUpload } from "@/components/navbar/CompactFileUpload";
 import { FileList } from "@/components/navbar/FileList";
 import { DashboardTabs } from "@/components/layout/DashboardTabs";
-import { FloatingInsightsButton } from "@/components/insights/FloatingInsightsButton";
 import { ProcessingToast } from "@/components/navbar/ProcessingToast";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 import { useAsyncFileProcessor } from "@/hooks/useAsyncFileProcessor";
@@ -130,15 +129,10 @@ const Index = () => {
         ) : (
           <div className="space-y-8">
             {/* Dashboard Tabs */}
-            <DashboardTabs widgets={allWidgets} />
+            <DashboardTabs widgets={allWidgets} rawJsonStrings={rawJsonStrings} />
           </div>
         )}
       </main>
-
-      {/* Floating AI Insights Button */}
-      {rawJsonStrings.length > 0 && (
-        <FloatingInsightsButton rawJsonStrings={rawJsonStrings} />
-      )}
 
       {/* Processing Toast */}
       {showProcessingToast && (

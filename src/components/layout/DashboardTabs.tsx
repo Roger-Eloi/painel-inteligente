@@ -6,13 +6,15 @@ import { DashboardFilters } from "@/components/filters/DashboardFilters";
 import { ParsedWidget } from "@/utils/jsonParser";
 import { exportDashboardToPDF, exportAllTablesToCSV, exportKeywordsToPDF, exportKeywordsToCSV, exportSatisfactionToPDF } from "@/utils/exportHelpers";
 import { getCategoryDisplayName } from "@/utils/categoryMapping";
-import { FileDown, FileSpreadsheet } from "lucide-react";
+import { FileDown, FileSpreadsheet, Sparkles } from "lucide-react";
+import { AIAnalysisTab } from "@/components/insights/AIAnalysisTab";
 
 interface DashboardTabsProps {
   widgets: ParsedWidget[];
+  rawJsonStrings: string[];
 }
 
-export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
+export const DashboardTabs = ({ widgets, rawJsonStrings }: DashboardTabsProps) => {
   // Agrupar widgets por categoria
   const categories = useMemo(() => {
     const grouped: Record<string, ParsedWidget[]> = {};
@@ -137,7 +139,7 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
 
   return (
     <Tabs defaultValue="todos" className="w-full">
-      <TabsList className="grid w-full gap-2 mb-6 h-auto p-1 bg-muted/50" style={{ gridTemplateColumns: `repeat(${categoryKeys.length + 1}, minmax(0, 1fr))` }}>
+      <TabsList className="grid w-full gap-2 mb-6 h-auto p-1 bg-muted/50" style={{ gridTemplateColumns: `repeat(${categoryKeys.length + 2}, minmax(0, 1fr))` }}>
         <TabsTrigger 
           value="todos" 
           className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -153,6 +155,13 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
             {getCategoryDisplayName(category)} ({categories[category].length})
           </TabsTrigger>
         ))}
+        <TabsTrigger 
+          value="ai-analysis"
+          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2"
+        >
+          <Sparkles className="h-4 w-4" />
+          Análises com IA
+        </TabsTrigger>
       </TabsList>
       
       {/* Aba "Todos" */}
@@ -197,6 +206,14 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
           <DashboardGrid widgets={filteredCategories[category] || categories[category]} />
         </TabsContent>
       ))}
+
+      {/* Aba Análises com IA */}
+      <TabsContent 
+        value="ai-analysis"
+        className="animate-fade-in mt-0"
+      >
+        <AIAnalysisTab rawJsonStrings={rawJsonStrings} />
+      </TabsContent>
     </Tabs>
   );
 };
