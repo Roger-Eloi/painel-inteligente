@@ -58,8 +58,15 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.text();
-      setFullText(result);
+      const result = await response.json();
+      const analysisText = result.RESPOSTA || result.teste || "";
+      
+      if (!analysisText) {
+        console.error("Resposta do N8N sem campo RESPOSTA ou teste:", result);
+        throw new Error("Formato de resposta inválido do servidor");
+      }
+      
+      setFullText(analysisText);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching AI analysis:", error);
