@@ -605,3 +605,439 @@ export const exportSatisfactionToPDF = async (
 
   pdf.save(`relatorio-satisfacao-${Date.now()}.pdf`);
 };
+
+// Interface para dados de instalações
+interface InstallationsExportData {
+  selectedSeries: {
+    name: string;
+    totalInstalls: number;
+    monthlyGrowth?: number;
+    yearlyGrowth?: number;
+    dateRange: { start: string; end: string };
+    color: string;
+  };
+  filteredMetrics: {
+    totalInstalls: number;
+    averagePerWeek: number;
+    averagePerDay: number;
+    dateRange?: { start: string; end: string };
+  };
+  chartData: {
+    displayData: Array<{ date: string; installs: number }>;
+    weekdayData: Array<{ weekday: string; average: number }>;
+    monthlyData: Array<{ month: string; installs: number }>;
+    viewMode: 'daily' | 'cumulative' | 'moving-average';
+  };
+  useCompactNumbers: boolean;
+}
+
+// Exportar relatório de Instalações para PDF
+export const exportInstallationsToPDF = async (
+  data: InstallationsExportData,
+  formatNumber: (value: number) => string
+) => {
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  
+  // Carregar logo
+  let logoBase64: string;
+  try {
+    logoBase64 = await svgToBase64('#1A89FF');
+  } catch (error) {
+    console.error('Error loading logo:', error);
+    logoBase64 = '';
+  }
+  
+  // Função para adicionar rodapé com logo
+  const addFooter = (pageNum: number, totalPages: number) => {
+    pdf.setDrawColor(26, 137, 255);
+    pdf.setLineWidth(0.5);
+    pdf.line(15, pageHeight - 20, pageWidth - 15, pageHeight - 20);
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFontSize(9);
+    pdf.text(`Página ${pageNum} de ${totalPages}`, 15, pageHeight - 12);
+    if (logoBase64) {
+      pdf.addImage(logoBase64, 'PNG', pageWidth - 50, pageHeight - 18, 35, 6.5);
+    }
+  };
+  
+  let currentPage = 1;
+  let yPosition = 20;
+  
+  // ========== CABEÇALHO ==========
+  pdf.setFillColor(26, 137, 255);
+  pdf.rect(0, 0, pageWidth, 35, 'F');
+  
+  // Logo no cabeçalho
+  if (logoBase64) {
+    pdf.addImage(logoBase64, 'PNG', 15, 10, 40, 7.5);
+  }
+  
+  // Título do relatório
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(20);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('Relatório de Instalações', pageWidth - 15, 17, { align: 'right' });
+  
+  pdf.setFontSize(11);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text(`Período: ${data.selectedSeries.name}`, pageWidth - 15, 25, { align: 'right' });
+  pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth - 15, 30, { align: 'right' });
+  
+  yPosition = 45;
+  
+  // ========== SEÇÃO 1: MÉTRICAS PRINCIPAIS ==========
+  pdf.setTextColor(26, 137, 255);
+  pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('📊 Métricas Principais', 15, yPosition);
+  yPosition += 8;
+  
+  pdf.setDrawColor(26, 137, 255);
+  pdf.setLineWidth(0.3);
+  pdf.line(15, yPosition, pageWidth - 15, yPosition);
+  yPosition += 8;
+  
+  // Grid de métricas (2x2)
+  const metricBoxWidth = (pageWidth - 40) / 2;
+  const metricBoxHeight = 22;
+  
+  // Métrica 1: Instalações Acumuladas
+  pdf.setFillColor(245, 247, 250);
+  pdf.rect(15, yPosition, metricBoxWidth, metricBoxHeight, 'F');
+  pdf.setTextColor(100, 100, 100);
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('INSTALAÇÕES ACUMULADAS', 20, yPosition + 6);
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFontSize(18);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(formatNumber(data.selectedSeries.totalInstalls), 20, yPosition + 14);
+  
+  // Crescimento
+  if (data.selectedSeries.monthlyGrowth !== undefined && data.selectedSeries.monthlyGrowth !== 0) {
+    const isPositive = data.selectedSeries.monthlyGrowth >= 0;
+    pdf.setFontSize(8);
+    pdf.setTextColor(isPositive ? 34 : 239, isPositive ? 197 : 68, isPositive ? 94 : 68);
+    const growthText = `${isPositive ? '↑' : '↓'} ${Math.abs(data.selectedSeries.monthlyGrowth).toFixed(2)}% (mês)`;
+    pdf.text(growthText, 20, yPosition + 19);
+  }
+  
+  // Métrica 2: Total de Instalações (período filtrado)
+  pdf.setFillColor(245, 247, 250);
+  pdf.rect(20 + metricBoxWidth, yPosition, metricBoxWidth, metricBoxHeight, 'F');
+  pdf.setTextColor(100, 100, 100);
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('TOTAL DE INSTALAÇÕES', 25 + metricBoxWidth, yPosition + 6);
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFontSize(18);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(formatNumber(data.filteredMetrics.totalInstalls), 25 + metricBoxWidth, yPosition + 14);
+  pdf.setTextColor(100, 100, 100);
+  pdf.setFontSize(7);
+  pdf.setFont('helvetica', 'normal');
+  const dateRangeText = data.filteredMetrics.dateRange 
+    ? `${new Date(data.filteredMetrics.dateRange.start).toLocaleDateString('pt-BR')} - ${new Date(data.filteredMetrics.dateRange.end).toLocaleDateString('pt-BR')}`
+    : `${new Date(data.selectedSeries.dateRange.start).toLocaleDateString('pt-BR')} - ${new Date(data.selectedSeries.dateRange.end).toLocaleDateString('pt-BR')}`;
+  pdf.text(dateRangeText, 25 + metricBoxWidth, yPosition + 19);
+  
+  yPosition += metricBoxHeight + 5;
+  
+  // Métrica 3: Média por Semana
+  pdf.setFillColor(245, 247, 250);
+  pdf.rect(15, yPosition, metricBoxWidth, metricBoxHeight, 'F');
+  pdf.setTextColor(100, 100, 100);
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('MÉDIA POR SEMANA', 20, yPosition + 6);
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFontSize(18);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(formatNumber(Math.round(data.filteredMetrics.averagePerWeek)), 20, yPosition + 14);
+  
+  // Métrica 4: Média por Dia
+  pdf.setFillColor(245, 247, 250);
+  pdf.rect(20 + metricBoxWidth, yPosition, metricBoxWidth, metricBoxHeight, 'F');
+  pdf.setTextColor(100, 100, 100);
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('MÉDIA POR DIA', 25 + metricBoxWidth, yPosition + 6);
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFontSize(18);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(formatNumber(Math.round(data.filteredMetrics.averagePerDay)), 25 + metricBoxWidth, yPosition + 14);
+  
+  yPosition += metricBoxHeight + 12;
+  
+  // ========== SEÇÃO 2: GRÁFICO DE EVOLUÇÃO ==========
+  pdf.setTextColor(26, 137, 255);
+  pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(`📈 Evolução das Instalações - ${data.selectedSeries.name}`, 15, yPosition);
+  yPosition += 5;
+  
+  pdf.setTextColor(100, 100, 100);
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'normal');
+  const viewModeLabels = {
+    'cumulative': 'Instalações Acumuladas',
+    'moving-average': 'Média Móvel (7 dias)',
+    'daily': 'Instalações Diárias'
+  };
+  pdf.text(`Modo de visualização: ${viewModeLabels[data.chartData.viewMode]}`, 15, yPosition + 3);
+  yPosition += 10;
+  
+  // Tentar capturar o gráfico de área
+  const areaChartElement = document.querySelector('[data-chart-type="installations-area"]');
+  if (areaChartElement) {
+    try {
+      const canvas = await html2canvas(areaChartElement as HTMLElement, { 
+        scale: 3,
+        logging: false,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = pageWidth - 30;
+      const imgHeight = 80;
+      
+      if (yPosition + imgHeight > pageHeight - 30) {
+        addFooter(currentPage, 0);
+        pdf.addPage();
+        currentPage++;
+        yPosition = 20;
+      }
+      
+      pdf.addImage(imgData, 'PNG', 15, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10;
+    } catch (error) {
+      console.error('Error capturing area chart:', error);
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFontSize(10);
+      pdf.text('⚠️ Gráfico não pôde ser capturado', 15, yPosition);
+      yPosition += 10;
+    }
+  }
+  
+  // ========== SEÇÃO 3: DISTRIBUIÇÃO POR DIA DA SEMANA ==========
+  if (yPosition > pageHeight - 80) {
+    addFooter(currentPage, 0);
+    pdf.addPage();
+    currentPage++;
+    yPosition = 20;
+  }
+  
+  pdf.setTextColor(26, 137, 255);
+  pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('📅 Distribuição por Dia da Semana', 15, yPosition);
+  yPosition += 8;
+  
+  pdf.setDrawColor(26, 137, 255);
+  pdf.line(15, yPosition, pageWidth - 15, yPosition);
+  yPosition += 8;
+  
+  // Tentar capturar gráfico de barras
+  const weekdayChartElement = document.querySelector('[data-chart-type="installations-weekday"]');
+  if (weekdayChartElement) {
+    try {
+      const canvas = await html2canvas(weekdayChartElement as HTMLElement, { 
+        scale: 3,
+        logging: false,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = (pageWidth - 40) / 2;
+      const imgHeight = 70;
+      
+      pdf.addImage(imgData, 'PNG', 15, yPosition, imgWidth, imgHeight);
+    } catch (error) {
+      console.error('Error capturing weekday chart:', error);
+    }
+  }
+  
+  // ========== SEÇÃO 4: TABELA MENSAL ==========
+  pdf.setTextColor(26, 137, 255);
+  pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('📆 Instalações por Mês', pageWidth / 2 + 10, yPosition);
+  yPosition += 8;
+  
+  pdf.setDrawColor(26, 137, 255);
+  pdf.line(pageWidth / 2 + 10, yPosition, pageWidth - 15, yPosition);
+  yPosition += 3;
+  
+  // Criar tabela mensal
+  const monthlyTableData = data.chartData.monthlyData.map((item, index) => {
+    const previousInstalls = index > 0 ? data.chartData.monthlyData[index - 1].installs : 0;
+    const growth = index > 0 && previousInstalls > 0
+      ? ((item.installs - previousInstalls) / previousInstalls * 100).toFixed(1) + '%'
+      : '—';
+    
+    return [
+      item.month,
+      formatNumber(item.installs),
+      growth
+    ];
+  });
+  
+  autoTable(pdf, {
+    startY: yPosition,
+    head: [['Mês', 'Instalações', 'Variação']],
+    body: monthlyTableData,
+    theme: 'grid',
+    styles: { 
+      fontSize: 8,
+      cellPadding: 2
+    },
+    headStyles: { 
+      fillColor: [26, 137, 255],
+      fontSize: 9,
+      fontStyle: 'bold',
+      halign: 'center'
+    },
+    columnStyles: {
+      0: { cellWidth: 40 },
+      1: { halign: 'right', cellWidth: 30 },
+      2: { halign: 'center', cellWidth: 25 }
+    },
+    margin: { left: pageWidth / 2 + 10, right: 15 },
+    didDrawPage: () => {
+      currentPage = (pdf as any).internal.getCurrentPageInfo().pageNumber;
+    }
+  });
+  
+  // Calcular total de páginas e adicionar rodapés
+  const totalPages = (pdf as any).internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    pdf.setPage(i);
+    addFooter(i, totalPages);
+  }
+  
+  // Salvar PDF
+  const filename = `relatorio-instalacoes-${data.selectedSeries.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`;
+  pdf.save(filename);
+};
+
+// Exportar dados de Instalações para CSV
+export const exportInstallationsToCSV = (
+  data: InstallationsExportData,
+  formatNumber: (value: number) => string
+) => {
+  const csvData: any[] = [];
+  
+  // SEÇÃO 1: Métricas Principais
+  csvData.push({ 
+    Secao: 'MÉTRICAS PRINCIPAIS',
+    Campo: '',
+    Valor: '',
+    Detalhes: ''
+  });
+  
+  csvData.push({
+    Secao: 'Métricas',
+    Campo: 'Instalações Acumuladas',
+    Valor: data.selectedSeries.totalInstalls,
+    Detalhes: data.selectedSeries.monthlyGrowth !== undefined 
+      ? `Crescimento mensal: ${data.selectedSeries.monthlyGrowth.toFixed(2)}%`
+      : ''
+  });
+  
+  csvData.push({
+    Secao: 'Métricas',
+    Campo: 'Total de Instalações (período filtrado)',
+    Valor: data.filteredMetrics.totalInstalls,
+    Detalhes: data.filteredMetrics.dateRange
+      ? `${new Date(data.filteredMetrics.dateRange.start).toLocaleDateString('pt-BR')} - ${new Date(data.filteredMetrics.dateRange.end).toLocaleDateString('pt-BR')}`
+      : ''
+  });
+  
+  csvData.push({
+    Secao: 'Métricas',
+    Campo: 'Média por Semana',
+    Valor: Math.round(data.filteredMetrics.averagePerWeek),
+    Detalhes: ''
+  });
+  
+  csvData.push({
+    Secao: 'Métricas',
+    Campo: 'Média por Dia',
+    Valor: Math.round(data.filteredMetrics.averagePerDay),
+    Detalhes: ''
+  });
+  
+  csvData.push({ Secao: '', Campo: '', Valor: '', Detalhes: '' });
+  
+  // SEÇÃO 2: Evolução Temporal
+  csvData.push({ 
+    Secao: 'EVOLUÇÃO TEMPORAL',
+    Campo: '',
+    Valor: '',
+    Detalhes: ''
+  });
+  
+  data.chartData.displayData.forEach(item => {
+    csvData.push({
+      Secao: 'Evolução',
+      Campo: 'Data',
+      Valor: new Date(item.date).toLocaleDateString('pt-BR'),
+      Detalhes: `${item.installs} instalações`
+    });
+  });
+  
+  csvData.push({ Secao: '', Campo: '', Valor: '', Detalhes: '' });
+  
+  // SEÇÃO 3: Distribuição por Dia da Semana
+  csvData.push({ 
+    Secao: 'DISTRIBUIÇÃO POR DIA DA SEMANA',
+    Campo: '',
+    Valor: '',
+    Detalhes: ''
+  });
+  
+  data.chartData.weekdayData.forEach(item => {
+    csvData.push({
+      Secao: 'Dia da Semana',
+      Campo: item.weekday,
+      Valor: item.average,
+      Detalhes: 'Média de instalações'
+    });
+  });
+  
+  csvData.push({ Secao: '', Campo: '', Valor: '', Detalhes: '' });
+  
+  // SEÇÃO 4: Instalações Mensais
+  csvData.push({ 
+    Secao: 'INSTALAÇÕES MENSAIS',
+    Campo: '',
+    Valor: '',
+    Detalhes: ''
+  });
+  
+  data.chartData.monthlyData.forEach((item, index) => {
+    const previousInstalls = index > 0 ? data.chartData.monthlyData[index - 1].installs : 0;
+    const growth = index > 0 && previousInstalls > 0
+      ? `${((item.installs - previousInstalls) / previousInstalls * 100).toFixed(1)}%`
+      : '—';
+    
+    csvData.push({
+      Secao: 'Mês',
+      Campo: item.month,
+      Valor: item.installs,
+      Detalhes: `Variação: ${growth}`
+    });
+  });
+  
+  // Gerar CSV com UTF-8 BOM
+  const csv = '\uFEFF' + Papa.unparse(csvData);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `instalacoes-${data.selectedSeries.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.csv`;
+  link.click();
+};

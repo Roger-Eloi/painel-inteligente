@@ -19,7 +19,8 @@ import {
   Cell,
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { Calendar as CalendarIcon, Check, X, TrendingUp, TrendingDown } from "lucide-react";
+import { Calendar as CalendarIcon, Check, X, TrendingUp, TrendingDown, Download, FileSpreadsheet } from "lucide-react";
+import { exportInstallationsToPDF, exportInstallationsToCSV } from "@/utils/exportHelpers";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -485,10 +486,77 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
       case 'daily':
       default:
         displayData = filteredTimeSeriesData;
-        yAxisLabel = 'Instalações Diárias';
+      yAxisLabel = 'Instalações Diárias';
         break;
     }
   }
+
+  // Handlers de exportação
+  const handleExportPDF = async () => {
+    if (!selectedSeries) return;
+    
+    const exportData = {
+      selectedSeries: {
+        name: selectedSeries.name,
+        totalInstalls: selectedSeries.totalInstalls,
+        monthlyGrowth: selectedSeries.monthlyGrowth,
+        yearlyGrowth: selectedSeries.yearlyGrowth,
+        dateRange: selectedSeries.dateRange,
+        color: selectedSeries.color
+      },
+      filteredMetrics: {
+        totalInstalls: filteredTotalInstalls,
+        averagePerWeek: filteredAveragePerWeek,
+        averagePerDay: filteredAveragePerDay,
+        dateRange: showAllPeriods ? undefined : {
+          start: dateFilter.start!.toISOString(),
+          end: dateFilter.end!.toISOString()
+        }
+      },
+      chartData: {
+        displayData,
+        weekdayData: getFilteredWeekdayData(filteredTimeSeriesData),
+        monthlyData: yearFilteredMonthlyData,
+        viewMode
+      },
+      useCompactNumbers
+    };
+    
+    await exportInstallationsToPDF(exportData, formatNumber);
+  };
+
+  const handleExportCSV = () => {
+    if (!selectedSeries) return;
+    
+    const exportData = {
+      selectedSeries: {
+        name: selectedSeries.name,
+        totalInstalls: selectedSeries.totalInstalls,
+        monthlyGrowth: selectedSeries.monthlyGrowth,
+        yearlyGrowth: selectedSeries.yearlyGrowth,
+        dateRange: selectedSeries.dateRange,
+        color: selectedSeries.color
+      },
+      filteredMetrics: {
+        totalInstalls: filteredTotalInstalls,
+        averagePerWeek: filteredAveragePerWeek,
+        averagePerDay: filteredAveragePerDay,
+        dateRange: showAllPeriods ? undefined : {
+          start: dateFilter.start!.toISOString(),
+          end: dateFilter.end!.toISOString()
+        }
+      },
+      chartData: {
+        displayData,
+        weekdayData: getFilteredWeekdayData(filteredTimeSeriesData),
+        monthlyData: yearFilteredMonthlyData,
+        viewMode
+      },
+      useCompactNumbers
+    };
+    
+    exportInstallationsToCSV(exportData, formatNumber);
+  };
 
   if (!allInstallationsSeries || allInstallationsSeries.length === 0) {
     return (
@@ -521,22 +589,52 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between">
-              <div>
+              <div className="flex-1">
                 <CardTitle>Selecione o Período</CardTitle>
                 <CardDescription>Escolha qual arquivo de instalações deseja visualizar</CardDescription>
               </div>
               
-              {/* Toggle de Formatação Compacta */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-muted-foreground">
-                {useCompactNumbers ? 'Compacto' : 'Completo'}
-              </span>
-              <Switch
-                checked={useCompactNumbers}
-                onCheckedChange={setUseCompactNumbers}
-                aria-label="Alternar formatação de números"
-              />
-            </div>
+              {/* Botões de Exportação + Toggle */}
+              <div className="flex items-center gap-3">
+                {/* Botões de Exportação */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportPDF}
+                    disabled={!selectedSeries}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Exportar PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportCSV}
+                    disabled={!selectedSeries}
+                    className="gap-2"
+                  >
+                    <FileSpreadsheet className="h-4 w-4" />
+                    Exportar CSV
+                  </Button>
+                </div>
+                
+                {/* Separador visual */}
+                <div className="h-8 w-px bg-border" />
+                
+                {/* Toggle de Formatação Compacta */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {useCompactNumbers ? 'Compacto' : 'Completo'}
+                  </span>
+                  <Switch
+                    checked={useCompactNumbers}
+                    onCheckedChange={setUseCompactNumbers}
+                    aria-label="Alternar formatação de números"
+                  />
+                </div>
+              </div>
             </div>
           </CardHeader>
         <CardContent>
@@ -767,17 +865,18 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
               </div>
             </CardHeader>
             <CardContent>
-              <ChartContainer
-                config={{
-                  installs: {
-                    label: yAxisLabel,
-                    color: selectedSeries.color,
-                  },
-                }}
-                className="h-[350px] w-full"
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={displayData}>
+              <div data-chart-type="installations-area">
+                <ChartContainer
+                  config={{
+                    installs: {
+                      label: yAxisLabel,
+                      color: selectedSeries.color,
+                    },
+                  }}
+                  className="h-[350px] w-full"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={displayData}>
                     <defs>
                       <linearGradient id={`colorInstalls-${selectedSeries.id}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={selectedSeries.color} stopOpacity={0.3} />
@@ -828,6 +927,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                   </AreaChart>
                 </ResponsiveContainer>
               </ChartContainer>
+              </div>
               
               {/* Descrição do Widget */}
               {selectedSeries.widget.description && (
@@ -854,17 +954,18 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer
-                  config={{
-                    average: {
-                      label: "Média de Instalações",
-                      color: selectedSeries.color,
-                    },
-                  }}
-                  className="h-[390px] w-full"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart 
+                <div data-chart-type="installations-weekday">
+                  <ChartContainer
+                    config={{
+                      average: {
+                        label: "Média de Instalações",
+                        color: selectedSeries.color,
+                      },
+                    }}
+                    className="h-[390px] w-full"
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
                       data={getFilteredWeekdayData(filteredTimeSeriesData)}
                       layout="vertical"
                       margin={{ top: 5, right: 60, left: 0, bottom: 5 }}
@@ -899,6 +1000,7 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
+                </div>
               </CardContent>
             </Card>
 
