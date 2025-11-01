@@ -691,7 +691,7 @@ export const exportInstallationsToPDF = async (
   pdf.setTextColor(26, 137, 255);
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('📊 Métricas Principais', 15, yPosition);
+  pdf.text('Métricas Principais', 15, yPosition);
   yPosition += 8;
   
   pdf.setDrawColor(26, 137, 255);
@@ -701,7 +701,8 @@ export const exportInstallationsToPDF = async (
   
   // Grid de métricas (2x2)
   const metricBoxWidth = (pageWidth - 40) / 2;
-  const metricBoxHeight = 22;
+  const metricBoxHeight = 24;
+  const metricGap = 5;
   
   // Métrica 1: Instalações Acumuladas
   pdf.setFillColor(245, 247, 250);
@@ -709,41 +710,41 @@ export const exportInstallationsToPDF = async (
   pdf.setTextColor(100, 100, 100);
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('INSTALAÇÕES ACUMULADAS', 20, yPosition + 6);
+  pdf.text('INSTALAÇÕES ACUMULADAS', 20, yPosition + 7);
   pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(18);
+  pdf.setFontSize(16);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(formatNumber(data.selectedSeries.totalInstalls), 20, yPosition + 14);
+  pdf.text(formatNumber(data.selectedSeries.totalInstalls), 20, yPosition + 15);
   
   // Crescimento
   if (data.selectedSeries.monthlyGrowth !== undefined && data.selectedSeries.monthlyGrowth !== 0) {
     const isPositive = data.selectedSeries.monthlyGrowth >= 0;
     pdf.setFontSize(8);
     pdf.setTextColor(isPositive ? 34 : 239, isPositive ? 197 : 68, isPositive ? 94 : 68);
-    const growthText = `${isPositive ? '↑' : '↓'} ${Math.abs(data.selectedSeries.monthlyGrowth).toFixed(2)}% (mês)`;
-    pdf.text(growthText, 20, yPosition + 19);
+    const growthText = `${isPositive ? '+' : ''}${data.selectedSeries.monthlyGrowth.toFixed(1)}% (mês)`;
+    pdf.text(growthText, 20, yPosition + 21);
   }
   
-  // Métrica 2: Total de Instalações (período filtrado)
+  // Métrica 2: Total de Instalações
   pdf.setFillColor(245, 247, 250);
   pdf.rect(20 + metricBoxWidth, yPosition, metricBoxWidth, metricBoxHeight, 'F');
   pdf.setTextColor(100, 100, 100);
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('TOTAL DE INSTALAÇÕES', 25 + metricBoxWidth, yPosition + 6);
+  pdf.text('TOTAL PERÍODO', 25 + metricBoxWidth, yPosition + 7);
   pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(18);
+  pdf.setFontSize(16);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(formatNumber(data.filteredMetrics.totalInstalls), 25 + metricBoxWidth, yPosition + 14);
+  pdf.text(formatNumber(data.filteredMetrics.totalInstalls), 25 + metricBoxWidth, yPosition + 15);
   pdf.setTextColor(100, 100, 100);
   pdf.setFontSize(7);
   pdf.setFont('helvetica', 'normal');
   const dateRangeText = data.filteredMetrics.dateRange 
     ? `${new Date(data.filteredMetrics.dateRange.start).toLocaleDateString('pt-BR')} - ${new Date(data.filteredMetrics.dateRange.end).toLocaleDateString('pt-BR')}`
     : `${new Date(data.selectedSeries.dateRange.start).toLocaleDateString('pt-BR')} - ${new Date(data.selectedSeries.dateRange.end).toLocaleDateString('pt-BR')}`;
-  pdf.text(dateRangeText, 25 + metricBoxWidth, yPosition + 19);
+  pdf.text(dateRangeText, 25 + metricBoxWidth, yPosition + 21);
   
-  yPosition += metricBoxHeight + 5;
+  yPosition += metricBoxHeight + metricGap;
   
   // Métrica 3: Média por Semana
   pdf.setFillColor(245, 247, 250);
@@ -751,11 +752,11 @@ export const exportInstallationsToPDF = async (
   pdf.setTextColor(100, 100, 100);
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('MÉDIA POR SEMANA', 20, yPosition + 6);
+  pdf.text('MÉDIA POR SEMANA', 20, yPosition + 7);
   pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(18);
+  pdf.setFontSize(16);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(formatNumber(Math.round(data.filteredMetrics.averagePerWeek)), 20, yPosition + 14);
+  pdf.text(formatNumber(Math.round(data.filteredMetrics.averagePerWeek)), 20, yPosition + 15);
   
   // Métrica 4: Média por Dia
   pdf.setFillColor(245, 247, 250);
@@ -763,11 +764,11 @@ export const exportInstallationsToPDF = async (
   pdf.setTextColor(100, 100, 100);
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('MÉDIA POR DIA', 25 + metricBoxWidth, yPosition + 6);
+  pdf.text('MÉDIA POR DIA', 25 + metricBoxWidth, yPosition + 7);
   pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(18);
+  pdf.setFontSize(16);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(formatNumber(Math.round(data.filteredMetrics.averagePerDay)), 25 + metricBoxWidth, yPosition + 14);
+  pdf.text(formatNumber(Math.round(data.filteredMetrics.averagePerDay)), 25 + metricBoxWidth, yPosition + 15);
   
   yPosition += metricBoxHeight + 12;
   
@@ -775,7 +776,7 @@ export const exportInstallationsToPDF = async (
   pdf.setTextColor(26, 137, 255);
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(`📈 Evolução das Instalações - ${data.selectedSeries.name}`, 15, yPosition);
+  pdf.text(`Evolução das Instalações - ${data.selectedSeries.name}`, 15, yPosition);
   yPosition += 5;
   
   pdf.setTextColor(100, 100, 100);
@@ -817,7 +818,7 @@ export const exportInstallationsToPDF = async (
       console.error('Error capturing area chart:', error);
       pdf.setTextColor(150, 150, 150);
       pdf.setFontSize(10);
-      pdf.text('⚠️ Gráfico não pôde ser capturado', 15, yPosition);
+      pdf.text('Gráfico não disponível para captura', 15, yPosition);
       yPosition += 10;
     }
   }
@@ -833,7 +834,7 @@ export const exportInstallationsToPDF = async (
   pdf.setTextColor(26, 137, 255);
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('📅 Distribuição por Dia da Semana', 15, yPosition);
+  pdf.text('Distribuição por Dia da Semana', 15, yPosition);
   yPosition += 8;
   
   pdf.setDrawColor(26, 137, 255);
@@ -865,7 +866,7 @@ export const exportInstallationsToPDF = async (
   pdf.setTextColor(26, 137, 255);
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('📆 Instalações por Mês', pageWidth / 2 + 10, yPosition);
+  pdf.text('Instalações por Mês', pageWidth / 2 + 10, yPosition);
   yPosition += 8;
   
   pdf.setDrawColor(26, 137, 255);
@@ -931,105 +932,100 @@ export const exportInstallationsToCSV = (
 ) => {
   const csvData: any[] = [];
   
-  // SEÇÃO 1: Métricas Principais
+  // ========== CABEÇALHO DO RELATÓRIO ==========
   csvData.push({ 
-    Secao: 'MÉTRICAS PRINCIPAIS',
-    Campo: '',
-    Valor: '',
-    Detalhes: ''
+    Tipo: 'Relatório',
+    Categoria: 'Instalações',
+    Período: data.selectedSeries.name,
+    'Data Geração': new Date().toLocaleString('pt-BR')
   });
+  csvData.push({}); // Linha vazia
   
-  csvData.push({
-    Secao: 'Métricas',
-    Campo: 'Instalações Acumuladas',
+  // ========== SEÇÃO 1: MÉTRICAS RESUMIDAS ==========
+  csvData.push({ 
+    Métrica: 'Instalações Acumuladas',
     Valor: data.selectedSeries.totalInstalls,
-    Detalhes: data.selectedSeries.monthlyGrowth !== undefined 
-      ? `Crescimento mensal: ${data.selectedSeries.monthlyGrowth.toFixed(2)}%`
-      : ''
+    Crescimento: data.selectedSeries.monthlyGrowth !== undefined 
+      ? `${data.selectedSeries.monthlyGrowth.toFixed(2)}% (mês)`
+      : 'N/A'
   });
   
   csvData.push({
-    Secao: 'Métricas',
-    Campo: 'Total de Instalações (período filtrado)',
+    Métrica: 'Total no Período Filtrado',
     Valor: data.filteredMetrics.totalInstalls,
-    Detalhes: data.filteredMetrics.dateRange
-      ? `${new Date(data.filteredMetrics.dateRange.start).toLocaleDateString('pt-BR')} - ${new Date(data.filteredMetrics.dateRange.end).toLocaleDateString('pt-BR')}`
-      : ''
+    Crescimento: data.filteredMetrics.dateRange
+      ? `${new Date(data.filteredMetrics.dateRange.start).toLocaleDateString('pt-BR')} até ${new Date(data.filteredMetrics.dateRange.end).toLocaleDateString('pt-BR')}`
+      : 'Período completo'
   });
   
   csvData.push({
-    Secao: 'Métricas',
-    Campo: 'Média por Semana',
+    Métrica: 'Média Semanal',
     Valor: Math.round(data.filteredMetrics.averagePerWeek),
-    Detalhes: ''
+    Crescimento: ''
   });
   
   csvData.push({
-    Secao: 'Métricas',
-    Campo: 'Média por Dia',
+    Métrica: 'Média Diária',
     Valor: Math.round(data.filteredMetrics.averagePerDay),
-    Detalhes: ''
+    Crescimento: ''
   });
   
-  csvData.push({ Secao: '', Campo: '', Valor: '', Detalhes: '' });
+  csvData.push({}); // Linha vazia
+  csvData.push({}); // Linha vazia
   
-  // SEÇÃO 2: Evolução Temporal
+  // ========== SEÇÃO 2: EVOLUÇÃO DIÁRIA ==========
   csvData.push({ 
-    Secao: 'EVOLUÇÃO TEMPORAL',
-    Campo: '',
-    Valor: '',
-    Detalhes: ''
+    Data: '=== EVOLUÇÃO TEMPORAL ===',
+    Instalações: '',
+    'Modo Visualização': data.chartData.viewMode === 'cumulative' ? 'Acumulado' 
+      : data.chartData.viewMode === 'moving-average' ? 'Média Móvel 7d' 
+      : 'Diário'
   });
   
   data.chartData.displayData.forEach(item => {
     csvData.push({
-      Secao: 'Evolução',
-      Campo: 'Data',
-      Valor: new Date(item.date).toLocaleDateString('pt-BR'),
-      Detalhes: `${item.installs} instalações`
+      Data: new Date(item.date).toLocaleDateString('pt-BR'),
+      Instalações: item.installs,
+      'Modo Visualização': ''
     });
   });
   
-  csvData.push({ Secao: '', Campo: '', Valor: '', Detalhes: '' });
+  csvData.push({}); // Linha vazia
+  csvData.push({}); // Linha vazia
   
-  // SEÇÃO 3: Distribuição por Dia da Semana
+  // ========== SEÇÃO 3: DISTRIBUIÇÃO POR DIA DA SEMANA ==========
   csvData.push({ 
-    Secao: 'DISTRIBUIÇÃO POR DIA DA SEMANA',
-    Campo: '',
-    Valor: '',
-    Detalhes: ''
+    'Dia da Semana': '=== DISTRIBUIÇÃO SEMANAL ===',
+    'Média Instalações': ''
   });
   
   data.chartData.weekdayData.forEach(item => {
     csvData.push({
-      Secao: 'Dia da Semana',
-      Campo: item.weekday,
-      Valor: item.average,
-      Detalhes: 'Média de instalações'
+      'Dia da Semana': item.weekday,
+      'Média Instalações': Math.round(item.average)
     });
   });
   
-  csvData.push({ Secao: '', Campo: '', Valor: '', Detalhes: '' });
+  csvData.push({}); // Linha vazia
+  csvData.push({}); // Linha vazia
   
-  // SEÇÃO 4: Instalações Mensais
+  // ========== SEÇÃO 4: DADOS MENSAIS ==========
   csvData.push({ 
-    Secao: 'INSTALAÇÕES MENSAIS',
-    Campo: '',
-    Valor: '',
-    Detalhes: ''
+    Mês: '=== INSTALAÇÕES MENSAIS ===',
+    Total: '',
+    'Variação %': ''
   });
   
   data.chartData.monthlyData.forEach((item, index) => {
     const previousInstalls = index > 0 ? data.chartData.monthlyData[index - 1].installs : 0;
     const growth = index > 0 && previousInstalls > 0
-      ? `${((item.installs - previousInstalls) / previousInstalls * 100).toFixed(1)}%`
-      : '—';
+      ? ((item.installs - previousInstalls) / previousInstalls * 100).toFixed(1)
+      : '';
     
     csvData.push({
-      Secao: 'Mês',
-      Campo: item.month,
-      Valor: item.installs,
-      Detalhes: `Variação: ${growth}`
+      Mês: item.month,
+      Total: item.installs,
+      'Variação %': growth ? `${growth}%` : 'N/A'
     });
   });
   

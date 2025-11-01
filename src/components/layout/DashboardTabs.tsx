@@ -44,6 +44,15 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
     const displayName = getCategoryDisplayName(categoryName);
     const normalizedCategory = categoryName.toLowerCase();
     
+    // Verificar se é a categoria de instalações
+    if (normalizedCategory === 'category2' || displayName === 'Instalações') {
+      const exportEvent = new CustomEvent('export-installations', { 
+        detail: { type: 'pdf' } 
+      });
+      window.dispatchEvent(exportEvent);
+      return;
+    }
+    
     // Usar função específica para cada categoria
     if (normalizedCategory === 'category5') {
       await exportKeywordsToPDF(widgetsToExport, displayName);
@@ -58,6 +67,15 @@ export const DashboardTabs = ({ widgets }: DashboardTabsProps) => {
     const widgetsToExport = filteredCategories[categoryName] || categories[categoryName];
     const displayName = getCategoryDisplayName(categoryName).toLowerCase().replace(/\s+/g, '-');
     const normalizedCategory = categoryName.toLowerCase();
+    
+    // Verificar se é a categoria de instalações
+    if (normalizedCategory === 'category2' || displayName === 'instalações') {
+      const exportEvent = new CustomEvent('export-installations', { 
+        detail: { type: 'csv' } 
+      });
+      window.dispatchEvent(exportEvent);
+      return;
+    }
     
     // Usar função específica para cada categoria
     if (normalizedCategory === 'category5') {

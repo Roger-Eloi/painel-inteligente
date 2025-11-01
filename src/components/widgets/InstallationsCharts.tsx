@@ -19,7 +19,7 @@ import {
   Cell,
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { Calendar as CalendarIcon, Check, X, TrendingUp, TrendingDown, Download, FileSpreadsheet } from "lucide-react";
+import { Calendar as CalendarIcon, Check, X, TrendingUp, TrendingDown } from "lucide-react";
 import { exportInstallationsToPDF, exportInstallationsToCSV } from "@/utils/exportHelpers";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -555,8 +555,26 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
       useCompactNumbers
     };
     
-    exportInstallationsToCSV(exportData, formatNumber);
+  exportInstallationsToCSV(exportData, formatNumber);
+};
+
+// Listener para eventos de exportação do DashboardTabs
+useEffect(() => {
+  const handleExportEvent = (event: Event) => {
+    const customEvent = event as CustomEvent;
+    if (customEvent.detail.type === 'pdf') {
+      handleExportPDF();
+    } else if (customEvent.detail.type === 'csv') {
+      handleExportCSV();
+    }
   };
+  
+  window.addEventListener('export-installations', handleExportEvent);
+  
+  return () => {
+    window.removeEventListener('export-installations', handleExportEvent);
+  };
+}, [selectedSeries, displayData, filteredTotalInstalls, filteredAveragePerWeek, filteredAveragePerDay, viewMode, yearFilteredMonthlyData, filteredTimeSeriesData]);
 
   if (!allInstallationsSeries || allInstallationsSeries.length === 0) {
     return (
@@ -594,46 +612,16 @@ export const InstallationsCharts = ({ widgets }: InstallationsChartsProps) => {
                 <CardDescription>Escolha qual arquivo de instalações deseja visualizar</CardDescription>
               </div>
               
-              {/* Botões de Exportação + Toggle */}
-              <div className="flex items-center gap-3">
-                {/* Botões de Exportação */}
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExportPDF}
-                    disabled={!selectedSeries}
-                    className="gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Exportar PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExportCSV}
-                    disabled={!selectedSeries}
-                    className="gap-2"
-                  >
-                    <FileSpreadsheet className="h-4 w-4" />
-                    Exportar CSV
-                  </Button>
-                </div>
-                
-                {/* Separador visual */}
-                <div className="h-8 w-px bg-border" />
-                
-                {/* Toggle de Formatação Compacta */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {useCompactNumbers ? 'Compacto' : 'Completo'}
-                  </span>
-                  <Switch
-                    checked={useCompactNumbers}
-                    onCheckedChange={setUseCompactNumbers}
-                    aria-label="Alternar formatação de números"
-                  />
-                </div>
+              {/* Toggle de Formatação Compacta */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {useCompactNumbers ? 'Compacto' : 'Completo'}
+                </span>
+                <Switch
+                  checked={useCompactNumbers}
+                  onCheckedChange={setUseCompactNumbers}
+                  aria-label="Alternar formatação de números"
+                />
               </div>
             </div>
           </CardHeader>
