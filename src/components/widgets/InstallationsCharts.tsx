@@ -317,6 +317,11 @@ export const InstallationsCharts = ({
     }
     const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
     const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+    
+    // Normalizar para início do dia (remover horário) para comparações corretas
+    minDate.setHours(0, 0, 0, 0);
+    maxDate.setHours(0, 0, 0, 0);
+    
     return {
       minDate,
       maxDate
@@ -740,8 +745,12 @@ export const InstallationsCharts = ({
                       }
                     }
                   }} disabled={date => {
+                    // Normalizar data do calendário para início do dia
+                    const normalizedDate = new Date(date);
+                    normalizedDate.setHours(0, 0, 0, 0);
+                    
                     // Desabilitar datas fora do range do JSON
-                    return date < availableDateRange.minDate || date > availableDateRange.maxDate;
+                    return normalizedDate < availableDateRange.minDate || normalizedDate > availableDateRange.maxDate;
                   }} defaultMonth={availableDateRange.minDate} locale={ptBR} numberOfMonths={2} className="pointer-events-auto" />
                     </PopoverContent>
                   </Popover>
