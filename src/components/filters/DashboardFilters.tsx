@@ -122,8 +122,8 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none"></SelectItem>
-                <SelectItem value="asc">↓ Menor</SelectItem>
-                <SelectItem value="desc">↑ Maior</SelectItem>
+                <SelectItem value="asc">Menor posição</SelectItem>
+                <SelectItem value="desc">Maior posição</SelectItem>
               </SelectContent>
             </Select>
           </div>
