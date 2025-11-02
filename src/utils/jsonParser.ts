@@ -37,38 +37,20 @@ const parseWidget = (widget: any, index: number): ParsedWidget => {
     name: category.name.toLowerCase()
   } : category;
   
-  // Extract actual data - prefer the dataset with more data points
+  // Extract actual data - SEMPRE usar o objeto "dados", nunca "exampleData"
   let extractedData: any[] = [];
-  let dataFromData: any[] = [];
-  let dataFromExample: any[] = [];
   
-  // Extract from 'data' field
+  // Buscar APENAS no campo "data" (que contém os dados reais)
   if (data && typeof data === 'object') {
     const appIds = Object.keys(data);
     if (appIds.length > 0) {
-      dataFromData = data[appIds[0]] || [];
+      extractedData = data[appIds[0]] || [];
     }
   }
   
-  // Extract from 'exampleData' field
-  if (exampleData && typeof exampleData === 'object') {
-    const appIds = Object.keys(exampleData);
-    if (appIds.length > 0) {
-      dataFromExample = exampleData[appIds[0]] || [];
-    }
-  }
-  
-  // Prefer the dataset with more data points
-  // This ensures we use the most complete dataset available
-  if (dataFromData.length > 0 && dataFromExample.length > 0) {
-    // Both exist - use the one with more data points
-    extractedData = dataFromData.length >= dataFromExample.length ? dataFromData : dataFromExample;
-  } else if (dataFromData.length > 0) {
-    // Only data exists
-    extractedData = dataFromData;
-  } else if (dataFromExample.length > 0) {
-    // Only exampleData exists
-    extractedData = dataFromExample;
+  // Log de warning se não houver dados válidos
+  if (extractedData.length === 0) {
+    console.warn(`[jsonParser] Widget "${name}" não possui dados no objeto "dados"`);
   }
   
   return {
