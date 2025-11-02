@@ -7,8 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { exportInsightsToPDF } from "@/utils/exportHelpers";
 import { shareToWhatsApp, shareToTelegram } from "@/utils/shareHelpers";
-import { preprocessDataForN8N } from "@/utils/dataPreprocessor";
-import { parseJsonData } from "@/utils/jsonParser";
 import WhatsAppIcon from "@/assets/whatsapp-icon.svg";
 import TelegramIcon from "@/assets/telegram-icon.svg";
 import LinkedInIcon from "@/assets/linkedin-icon.svg";
@@ -40,25 +38,8 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
     setIsLoading(true);
     
     try {
-      // Parsear os JSONs
-      const allWidgets = rawJsonStrings.flatMap(jsonStr => {
-        try {
-          const parsed = JSON.parse(jsonStr);
-          return parseJsonData(parsed);
-        } catch (error) {
-          console.error("Erro ao parsear JSON:", error);
-          return [];
-        }
-      });
-      
-      // Pré-processar os dados
-      const preprocessedData = preprocessDataForN8N(allWidgets);
-      
-      console.log("📊 Dados pré-processados para N8N:", preprocessedData);
-      
       const payload = {
-        DADOS_PROCESSADOS: preprocessedData,
-        DADOS_RAW: rawJsonStrings, // Manter raw como backup
+        DADOS: rawJsonStrings,
         PROMPT_USER: customPrompt || ""
       };
 
