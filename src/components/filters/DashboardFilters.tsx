@@ -121,7 +121,7 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
                 <SelectValue placeholder="Sem ordenação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none"></SelectItem>
+                <SelectItem value="none">Sem ordenação</SelectItem>
                 <SelectItem value="asc">Menor posição</SelectItem>
                 <SelectItem value="desc">Maior posição</SelectItem>
               </SelectContent>
