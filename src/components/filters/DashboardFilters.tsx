@@ -15,31 +15,31 @@ interface DashboardFiltersProps {
 }
 
 export const DashboardFilters = ({ category, widgets, onFilterChange }: DashboardFiltersProps) => {
-  const [keywordSearch, setKeywordSearch] = useState('');
-  const [competitivityFilter, setCompetitivityFilter] = useState<string>('all');
-  const [sortByPosition, setSortByPosition] = useState<'asc' | 'desc' | 'none'>('none');
+  const [keywordSearch, setKeywordSearch] = useState("");
+  const [competitivityFilter, setCompetitivityFilter] = useState<string>("all");
+  const [sortByPosition, setSortByPosition] = useState<"asc" | "desc" | "none">("none");
 
   useEffect(() => {
     let filtered = [...widgets];
 
     // Filtros específicos para Keywords (category5)
     if (shouldShowFilters(category)) {
-      filtered = filtered.map(widget => {
-        if (widget.kind === 'table') {
-          let filteredData = widget.data.filter(row => {
+      filtered = filtered.map((widget) => {
+        if (widget.kind === "table") {
+          let filteredData = widget.data.filter((row) => {
             // Buscar keyword
-            const keywordColumn = row.columns?.find((col: any) => col.field === 'keyword');
-            const keyword = keywordColumn?.value || '';
-            
+            const keywordColumn = row.columns?.find((col: any) => col.field === "keyword");
+            const keyword = keywordColumn?.value || "";
+
             if (keywordSearch && !keyword.toLowerCase().includes(keywordSearch.toLowerCase())) {
               return false;
             }
 
             // Filtrar competitividade
-            const competitivityColumn = row.columns?.find((col: any) => col.field === 'competitivity');
-            const competitivity = competitivityColumn?.value || '';
-            
-            if (competitivityFilter !== 'all' && competitivity !== competitivityFilter) {
+            const competitivityColumn = row.columns?.find((col: any) => col.field === "competitivity");
+            const competitivity = competitivityColumn?.value || "";
+
+            if (competitivityFilter !== "all" && competitivity !== competitivityFilter) {
               return false;
             }
 
@@ -47,13 +47,13 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
           });
 
           // Aplicar ordenação por posição
-          if (sortByPosition !== 'none') {
+          if (sortByPosition !== "none") {
             filteredData = [...filteredData].sort((a, b) => {
-              const posA = a.columns?.find((col: any) => col.field === 'position')?.value || 0;
-              const posB = b.columns?.find((col: any) => col.field === 'position')?.value || 0;
-              
-              return sortByPosition === 'asc' 
-                ? posA - posB  // Menor para maior
+              const posA = a.columns?.find((col: any) => col.field === "position")?.value || 0;
+              const posB = b.columns?.find((col: any) => col.field === "position")?.value || 0;
+
+              return sortByPosition === "asc"
+                ? posA - posB // Menor para maior
                 : posB - posA; // Maior para menor
             });
           }
@@ -72,7 +72,7 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
     return null;
   }
 
-  const hasFilters = keywordSearch || competitivityFilter !== 'all' || sortByPosition !== 'none';
+  const hasFilters = keywordSearch || competitivityFilter !== "all" || sortByPosition !== "none";
 
   return (
     <Card className="mb-6">
@@ -97,13 +97,8 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
 
           {/* Filtro de Competitividade */}
           <div>
-            <Label className="text-sm font-medium mb-2 block">
-              Competitividade
-            </Label>
-            <Select
-              value={competitivityFilter}
-              onValueChange={(value) => setCompetitivityFilter(value)}
-            >
+            <Label className="text-sm font-medium mb-2 block">Competitividade</Label>
+            <Select value={competitivityFilter} onValueChange={(value) => setCompetitivityFilter(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
@@ -120,20 +115,15 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
 
           {/* Ordenação por Posição */}
           <div>
-            <Label className="text-sm font-medium mb-2 block">
-              Ordenar por Posição
-            </Label>
-            <Select
-              value={sortByPosition}
-              onValueChange={(value: 'asc' | 'desc' | 'none') => setSortByPosition(value)}
-            >
+            <Label className="text-sm font-medium mb-2 block">Ordenar por Posição</Label>
+            <Select value={sortByPosition} onValueChange={(value: "asc" | "desc" | "none") => setSortByPosition(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Sem ordenação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Sem ordenação</SelectItem>
-                <SelectItem value="asc">Menor → Maior (1, 2, 3...)</SelectItem>
-                <SelectItem value="desc">Maior → Menor (...3, 2, 1)</SelectItem>
+                <SelectItem value="none"></SelectItem>
+                <SelectItem value="asc">↓ Menor</SelectItem>
+                <SelectItem value="desc">↑ Maior</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -143,9 +133,9 @@ export const DashboardFilters = ({ category, widgets, onFilterChange }: Dashboar
             <Button
               variant="outline"
               onClick={() => {
-                setKeywordSearch('');
-                setCompetitivityFilter('all');
-                setSortByPosition('none');
+                setKeywordSearch("");
+                setCompetitivityFilter("all");
+                setSortByPosition("none");
               }}
               className="w-full"
               disabled={!hasFilters}
