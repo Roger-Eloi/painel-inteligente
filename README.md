@@ -1,73 +1,60 @@
-# Welcome to your Lovable project
+# Painel Inteligente Lovable 
 
-## Project info
+Painel Inteligente desenvolvido com **Lovable** e integração ao **n8n**, focado na análise avançada de dados e automação para equipes de marketing, produto e negócios.  
+[🔗 Acessar o painel](https://painel-inteligente.lovable.app/?utm_source=lovable-editor)
 
-**URL**: https://lovable.dev/projects/ea7ea949-0d21-47b3-9f21-c74593ed5468
 
-## How can I edit this code?
 
-There are several ways of editing your application.
+## 🎯 Resumo
 
-**Use Lovable**
+O projeto oferece um painel dinâmico para visualização, processamento automatizado e análise de dados de aplicativos, centralizando informações essenciais através de agentes inteligentes integrados via n8n. Permite avaliação de performance, engajamento, satisfação e aquisição de usuários em linguagem natural com análise por categoria.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ea7ea949-0d21-47b3-9f21-c74593ed5468) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 💡 O que faz e quais problemas resolve
 
-**Use your preferred IDE**
+- Centraliza dashboards e relatórios inteligentes para apps.
+- Automatiza o encaminhamento de dados para agentes especializados de Análise, Ativação, Engajamento, Satisfação e Keywords.
+- Gera métricas e insights acionáveis para tomada de decisão por áreas de produto, marketing e negócios.
+- 
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📦 Requisitos e Dependências
 
-Follow these steps:
+- Conta n8n (servidor cloud) para receber as requisições
+- Permissões de autenticação básicas configuradas para o Webhook (lovable -> n8n)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## ⚡ Configuração no n8n
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 1. Configure o Webhooks
+  - 1.1 configure o path do webhook para `projeto-1-lovable-painel-inteligente` no n8n para receber dados do painel Lovable.
+  
+  - 1.2 Crie uma credencial básica com
+      - username: "produto.rankmyapp.com.br"
+      - password: "Mudar123"
+### 2. Configure o Modelo OpenIA
+  - Criar uma credencial da api e inserir sua chave `API KEY`  
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## Decisões técnicas tomadas
 
-**Edit a file directly in GitHub**
+- Optei por utilizar a orquestração de tool agents para maior organização do fluxo de agentes
+- Transformei os dados json em string para que o lovable enviasse ao n8n, para tratar esses dados
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Desafios encontrados e como foram resolvidos
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Tive dificuldade em tratar os dados brutos vindo do lovable, mas encontrei uma solução que foi reduzir a quantidade de palavras repetidas como por exemplo: "maxInstals", "createdAt", etc. assim reduzindo a quantidade de informações desnecessárias que serão enviadas ao prompt do agente que fará a analise desses dados.
 
-## What technologies are used for this project?
+---
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/ea7ea949-0d21-47b3-9f21-c74593ed5468) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🚀 Melhorias futuras
+- Trasformar os dados json recebidos e inseri-los em um banco de dados relacional para os agentes conseguirem ler e interpretar os dados com maior rapidez.
+- Criar uma chave única por dia para cada cliente, na qual registrará os dados json em um banco de dados relacional com esse id da chave e para futuras consultas nos dados não necessitar que envie todos os arquivos json novamente, com duração de expiração de 2h ou a cada novos arquivos sendo identificados no painel, assim deletando os dados anteriores do banco e registrando novos dados para os agentes passarem a utilizar nas análises.
+- Exportação completa de todo o painel para PDF
+- Cards abaixo dos gráficos com informações de insights gerados pela IA automaticamente
+---
