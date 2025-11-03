@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 import { filterDuplicates } from "@/utils/duplicateDetector";
+import { aiAnalysisManager } from "@/utils/aiAnalysisManager";
 
 export interface ProcessingState {
   isProcessing: boolean;
@@ -90,6 +91,9 @@ export const useAsyncFileProcessor = (
   const processFiles = useCallback(
     async (files: Array<{ name: string; data: any }>) => {
       cancelRef.current = false;
+      
+      // Resetar cache de IA quando processar novos arquivos
+      aiAnalysisManager.reset();
 
       updateState({
         isProcessing: true,
