@@ -48,7 +48,6 @@ O projeto oferece um painel dinâmico para visualização, processamento automat
 - Optei por utilizar a orquestração de tool agents para maior organização do fluxo de agentes
 - Transformei os dados json em string para que o lovable enviasse ao n8n, para tratar esses dados
 - Após todas as análises dos agente das categorias, passei todos os dados para um agente resume os dados de maneira inteligente
-- Não processar arquivos repetidos no painel
 - Filtros interativos para cada tipo de seção
 
 ---
