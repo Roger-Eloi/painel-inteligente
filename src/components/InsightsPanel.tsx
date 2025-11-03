@@ -47,7 +47,7 @@ export const InsightsPanel = ({ data, widgets }: InsightsPanelProps) => {
       };
 
       // Call N8N webhook with basic auth
-      const username = "produto@rankmyapp.com.br";
+      const username = "produto.rankmyapp.com.br";
       const password = "Mudar123";
       const credentials = btoa(`${username}:${password}`);
 
