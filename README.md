@@ -11,12 +11,11 @@ O projeto oferece um painel dinâmico para visualização, processamento automat
 
 ---
 
-## 💡 O que faz e quais problemas resolve
+## 💡 O que faz
 
 - Centraliza dashboards e relatórios inteligentes para apps.
 - Automatiza o encaminhamento de dados para agentes especializados de Análise, Ativação, Engajamento, Satisfação e Keywords.
 - Gera métricas e insights acionáveis para tomada de decisão por áreas de produto, marketing e negócios.
-- 
 
 ---
 
@@ -36,13 +35,14 @@ O projeto oferece um painel dinâmico para visualização, processamento automat
       - username: "produto.rankmyapp.com.br"
       - password: "Mudar123"
 ### 2. Configure o Modelo OpenIA
-  - Criar uma credencial da api e inserir sua chave `API KEY`  
+  - Criar uma credencial e inserir sua chave no campo `API KEY`  
 ---
 
 ## Decisões técnicas tomadas
 
 - Optei por utilizar a orquestração de tool agents para maior organização do fluxo de agentes
 - Transformei os dados json em string para que o lovable enviasse ao n8n, para tratar esses dados
+- Após todas as análises dos agente das categorias, passei todos os dados para um agente resume os dados de maneira inteligente
 
 ---
 
