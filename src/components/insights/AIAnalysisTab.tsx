@@ -26,7 +26,7 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
   const [isSending, setIsSending] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
   
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const contentEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -64,22 +64,44 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
     fetchInitialAnalysis();
   }, []);
 
+  // Listener de scroll manual para o viewport do ScrollArea
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const handleScrollEvent = () => {
+      const { scrollTop, scrollHeight, clientHeight } = viewport;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollButton(!isNearBottom);
+    };
+
+    viewport.addEventListener('scroll', handleScrollEvent);
+    return () => viewport.removeEventListener('scroll', handleScrollEvent);
+  }, []);
+
   // Auto-scroll quando mensagens mudam
   useEffect(() => {
-    if (!isSending && contentEndRef.current) {
-      contentEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (!isSending) {
+      const viewport = viewportRef.current;
+      if (viewport) {
+        setTimeout(() => {
+          viewport.scrollTo({
+            top: viewport.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 100);
+      }
     }
-  }, [chatMessages, isSending]);
-
-  // Detectar quando usuário rola para cima
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    const target = event.currentTarget;
-    const scrolledUp = target.scrollHeight - target.scrollTop - target.clientHeight > 100;
-    setShowScrollButton(scrolledUp);
-  };
+  }, [chatMessages, isSending, initialAnalysis]);
 
   const scrollToBottom = () => {
-    contentEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const viewport = viewportRef.current;
+    if (viewport) {
+      viewport.scrollTo({
+        top: viewport.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const fetchInitialAnalysis = async () => {
@@ -220,130 +242,128 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
       </div>
 
       {/* Conteúdo com scroll */}
-      <ScrollArea 
-        className="flex-1 p-6" 
-        ref={scrollAreaRef}
-        onScrollCapture={handleScroll}
-      >
-        <div className="space-y-6">
-          {/* Análise Inicial */}
-          <div className="prose prose-slate dark:prose-invert max-w-none">
-            <ReactMarkdown
-              components={{
-                h1: ({ node, ...props }) => (
-                  <h1 className="text-3xl font-bold mb-4 text-primary" {...props} />
-                ),
-                h2: ({ node, ...props }) => (
-                  <h2 className="text-2xl font-semibold mb-3 text-primary" {...props} />
-                ),
-                h3: ({ node, ...props }) => (
-                  <h3 className="text-xl font-semibold mb-2" {...props} />
-                ),
-                p: ({ node, ...props }) => (
-                  <p className="mb-4 leading-relaxed" {...props} />
-                ),
-                ul: ({ node, ...props }) => (
-                  <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />
-                ),
-                ol: ({ node, ...props }) => (
-                  <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />
-                ),
-                li: ({ node, ...props }) => (
-                  <li className="leading-relaxed" {...props} />
-                ),
-                strong: ({ node, ...props }) => (
-                  <strong className="font-bold text-foreground" {...props} />
-                ),
-                code: ({ node, inline, ...props }: any) => (
-                  inline ? (
-                    <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props} />
+      <div className="relative flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-6 space-y-6" ref={viewportRef}>
+            {/* Análise Inicial */}
+            <div className="prose prose-slate dark:prose-invert max-w-none">
+              <ReactMarkdown
+                components={{
+                  h1: ({ node, ...props }) => (
+                    <h1 className="text-3xl font-bold mb-4 text-primary" {...props} />
+                  ),
+                  h2: ({ node, ...props }) => (
+                    <h2 className="text-2xl font-semibold mb-3 text-primary" {...props} />
+                  ),
+                  h3: ({ node, ...props }) => (
+                    <h3 className="text-xl font-semibold mb-2" {...props} />
+                  ),
+                  p: ({ node, ...props }) => (
+                    <p className="mb-4 leading-relaxed" {...props} />
+                  ),
+                  ul: ({ node, ...props }) => (
+                    <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />
+                  ),
+                  ol: ({ node, ...props }) => (
+                    <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />
+                  ),
+                  li: ({ node, ...props }) => (
+                    <li className="leading-relaxed" {...props} />
+                  ),
+                  strong: ({ node, ...props }) => (
+                    <strong className="font-bold text-foreground" {...props} />
+                  ),
+                  code: ({ node, inline, ...props }: any) => (
+                    inline ? (
+                      <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props} />
+                    ) : (
+                      <code className="block bg-muted p-4 rounded-lg overflow-x-auto" {...props} />
+                    )
+                  ),
+                }}
+              >
+                {initialAnalysis}
+              </ReactMarkdown>
+            </div>
+
+            {/* Divisor entre análise e chat */}
+            {chatMessages.length > 0 && (
+              <Separator className="my-6" />
+            )}
+
+            {/* Mensagens do Chat */}
+            {chatMessages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex gap-3 ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                }`}
+              >
+                {message.role === 'assistant' && (
+                  <Avatar className="h-8 w-8 shrink-0">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      🤖
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                
+                <div
+                  className={`rounded-lg px-4 py-3 max-w-[80%] ${
+                    message.role === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                  }`}
+                >
+                  {message.role === 'assistant' ? (
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
                   ) : (
-                    <code className="block bg-muted p-4 rounded-lg overflow-x-auto" {...props} />
-                  )
-                ),
-              }}
-            >
-              {initialAnalysis}
-            </ReactMarkdown>
-          </div>
+                    <p className="text-sm leading-relaxed">{message.content}</p>
+                  )}
+                </div>
 
-          {/* Divisor entre análise e chat */}
-          {chatMessages.length > 0 && (
-            <Separator className="my-6" />
-          )}
+                {message.role === 'user' && (
+                  <Avatar className="h-8 w-8 shrink-0">
+                    <AvatarFallback className="bg-accent text-accent-foreground">
+                      👤
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+              </div>
+            ))}
 
-          {/* Mensagens do Chat */}
-          {chatMessages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex gap-3 ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              {message.role === 'assistant' && (
+            {/* Loading indicator */}
+            {isSending && (
+              <div className="flex gap-3 justify-start">
                 <Avatar className="h-8 w-8 shrink-0">
                   <AvatarFallback className="bg-primary text-primary-foreground">
                     🤖
                   </AvatarFallback>
                 </Avatar>
-              )}
-              
-              <div
-                className={`rounded-lg px-4 py-3 max-w-[80%] ${
-                  message.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
-                }`}
-              >
-                {message.role === 'assistant' ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <ReactMarkdown>{message.content}</ReactMarkdown>
-                  </div>
-                ) : (
-                  <p className="text-sm leading-relaxed">{message.content}</p>
-                )}
+                <div className="bg-muted rounded-lg px-4 py-3">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
               </div>
+            )}
 
-              {message.role === 'user' && (
-                <Avatar className="h-8 w-8 shrink-0">
-                  <AvatarFallback className="bg-accent text-accent-foreground">
-                    👤
-                  </AvatarFallback>
-                </Avatar>
-              )}
-            </div>
-          ))}
+            {/* Scroll anchor */}
+            <div ref={contentEndRef} />
+          </div>
+        </ScrollArea>
 
-          {/* Loading indicator */}
-          {isSending && (
-            <div className="flex gap-3 justify-start">
-              <Avatar className="h-8 w-8 shrink-0">
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  🤖
-                </AvatarFallback>
-              </Avatar>
-              <div className="bg-muted rounded-lg px-4 py-3">
-                <Loader2 className="h-4 w-4 animate-spin" />
-              </div>
-            </div>
-          )}
-
-          {/* Scroll anchor */}
-          <div ref={contentEndRef} />
-        </div>
-      </ScrollArea>
-
-      {/* Botão scroll to bottom */}
-      {showScrollButton && (
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute bottom-24 right-8 rounded-full shadow-lg"
-          onClick={scrollToBottom}
-        >
-          <ArrowDown className="h-4 w-4" />
-        </Button>
-      )}
+        {/* Botão scroll to bottom */}
+        {showScrollButton && (
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute bottom-4 right-4 rounded-full shadow-lg z-10"
+            onClick={scrollToBottom}
+          >
+            <ArrowDown className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
 
       {/* Input de Chat */}
       <div className="border-t border-border p-4 shrink-0">
