@@ -1,0 +1,1449 @@
+{
+  "name": "AGENTE ANÁLISE DE DADOS",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "projeto-1-lovable-painel-inteligente",
+        "authentication": "basicAuth",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        688
+      ],
+      "id": "67f2a8be-d658-4846-bcf5-07b0ffdda70a",
+      "name": "Dados Lovable",
+      "webhookId": "bf763998-da7a-429d-a821-fc7ac78907a8",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "JeLR7TtBMefsfk41",
+          "name": "AUTH (PROJETO 1) - LOVABLE PAINEL INTELIGENTE"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        4192,
+        688
+      ],
+      "id": "4b8c767b-999f-4159-be29-fb8bcfe3d0fc",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        3728,
+        1088
+      ],
+      "id": "db50bfd1-43c9-4dc9-8e02-4deb7c470169",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        368,
+        688
+      ],
+      "id": "319addcc-9014-409b-a08b-23076b8af09d",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1424,
+        1168
+      ],
+      "id": "88347f73-0a17-4a2e-9953-8315ddcef045",
+      "name": "Think3"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1744,
+        1328
+      ],
+      "id": "3f090b9a-6bdd-4fe4-a3ad-5b8e0a55f029",
+      "name": "Think4"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        2128,
+        1328
+      ],
+      "id": "375bc6a1-f9f9-4b10-b3a7-589b8134ad4c",
+      "name": "Think5"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        2864,
+        1168
+      ],
+      "id": "40a4df18-98ae-4845-a13d-a367f4e0a988",
+      "name": "Think6"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        1328
+      ],
+      "id": "eb609831-0efb-4b68-9619-a91a045b9a98",
+      "name": "Think7"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        1328
+      ],
+      "id": "0d96aa9b-d12a-4d06-b7ba-59031adcc23a",
+      "name": "Calculator2"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        2992,
+        1168
+      ],
+      "id": "e72291a4-2dc2-4293-b43d-f514e269826d",
+      "name": "Calculator3"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        1328
+      ],
+      "id": "c21e41a7-0ef1-4eef-b1bd-f86871736a14",
+      "name": "Calculator4"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        1328
+      ],
+      "id": "4a58cdff-75ee-43d7-9dd1-cb9370b65dc8",
+      "name": "Calculator5"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        1168
+      ],
+      "id": "7914e755-2e81-4820-8e3b-06f77ec1e07a",
+      "name": "Calculator6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.PROMT_USER? \"PERGUNTA DO USUÁRIO: '''\" + $json.PROMT_USER + \" ''' \" : \"\" }}\n\nCATEGORIA: {{ $json.categoria }}\n\nTITULO ANÁLISE: {{ $json.titulo }}\nDESCRIÇÃO DA ANÁLISE: {{ $json.descricao }}\n\nDADOS:\n{{ $json.data }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "📌 Contexto:\nVocê atua como agente orquestrador e recebe solicitações contendo dados e uma categoria de processamento indicada. Seu papel é exclusivamente encaminhar cada solicitação ao agente especializado correto (Activation, Analytics, Category5, Engagement ou Satisfaction), sem processar ou alterar os dados, e nunca deixar de delegar para o agente correspondente.\n\n🎯 Objetivo:\nRealizar a delegação automática dos dados e parâmetros recebidos para o agente correspondente à categoria informada. Após o processamento pelos agentes, retorne apenas o resultado da análise, sem qualquer ajuste, comentário ou interpretação adicional.\n\n📋 Instruções Passo a Passo:\n1. Receba a solicitação contendo os campos: TÍTULO DA ANÁLISE, DESCRIÇÃO DA ANÁLISE, DADOS e PERGUNTA DO USUÁRIO (caso exista), junto da informação de categoria.\n2. Utilize SEMPRE a ferramenta de pensamento (\"tool think\") para analisar a categoria e delegar a um desses agente:\n\n3. Após a análise da categoria:\n   - Na categoria \"Category5\", envie diretamente para o AGENTE (CATEGORY5)\n   - Na categoria \"Activation\", envie diretamente para o AGENTE (ACTIVATION)\n   - Na categoria \"Analytics\", envie diretamente para o AGENTE (ANALYTICS)\n   - Na categoria \"Engagement\", envie diretamente para o AGENTE (ENGAGEMENT)\n   - Na categoria \"Satisfaction\", envie diretamente para o AGENTE (SATISFACTION).\n4. Não execute NENHUM processamento próprio, não interprete nem altere os dados recebidos; apenas repasse-os.\n5. Encaminhe todos os campos (TÍTULO DA ANÁLISE, DESCRIÇÃO DA ANÁLISE, DADOS, PERGUNTA DO USUÁRIO) para o agente responsável.\n6. Aguarde o retorno do(s) agente(s).\n7. Retorne no output final EXCLUSIVAMENTE a análise feita pelo agente, sem qualquer adendo ou comentário próprio.\n\n🧠 Tom e Estilo:\nTécnico, claro e objetivo; nunca forneça interpretações, apenas o resultado dos agentes.\n\n📦 Formato da Resposta:\nOutput do agente especializado.\n\n🚀 Regras Extras:\n- Nunca processe, analise ou altere os dados recebidos, apenas encaminhe-os para o agente correto.\n- Utilize sempre a ferramenta de pensamento (\"tool think\") antes de decidir o agente destinatário.\n- Nunca deixe de delegar para um agente, se não houver categoria.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        2016,
+        688
+      ],
+      "id": "330a0cc8-b38e-46f4-838d-9e817c2747d1",
+      "name": "ORQUESTRADOR"
+    },
+    {
+      "parameters": {
+        "toolDescription": "retorne os dados recebidos",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "=📌 Contexto:\nAnalise o acúmulo de downloads ao longo do tempo, considerando dados históricos e as tendências relevantes, para compreender o desempenho de ativação do produto. A resposta deve ser composta apenas pela análise final — sem mencionar variáveis, ferramentas ou procedimentos técnicos — e trazer dados claros e interpretados diretamente.\n\n🎯 Objetivo:\nApresentar o panorama do acúmulo de downloads, identificando padrões de crescimento, oscilações marcantes e fatores que impactam a performance de ativação.\n\n📋 Instruções Passo a Passo:\n1. Analise a evolução total dos downloads no período disponível, evidenciando momentos de crescimento mais expressivo e possíveis períodos de estabilidade ou retração.\n2. Identifique variações mensais ou sazonais relevantes, destacando motivos potenciais para inflexões ou picos.\n3. Avalie a relação entre o ritmo de acumulação de downloads e o engajamento esperado em processos de ativação.\n4. Traga insights sobre oportunidades de melhoria no processo de ativação com base nos resultados observados.\n5. Apresente obrigatoriamente todos os resultados da análise, exibindo métricas, padrões e interpretações claras, sem omitir marcos relevantes ou dados encontrados.\n\n🧠 Tom e Estilo:\nFormal, objetivo e estratégico, voltado a profissionais de marketing e produto, sem referência a processos internos ou etapas técnicas.\n\n📦 Formato da Resposta:\nTexto dividido em seções: Análise do Acúmulo de Downloads, Insights e Recomendações Práticas.\n\n🚀 Regras Extras:\n- Não inclua nomes de variáveis, ferramentas, métodos, algoritmos ou qualquer menção a etapas analíticas internas; apenas entregue a interpretação e os resultados finais.\n- Traga exemplos de dados ou padrões relevantes observados, se possível.\n- Foque em clareza, assertividade e rigor interpretativo, evitando generalizações ou respostas excessivamente resumidas.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        960
+      ],
+      "id": "0f388247-f9b3-4886-a978-cbfddc39d0bb",
+      "name": "AGENTE (ACTIVATION)"
+    },
+    {
+      "parameters": {
+        "toolDescription": "retorne os dados recebidos",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "📌 Contexto:\nAnalise métricas detalhadas de sessões, usuários ativos diários, e tempo médio por sessão para compreender profundamente o comportamento do usuário dentro do app. É imprescindível que o resultado da análise seja devolvido com informações claras e concretas, embasando decisões de melhorias. Não inclua na resposta nomes de variáveis, ferramentas utilizadas ou qualquer referência técnica ao processo; entregue apenas a análise final.\n\n🎯 Objetivo:\nDescobrir padrões de uso, níveis de engajamento e retenção, além de identificar potenciais pontos de fricção ou abandono, destacando explicitamente os resultados interpretados a partir dos dados.\n\n📋 Instruções Passo a Passo:\n1. Analise as tendências de sessões e usuários ativos ao longo do tempo, apresentando resultados observados de maneira clara.\n2. Avalie o tempo médio gasto por sessão e a taxa de retenção dos usuários, destacando os padrões encontrados.\n3. Identifique comportamentos repetidos, quedas de uso e pontos de surpresa evidenciados nos dados.\n4. Gere insights sobre o engajamento dos usuários e proponha melhorias práticas para aumentar a retenção, embasadas nas interpretações dos dados.\n5. Retorne obrigatoriamente todos os resultados da análise, sem omitir evidências, métricas e interpretações.\n\n🧠 Tom e Estilo:\nFormal e analítico, com linguagem clara, objetiva e acessível a times de marketing e produto, sem mencionar variáveis, ferramentas ou processos técnicos.\n\n📦 Formato da Resposta:\nTexto dividido em seções: Análise, Insights (com apresentação explícita dos resultados da análise) e Recomendações práticas.\n\n🚀 Regras Extras:\n- Os resultados de cada etapa da análise devem ser apresentados de forma evidente e detalhada, não sendo omitidos ou resumidos excessivamente.\n- Relacione sempre os dados analisados às ações ou recomendações práticas sugeridas.\n- Inclua exemplos de métricas ou padrões observados, se possível.\n- Nunca inclua na resposta nomes de variáveis, etapas técnicas, ferramentas utilizadas ou qualquer referência ao processo interno: somente entregue o resultado final da análise.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        1120
+      ],
+      "id": "894515e7-726f-430d-99f2-5c7b8382318e",
+      "name": "AGENTE (ANALYTICS)"
+    },
+    {
+      "parameters": {
+        "toolDescription": "retorne os dados recebidos",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "📌 Contexto:\nAnalise dados referentes a palavras-chave, volume de buscas e competitividade para mensurar e aprimorar a aquisição de usuários por meio de canais de busca e conteúdo. A resposta deve apresentar apenas a análise final, sempre clara e embasada nos dados, sem mencionar variáveis, ferramentas, processos técnicos ou nomes de algoritmos.\n\n🎯 Objetivo:\nMapear o posicionamento do negócio no mercado digital, entender o impacto das principais keywords nas aquisições e recomendar melhorias objetivas de SEO e marketing, focando exclusivamente nas palavras-chave selecionadas.\n\n📋 Instruções Passo a Passo:\n1. Revise os dados para identificar as 10 palavras-chave mais relevantes do setor analisado, considerando volume de buscas, competitividade, potencial de aquisição e relevância estratégica.\n2. Liste no máximo 10 palavras-chave principais, explicando brevemente por que são as mais relevantes. Consolide termos próximos e cite apenas a principal por categoria, omitindo cauda longa ou composições redundantes.\n3. Para cada palavra-chave selecionada, apresente um resumo contendo o volume de busca, posição média e nível de competitividade.\n4. Identifique, a partir do desempenho dessas palavras-chave, tendências, oportunidades e desafios para aquisição de usuários.\n5. Avalie a relação das palavras-chave principais com taxas de conversão e proponha melhorias pontuais de SEO e marketing baseadas apenas nas palavras elencadas.\n6. Proponha estratégias exclusivamente baseadas nas keywords destacadas, evitando expandir para termos fora das principais.\n7. A resposta deve trazer os resultados da análise e interpretações de forma sucinta e assertiva, sem listas extensas ou tabelas com mais de 10 termos.\n\n🧠 Tom e Estilo:\nTécnico e estratégico, direcionado a profissionais de marketing digital, priorizando clareza, objetividade e rigor interpretativo, sem referência a métodos ou ferramentas utilizadas.\n\n📦 Formato da Resposta:\nTexto técnico, estruturado nas seções: Análise das Top 10 Keywords, Insights e Estratégias. Não utilize listas extensas, tabelas com mais de 10 termos nem citações a processos internos.\n\n🚀 Regras Extras:\n- Uso máximo de 500 tokens.\n- Não ultrapassar 10 palavras-chave na resposta, mesmo se houver outras relevantes no dataset; consolide por categorias quando necessário e cite apenas a principal.\n- Não mencionar variações de cauda longa ou termos compostos que repitam o conceito central de uma keyword já listada.\n- Não incluir nomes de variáveis, ferramentas, algoritmos ou qualquer referência técnica ao processo — apenas entregue o resultado final da análise.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        2032,
+        1120
+      ],
+      "id": "c87a7179-f08d-4947-b529-f5190bc2d012",
+      "name": "AGENTE (CATEGORY5)"
+    },
+    {
+      "parameters": {
+        "toolDescription": "retorne os dados recebidos",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "📌 Contexto:\nAnalise dados provenientes de avaliações dos usuários por estrelas, taxa de falhas do aplicativo e demais métricas qualitativas para medir a satisfação do cliente e a qualidade da experiência. Não cite variáveis, ferramentas, algoritmos ou qualquer referência técnica; retorne apenas o resultado final da análise, apresentando evidências concretas e interpretação útil para decisões.\n\n🎯 Objetivo:\nIdentificar fatores predominantes que influenciam a satisfação dos usuários, evidenciar problemas críticos e recomendar melhorias que promovam o aumento das avaliações e da fidelidade.\n\n📋 Instruções Passo a Passo:\n1. Analise a distribuição das avaliações e dos comentários, evidenciando padrões recorrentes e destaques críticos nas notas atribuídas.\n2. Avalie taxas de falhas e reclamações, apontando ocorrências significativas que impactam negativamente a experiência.\n3. Gere insights claros sobre os principais pontos fortes e vulnerabilidades do uso do aplicativo, destacando aspectos que influenciam diretamente a percepção dos usuários.\n4. Proponha recomendações objetivas para aprimorar a satisfação e reduzir os problemas identificados, fundamentando cada sugestão nos resultados da análise.\n5. Exclua totalmente da resposta qualquer nome de variável, detalhe técnico, ferramenta ou referência ao processo interno; forneça apenas interpretações e recomendações resultantes dos dados.\n\n🧠 Tom e Estilo:\nEmpático e técnico, com foco em experiência do usuário. Mantenha a linguagem clara, objetiva e voltada para equipes de produto.\n\n📦 Formato da Resposta:\nTexto estruturado em seções: Análise, Insights e Recomendações para melhoria do produto, mantendo a concisão e evidenciando os achados relevantes em cada etapa.\n\n🚀 Regras Extras:\n- Apresente os resultados analíticos e interpretações fundamentadas, sem omitir ou resumir excessivamente as evidências.\n- Relacione sempre as evidências aos pontos de melhoria recomendados.\n- Inclua exemplos de padrões, pontos críticos ou métricas observadas, se possível.\n- Nunca inclua nomes de variáveis, detalhes técnicos, ferramentas ou etapas do processo interno: entregue exclusivamente os resultados da análise final e recomendações claras.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        2416,
+        1120
+      ],
+      "id": "64ee50b9-507d-4942-924c-4e4e6dbf4958",
+      "name": "AGENTE (SATISFACTION)"
+    },
+    {
+      "parameters": {
+        "toolDescription": "retorne os dados recebidos",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "📌 Contexto:\nAnalise métricas de engajamento, incluindo instalações, desinstalações, usuários ativos estimados e padrões de comportamento dos usuários, visando uma compreensão aprofundada sem citar variáveis, ferramentas, algoritmos ou processos técnicos no resultado. Toda análise deve se basear em evidências concretas e ser útil para a tomada de decisões, retornando apenas o conteúdo final interpretado.\n\n🎯 Objetivo:\nIdentificar padrões de interação dos usuários com o app, avaliar o nível de engajamento e apresentar recomendações práticas para ampliação da interação contínua e sustentável.\n\n📋 Instruções Passo a Passo:\n1. Analise as tendências observadas nas métricas de instalações, desinstalações e usuários ativos, apresentando resultados claros e objetivos.\n2. Examine dados preditivos para antecipar comportamentos futuros de interação, evidenciando possíveis movimentos e mudanças.\n3. Detecte padrões que indiquem níveis baixos ou altos de interação, descrevendo-os de forma sucinta e direta.\n4. Elabore insights interpretativos e recomendações específicas, focadas em maximizar o engajamento do usuário.\n5. Exclua totalmente da resposta quaisquer nomes de variáveis, etapas técnicas, ferramentas utilizadas ou detalhes do processo interno; forneça somente a análise e sugestões embasadas.\n\n🧠 Tom e Estilo:\nObjetivo, claro e focado em resultados mensuráveis, voltado para equipes que priorizam decisões práticas e rápidas, sem tecnicismos desnecessários.\n\n📦 Formato da Resposta:\nTexto dividido em Engajamento, Insights e Recomendações, mantendo a concisão e clareza em todas as seções.\n\n🚀 Regras Extras:\n- Apresente de forma evidente e detalhada os resultados e evidências encontradas, sem omitir ou resumir excessivamente.\n- Relacione os dados analisados diretamente às recomendações práticas.\n- Inclua exemplos de padrões ou métricas observadas, se possível.\n- Nunca inclua nomes de variáveis, etapas técnicas, ferramentas ou qualquer referência ao processo interno: entregue apenas o resultado final interpretado e as recomendações claras.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        2768,
+        960
+      ],
+      "id": "aaba3c2a-8f22-4a21-bac2-163afed72be1",
+      "name": "AGENTE (ENGAGEMENT)"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        3056,
+        992
+      ],
+      "id": "2c995108-617b-4b1a-b372-641972b6cd36",
+      "name": "Think"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1264,
+        688
+      ],
+      "id": "026a264b-a344-4223-a4f3-535c60a47890",
+      "name": "Combinar Listas",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "jsCode": "function compactarDataParaDict(data) {\n  // Garante array\n  if (!Array.isArray(data)) return data;\n\n  // Coleta campos únicos na ordem\n  const camposUnicos = [];\n  data.forEach(obj => {\n    Object.keys(obj).forEach(key => {\n      if (!camposUnicos.includes(key)) camposUnicos.push(key);\n    });\n  });\n\n  // data_dict: índice => campo\n  const data_dict = {};\n  camposUnicos.forEach((campo, i) => data_dict[i] = campo);\n\n  // Compacta: cada objeto → array de valores seguindo a ordem de camposUnicos\n  const dadosCompactados = data.map(obj =>\n    camposUnicos.map(campo => obj[campo])\n  );\n\n  // Resultado final\n  return { data_dict, data: dadosCompactados };\n}\n\n// INTEGRAÇÃO NO PIPELINE:\nreturn items.flatMap(i => {\n  let lista = i.json['body.DADOS'];\n  if (typeof lista === 'string') lista = JSON.parse(lista);\n  lista = Array.isArray(lista) ? lista : [lista];\n\n  return lista.map(obj => {\n    let data = null;\n    if (obj.data) {\n      // Aqui está o pulo do gato:\n      // 1. Deserializa data SE preciso (caso ela seja string JSON)\n      let d = obj.data;\n      if (typeof d === 'string') d = JSON.parse(d);\n\n      // 2. Para cada chave nesse objeto (ex: com.acme...), aplicar compactação se for array\n      const resultado = {};\n      Object.entries(d).forEach(([app, arr]) => {\n        resultado[app] = compactarDataParaDict(arr);\n      });\n\n      // 3. Serializa para string final\n      data = JSON.stringify(resultado);\n    }\n    return {\n      json: {\n        PROMT_USER: $input.first().json['body.PROMPT_USER'],\n        titulo: obj.name || obj.config?.title?.text || obj.title || null,\n        categoria: obj.category?.name || obj.category_name || obj.category || null,\n        descricao: obj.description || obj.config?.description || null,\n        data: data\n      }\n    };\n  });\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        688
+      ],
+      "id": "cff1a728-8587-43f3-876c-f6d77cfc64e6",
+      "name": "Refina e Agrupa informações",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "function formatarCategoy5(jsonStr) {\n  const obj = JSON.parse(jsonStr);\n  const bloco = obj[\"com.acme.myapp_google_br_pt-BR\"]?.data;\n  if (!Array.isArray(bloco)) return \"\";\n\n  // Campos essenciais\n  const CAMPOS = [\"keyword\", \"position\", \"change_from_previous_day\", \"competitivity\", \"search_volume\"];\n\n  // Monta os arrays de valores\n  const matriz = bloco.map(item => {\n    const campoValor = {};\n    (item[0] || []).forEach(attr => { campoValor[attr.field] = attr.value; });\n    return CAMPOS.map(campo => campoValor[campo]);\n  });\n\n  // Gera string: cada linha é [valor1, valor2, ...]\n  return matriz\n    .map(arr => \"[\" + arr.map(v =>\n      typeof v === \"string\" ? `\"${v}\"` : v\n    ).join(\", \") + \"]\")\n    .join(\", \");\n}\n\n\nconst data = '{data_dict: {0: \"keyword\", 1: \"position\", 2: \"change_from_previous_day\", 3: \"competitivity\", 4: \"search_volume\"}, data: [' + formatarCategoy5($input.first().json.data) + \"]}\"\n\nreturn {\n  json: {\n    PROMT_USER: $('Refina e Agrupa informações').first().json.PROMT_USER,\n    titulo: $input.first().json.titulo,\n    categoria: $input.first().json.categoria,\n    descricao: $input.first().json.descricao,\n    data: data\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        560
+      ],
+      "id": "10c09aff-8269-4465-958f-e8658f7e8c94",
+      "name": "Refina e Agrupa informações Category5",
+      "retryOnFail": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "484b62fb-e75c-43ed-b408-af719f7e4edc",
+              "leftValue": "={{ $json.categoria }}",
+              "rightValue": "Category5",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        688
+      ],
+      "id": "604b1d62-8fb0-491e-b418-682e5ad7ee84",
+      "name": "Se Category5 estiver presente"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "97ca4c56-436f-4fbc-a764-114984f6bbf9",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "{}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1504,
+        688
+      ],
+      "id": "28d1cbff-9c8f-4a0c-be3b-5d3dd90a8561",
+      "name": "Filtra DADOS vazios"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.DADOS",
+        "include": "selectedOtherFields",
+        "fieldsToInclude": "body.PROMPT_USER",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        144,
+        688
+      ],
+      "id": "6851947b-8e0c-44eb-a685-ba04813bd3af",
+      "name": "Pega Somente body.DADOS"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": []
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1728,
+        688
+      ],
+      "id": "0da14f0a-5b2a-4986-b723-04fd687daab6",
+      "name": "DADOS TRATADOS",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        3712,
+        640
+      ],
+      "id": "f67d9992-b2e8-48ad-99cd-42382b06121c",
+      "name": "Calculator1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        688
+      ],
+      "id": "85e80140-e79b-487d-8415-2ae079efaab6",
+      "name": "Agrupar Dados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0dbc48ba-e56e-462f-98f5-4d6687539a3b",
+              "leftValue": "={{ $json.PROMT_USER }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3184,
+        688
+      ],
+      "id": "8da6c022-36c9-4c88-a411-91fb0d100711",
+      "name": "SE HOUVER PROMPT USUÁRIO"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1bf045c-b464-4e65-9d61-77cb3964258b",
+              "name": "RESPOSTA",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3920,
+        688
+      ],
+      "id": "108a3410-b4c6-49f8-8618-05f630c06733",
+      "name": "RESPOSTA",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c76d2ae4-bebe-44e1-a3ca-3c4f871370e8",
+              "name": "PROMT_USER",
+              "value": "={{ $('DADOS TRATADOS').first().json.PROMT_USER }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2896,
+        688
+      ],
+      "id": "39b9c5c3-f78d-453f-8fcd-4c5eb66bf799",
+      "name": "PROMPTS",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "content": "## Dados Recebidos do Lovable\n\nCom:\n- Autenticação para segurança dos dados do cliente",
+        "height": 544,
+        "width": 272,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        416
+      ],
+      "id": "f32d1cff-4631-4faf-b508-ae415140cdb9",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        1168
+      ],
+      "id": "0b778530-0c87-400b-a81f-2c1ab74788f9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1632,
+        1328
+      ],
+      "id": "bce6c8e4-6232-4f30-8e46-19321aa43073",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2016,
+        1328
+      ],
+      "id": "e4dcab32-3b14-4826-ab4e-42a3024b2dbd",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        1328
+      ],
+      "id": "f8dcad60-921b-453a-88cb-2bedd0a6a985",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2752,
+        1168
+      ],
+      "id": "60390925-2a31-424e-abb9-c25456135b8a",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2064,
+        928
+      ],
+      "id": "9fc0cf9f-1be1-437a-a22e-efcffd594e44",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        928
+      ],
+      "id": "6392bebf-d4a6-487d-8e88-8f3489304bfb",
+      "name": "OpenAI Chat Model6",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3440,
+        1088
+      ],
+      "id": "7acbb619-8664-4d6e-a6f9-87522b998799",
+      "name": "OpenAI Chat Model7",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3584,
+        1088
+      ],
+      "id": "3624d4af-2e60-4733-9fe7-b56b1405ef3f",
+      "name": "OpenAI Chat Model8",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3456,
+        640
+      ],
+      "id": "4495f588-6eb6-44f4-bc60-591e85565183",
+      "name": "OpenAI Chat Model9",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3584,
+        640
+      ],
+      "id": "b5341b7a-b542-465a-8aee-63289dee886e",
+      "name": "OpenAI Chat Model10",
+      "credentials": {
+        "openAiApi": {
+          "id": "vymuL7AJiStj3ik1",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data.map(item => item.output).join('====================================================\\n\\n') }}\n",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "📌 Contexto:\nVocê utiliza um sistema inteligente que reuniu análises de dados robustas e objetivas de diferentes áreas de desempenho do seu aplicativo para orientar decisões estratégicas.\n\n🎯 Objetivo:\nGerar um resumo extremamente preciso e direto, apresentando exclusivamente os achados e recomendações mais relevantes obtidos a partir das análises consolidadas nas categorias: Activation, Analytics, Category5, Engagement e Satisfaction.\n\n📋 Instruções Passo a Passo:\n1. Liste todas as análises realizadas, agrupando por categoria (Activation, Analytics, Category5, Engagement, Satisfaction).\n2. Para cada categoria, destaque apenas os resultados mais impactantes, insights claros e recomendações acionáveis, omita qualquer detalhamento secundário.\n3. Unifique os resultados, evidencie onde os achados se complementam ou apontam direções diferentes, sempre focando em entregar o essencial.\n4. Liste explicitamente ações práticas, orientações e etapas objetivas recomendadas em cada categoria.\n5. Finalize apresentando um panorama decisivo dos principais aprendizados e as exatas próximas etapas sugeridas.\n\n🧠 Tom e Estilo:\nResposta sucinta, objetiva, profissional, voltada ao cliente; apenas entrega o mais importante e útil, sem textos introdutórios nem justificativas extras.\n\n📦 Formato da Resposta:\nMarkdown obrigatório, com títulos (##) para cada categoria. Utilize listas para recomendações e seções claras. Nada além do resultado sintético de cada área.\n\n🚀 Regras Extras:\n- Traga apenas os achados centrais e recomendações diretas; elimine conteúdo secundário ou explicações extensas.\n- Estruture sempre a resposta em Markdown, com divisões e listas visuais para facilitar leitura rápida.\n- Inicie profissionalmente com um saudação e depois, por exemplo: “Com base na sua pergunta”, \"entendi sua questão, aqui está minha análise..\".\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        3504,
+        416
+      ],
+      "id": "66f7dc5c-5ab6-49c3-9533-03f87a3fea45",
+      "name": "RESPOSTA (CLIENTE)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data.map(item => item.output).join('====================================================\\n\\n') }}\n",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=📌 Contexto:\nVocê está utilizando um sistema inteligente que consolida análises detalhadas advindas de múltiplos agentes de IA, organizadas em cinco áreas centrais: Instalações, Usuário, Keywords, Engajamento e Satisfação. O intuito é prover um relatório que combine textos explicativos aprofundados com o uso equilibrado de listas para destacar pontos essenciais, orientando decisões estratégicas do cliente de forma clara e acionável.\n\n🎯 Objetivo:\nElaborar um relatório integrado e robusto, que apresente os conteúdos das análises em parágrafos explicativos e utilize listas de forma moderada apenas para sintetizar achados, recomendações e ações sugeridas de cada categoria.\n\n📋 Instruções Passo a Passo:\n1. Estruture o texto em seções por categoria principal e inicie cada uma com um ou mais parágrafos contextualizando as análises realizadas, detalhando objetivos, escopo e metodologia.\n2. Dentro de cada categoria, desenvolva argumentações e explicações completas sobre os principais resultados e insights. Utilize listas com moderação somente para destacar pontos importante.\n3. Integre os resultados, evidenciando convergências e divergências entre as análises por meio de textos explicativos.\n4. Apresente recomendações práticas em parágrafos bem desenvolvidos, exemplificando impactos esperados, e só sintetize pontos-chave em listas curtas, se necessário.\n5. Finalize com uma seção de resumo geral, trazendo aprendizados integrados e continuidade das ações recomendadas.\n6. Utilize sempre Markdown, com títulos (##) para cada categoria, alternando entre parágrafos e listas conforme orientado.\n7. Inicie o relatório de modo formal e profissional, por exemplo: “Segue o relatório expandido das principais análises integradas, organizado por categoria.”\n\n🧠 Tom e Estilo:\nLinguagem clara, objetiva e explicativa, orientada ao cliente, alternando entre parágrafos analíticos e listas sucintas para melhor navegação.\n\n📦 Formato da Resposta:\nMarkdown, dividido por seções e categorias, composto predominantemente de parágrafos aprofundados e listas moderadas para ressaltar pontos essenciais. Finalize com síntese em texto corrido e recomendações organizadas também em listas sucintas.\n\n🚀 Regras Extras:\n- Priorize parágrafos explicativos, reservando listas curtas para síntese de achados, recomendações e ações.\n- Não incluir dados brutos ou listas extensas.\n- Garanta que toda categoria tenha tanto análise detalhada em texto quanto destaque conciso em listas.\n- Preserve a divisão categorizada e mantenha clareza visual na estrutura.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        3504,
+        864
+      ],
+      "id": "498e453c-fab4-4c61-aa55-453abcd3690d",
+      "name": "RESPOSTA (ANÁLISE GERAL)"
+    }
+  ],
+  "pinData": {
+    "Dados Lovable": [
+      {
+        "json": {
+          "headers": {
+            "host": "webhook.digital-ai.tech",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+            "content-length": "96529",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+            "authorization": "Basic cHJvZHV0by5yYW5rbXlhcHAuY29tLmJyOk11ZGFyMTIz",
+            "content-type": "application/json",
+            "origin": "https://preview--json-spark-analytica.lovable.app",
+            "priority": "u=1, i",
+            "referer": "https://preview--json-spark-analytica.lovable.app/",
+            "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "179.191.103.22",
+            "x-forwarded-host": "webhook.digital-ai.tech",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "9ba95b344159",
+            "x-real-ip": "179.191.103.22"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "DADOS": [
+              "{\"documentId\":\"doc_4124fcc18c05f71abb21d067\",\"name\":\"TOTAL DE NOVAS INSTALAÇÕES (ACUMULADAS)\",\"slug\":\"area-total-de-novas-instalacoes-acumuladas\",\"kind\":\"area\",\"xField\":\"createdAt\",\"yField\":\"maxinstalls\",\"description\":\"Novas instalações que foram acumuladas durante todo o tempo de vida do app. A cada dia, as novas instalações vão sendo somadas com o histórico.\\n\\nPeríodo de atualização Google: D-1\",\"combineData\":true,\"labels\":{\"default\":\"Instalações acumuladas\"},\"colors\":{\"default\":\"#09738a\",\"pv\":\"blue\",\"uv\":\"green\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"sum\",\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"True\",\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"TOTAL DE NOVAS INSTALAÇÕES (ACUMULADAS)\"},\"tooltip\":{\"format\":\"0.000a\",\"shared\":true,\"xDateFormat\":\"dd/MM/yyyy\"},\"xAxis\":{\"format\":\"dd/MM\",\"label\":\"Data\",\"rotateLabels\":true},\"yAxis\":{\"format\":\"0.000a\",\"label\":\"Instalações acumuladas\"}},\"exampleData\":{\"appId\":[{\"createdAt\":\"2025-03-01\",\"maxinstalls\":3018366},{\"createdAt\":\"2025-03-02\",\"maxinstalls\":3020068},{\"createdAt\":\"2025-03-03\",\"maxinstalls\":3021698},{\"createdAt\":\"2025-03-04\",\"maxinstalls\":3022615},{\"createdAt\":\"2025-03-05\",\"maxinstalls\":3024266},{\"createdAt\":\"2025-03-06\",\"maxinstalls\":3025287},{\"createdAt\":\"2025-03-07\",\"maxinstalls\":3027009},{\"createdAt\":\"2025-03-08\",\"maxinstalls\":3029392},{\"createdAt\":\"2025-03-09\",\"maxinstalls\":3030751},{\"createdAt\":\"2025-03-10\",\"maxinstalls\":3033747},{\"createdAt\":\"2025-03-11\",\"maxinstalls\":3035509},{\"createdAt\":\"2025-03-12\",\"maxinstalls\":3036815},{\"createdAt\":\"2025-03-13\",\"maxinstalls\":3037646},{\"createdAt\":\"2025-03-14\",\"maxinstalls\":3040178},{\"createdAt\":\"2025-03-15\",\"maxinstalls\":3042330},{\"createdAt\":\"2025-03-16\",\"maxinstalls\":3043531},{\"createdAt\":\"2025-03-17\",\"maxinstalls\":3044400},{\"createdAt\":\"2025-03-18\",\"maxinstalls\":3045622},{\"createdAt\":\"2025-03-19\",\"maxinstalls\":3050153},{\"createdAt\":\"2025-03-20\",\"maxinstalls\":3051499},{\"createdAt\":\"2025-03-21\",\"maxinstalls\":3053245},{\"createdAt\":\"2025-03-22\",\"maxinstalls\":3054883},{\"createdAt\":\"2025-03-23\",\"maxinstalls\":3056479},{\"createdAt\":\"2025-03-24\",\"maxinstalls\":3058378},{\"createdAt\":\"2025-03-27\",\"maxinstalls\":3063530},{\"createdAt\":\"2025-03-28\",\"maxinstalls\":3063755},{\"createdAt\":\"2025-03-29\",\"maxinstalls\":3065076}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1061\",\"url\":\"http://api-server:8080/api/line/total_new_installations_accumulated\",\"method\":\"POST\",\"params\":{},\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":{}},\"stores\":[\"google\"],\"source\":\"Store\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"createdAt\":\"2025-06-01\",\"maxinstalls\":109400043},{\"createdAt\":\"2025-06-02\",\"maxinstalls\":109424412},{\"createdAt\":\"2025-06-03\",\"maxinstalls\":109469742},{\"createdAt\":\"2025-06-04\",\"maxinstalls\":109521545},{\"createdAt\":\"2025-06-05\",\"maxinstalls\":109544721},{\"createdAt\":\"2025-06-06\",\"maxinstalls\":109594991},{\"createdAt\":\"2025-06-07\",\"maxinstalls\":109604446},{\"createdAt\":\"2025-06-08\",\"maxinstalls\":109643588},{\"createdAt\":\"2025-06-09\",\"maxinstalls\":109687397},{\"createdAt\":\"2025-06-10\",\"maxinstalls\":109726953},{\"createdAt\":\"2025-06-11\",\"maxinstalls\":109764182},{\"createdAt\":\"2025-06-12\",\"maxinstalls\":109786884},{\"createdAt\":\"2025-06-13\",\"maxinstalls\":109827217},{\"createdAt\":\"2025-06-14\",\"maxinstalls\":109855460},{\"createdAt\":\"2025-06-15\",\"maxinstalls\":109881184},{\"createdAt\":\"2025-06-16\",\"maxinstalls\":109918955},{\"createdAt\":\"2025-06-17\",\"maxinstalls\":109954889},{\"createdAt\":\"2025-06-18\",\"maxinstalls\":110007447},{\"createdAt\":\"2025-06-19\",\"maxinstalls\":110028289},{\"createdAt\":\"2025-06-20\",\"maxinstalls\":110062382},{\"createdAt\":\"2025-06-21\",\"maxinstalls\":110091293},{\"createdAt\":\"2025-06-22\",\"maxinstalls\":110115327},{\"createdAt\":\"2025-06-23\",\"maxinstalls\":110137328},{\"createdAt\":\"2025-06-24\",\"maxinstalls\":110171416},{\"createdAt\":\"2025-06-25\",\"maxinstalls\":110210205},{\"createdAt\":\"2025-06-26\",\"maxinstalls\":110243405},{\"createdAt\":\"2025-06-27\",\"maxinstalls\":110280928},{\"createdAt\":\"2025-06-28\",\"maxinstalls\":110296205},{\"createdAt\":\"2025-06-29\",\"maxinstalls\":110334586}]},\"category\":{\"name\":\"Activation\",\"slug\":\"ativacao\",\"documentId\":\"cat_ce6a2c91aaed394f0698c06b\"}}",
+              "{\"documentId\":\"doc_4124fcc18c05f71abb21d067\",\"name\":\"TOTAL DE NOVAS INSTALAÇÕES (ACUMULADAS)\",\"slug\":\"area-total-de-novas-instalacoes-acumuladas\",\"kind\":\"area\",\"xField\":\"createdAt\",\"yField\":\"maxinstalls\",\"description\":\"Novas instalações que foram acumuladas durante todo o tempo de vida do app. A cada dia, as novas instalações vão sendo somadas com o histórico.\\n\\nPeríodo de atualização Google: D-1\",\"combineData\":true,\"labels\":{\"default\":\"Instalações acumuladas\"},\"colors\":{\"default\":\"#09738a\",\"pv\":\"blue\",\"uv\":\"green\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"sum\",\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"True\",\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"TOTAL DE NOVAS INSTALAÇÕES (ACUMULADAS)\"},\"tooltip\":{\"format\":\"0.000a\",\"shared\":true,\"xDateFormat\":\"dd/MM/yyyy\"},\"xAxis\":{\"format\":\"dd/MM\",\"label\":\"Data\",\"rotateLabels\":true},\"yAxis\":{\"format\":\"0.000a\",\"label\":\"Instalações acumuladas\"}},\"exampleData\":{\"appId\":[{\"createdAt\":\"2025-03-01\",\"maxinstalls\":3018366},{\"createdAt\":\"2025-03-02\",\"maxinstalls\":3020068},{\"createdAt\":\"2025-03-03\",\"maxinstalls\":3021698},{\"createdAt\":\"2025-03-04\",\"maxinstalls\":3022615},{\"createdAt\":\"2025-03-05\",\"maxinstalls\":3024266},{\"createdAt\":\"2025-03-06\",\"maxinstalls\":3025287},{\"createdAt\":\"2025-03-07\",\"maxinstalls\":3027009},{\"createdAt\":\"2025-03-08\",\"maxinstalls\":3029392},{\"createdAt\":\"2025-03-09\",\"maxinstalls\":3030751},{\"createdAt\":\"2025-03-10\",\"maxinstalls\":3033747},{\"createdAt\":\"2025-03-11\",\"maxinstalls\":3035509},{\"createdAt\":\"2025-03-12\",\"maxinstalls\":3036815},{\"createdAt\":\"2025-03-13\",\"maxinstalls\":3037646},{\"createdAt\":\"2025-03-14\",\"maxinstalls\":3040178},{\"createdAt\":\"2025-03-15\",\"maxinstalls\":3042330},{\"createdAt\":\"2025-03-16\",\"maxinstalls\":3043531},{\"createdAt\":\"2025-03-17\",\"maxinstalls\":3044400},{\"createdAt\":\"2025-03-18\",\"maxinstalls\":3045622},{\"createdAt\":\"2025-03-19\",\"maxinstalls\":3050153},{\"createdAt\":\"2025-03-20\",\"maxinstalls\":3051499},{\"createdAt\":\"2025-03-21\",\"maxinstalls\":3053245},{\"createdAt\":\"2025-03-22\",\"maxinstalls\":3054883},{\"createdAt\":\"2025-03-23\",\"maxinstalls\":3056479},{\"createdAt\":\"2025-03-24\",\"maxinstalls\":3058378},{\"createdAt\":\"2025-03-27\",\"maxinstalls\":3063530},{\"createdAt\":\"2025-03-28\",\"maxinstalls\":3063755},{\"createdAt\":\"2025-03-29\",\"maxinstalls\":3065076}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1061\",\"url\":\"http://api-server:8080/api/line/total_new_installations_accumulated\",\"method\":\"POST\",\"params\":{},\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":{}},\"stores\":[\"google\"],\"source\":\"Store\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"createdAt\":\"2025-01-01\",\"maxinstalls\":104334221},{\"createdAt\":\"2025-01-02\",\"maxinstalls\":104365627},{\"createdAt\":\"2025-01-03\",\"maxinstalls\":104382062},{\"createdAt\":\"2025-01-04\",\"maxinstalls\":104419158},{\"createdAt\":\"2025-01-05\",\"maxinstalls\":104441403},{\"createdAt\":\"2025-01-06\",\"maxinstalls\":104459111},{\"createdAt\":\"2025-01-07\",\"maxinstalls\":104462268},{\"createdAt\":\"2025-01-08\",\"maxinstalls\":104462268},{\"createdAt\":\"2025-01-09\",\"maxinstalls\":104462268},{\"createdAt\":\"2025-01-10\",\"maxinstalls\":104629717},{\"createdAt\":\"2025-01-11\",\"maxinstalls\":104664114},{\"createdAt\":\"2025-01-12\",\"maxinstalls\":104693113},{\"createdAt\":\"2025-01-13\",\"maxinstalls\":104713035},{\"createdAt\":\"2025-01-14\",\"maxinstalls\":104757849},{\"createdAt\":\"2025-01-15\",\"maxinstalls\":104780677},{\"createdAt\":\"2025-01-16\",\"maxinstalls\":104828019},{\"createdAt\":\"2025-01-17\",\"maxinstalls\":104851570},{\"createdAt\":\"2025-01-18\",\"maxinstalls\":104885124},{\"createdAt\":\"2025-01-19\",\"maxinstalls\":104901149},{\"createdAt\":\"2025-01-20\",\"maxinstalls\":104927116},{\"createdAt\":\"2025-01-21\",\"maxinstalls\":104958983},{\"createdAt\":\"2025-01-22\",\"maxinstalls\":104992369},{\"createdAt\":\"2025-01-23\",\"maxinstalls\":105026655},{\"createdAt\":\"2025-01-24\",\"maxinstalls\":105074628},{\"createdAt\":\"2025-01-25\",\"maxinstalls\":105078689},{\"createdAt\":\"2025-01-26\",\"maxinstalls\":105110741},{\"createdAt\":\"2025-01-27\",\"maxinstalls\":105137709},{\"createdAt\":\"2025-01-28\",\"maxinstalls\":105165103},{\"createdAt\":\"2025-01-29\",\"maxinstalls\":105202217},{\"createdAt\":\"2025-01-30\",\"maxinstalls\":105244841},{\"createdAt\":\"2025-01-31\",\"maxinstalls\":105288000},{\"createdAt\":\"2025-02-01\",\"maxinstalls\":105304911},{\"createdAt\":\"2025-02-02\",\"maxinstalls\":105337381},{\"createdAt\":\"2025-02-03\",\"maxinstalls\":105347993},{\"createdAt\":\"2025-02-04\",\"maxinstalls\":105386955},{\"createdAt\":\"2025-02-05\",\"maxinstalls\":105413243},{\"createdAt\":\"2025-02-06\",\"maxinstalls\":105464735},{\"createdAt\":\"2025-02-07\",\"maxinstalls\":105488217},{\"createdAt\":\"2025-02-08\",\"maxinstalls\":105509057},{\"createdAt\":\"2025-02-09\",\"maxinstalls\":105533700},{\"createdAt\":\"2025-02-10\",\"maxinstalls\":105546719},{\"createdAt\":\"2025-02-11\",\"maxinstalls\":105577618},{\"createdAt\":\"2025-02-12\",\"maxinstalls\":105612787},{\"createdAt\":\"2025-02-13\",\"maxinstalls\":105647305},{\"createdAt\":\"2025-02-14\",\"maxinstalls\":105670563},{\"createdAt\":\"2025-02-15\",\"maxinstalls\":105694007},{\"createdAt\":\"2025-02-16\",\"maxinstalls\":105720120},{\"createdAt\":\"2025-02-17\",\"maxinstalls\":105763654},{\"createdAt\":\"2025-02-18\",\"maxinstalls\":105779540},{\"createdAt\":\"2025-02-19\",\"maxinstalls\":105779540},{\"createdAt\":\"2025-02-20\",\"maxinstalls\":105835188},{\"createdAt\":\"2025-02-21\",\"maxinstalls\":105895350},{\"createdAt\":\"2025-02-22\",\"maxinstalls\":105915785},{\"createdAt\":\"2025-02-23\",\"maxinstalls\":105940887},{\"createdAt\":\"2025-02-24\",\"maxinstalls\":105959962},{\"createdAt\":\"2025-02-25\",\"maxinstalls\":106013019},{\"createdAt\":\"2025-02-26\",\"maxinstalls\":106048548},{\"createdAt\":\"2025-02-27\",\"maxinstalls\":106106836},{\"createdAt\":\"2025-02-28\",\"maxinstalls\":106140207},{\"createdAt\":\"2025-03-01\",\"maxinstalls\":106148672},{\"createdAt\":\"2025-03-02\",\"maxinstalls\":106188003},{\"createdAt\":\"2025-03-03\",\"maxinstalls\":106202608},{\"createdAt\":\"2025-03-04\",\"maxinstalls\":106230188},{\"createdAt\":\"2025-03-05\",\"maxinstalls\":106264726},{\"createdAt\":\"2025-03-06\",\"maxinstalls\":106283764},{\"createdAt\":\"2025-03-07\",\"maxinstalls\":106328250},{\"createdAt\":\"2025-03-08\",\"maxinstalls\":106365637},{\"createdAt\":\"2025-03-09\",\"maxinstalls\":106389539},{\"createdAt\":\"2025-03-10\",\"maxinstalls\":106416268},{\"createdAt\":\"2025-03-11\",\"maxinstalls\":106453145},{\"createdAt\":\"2025-03-12\",\"maxinstalls\":106485827},{\"createdAt\":\"2025-03-13\",\"maxinstalls\":106526109},{\"createdAt\":\"2025-03-14\",\"maxinstalls\":106570031},{\"createdAt\":\"2025-03-15\",\"maxinstalls\":106586966},{\"createdAt\":\"2025-03-16\",\"maxinstalls\":106610383},{\"createdAt\":\"2025-03-17\",\"maxinstalls\":106634621},{\"createdAt\":\"2025-03-18\",\"maxinstalls\":106673675},{\"createdAt\":\"2025-03-19\",\"maxinstalls\":106719568},{\"createdAt\":\"2025-03-20\",\"maxinstalls\":106749388},{\"createdAt\":\"2025-03-21\",\"maxinstalls\":106802486},{\"createdAt\":\"2025-03-22\",\"maxinstalls\":106818922},{\"createdAt\":\"2025-03-23\",\"maxinstalls\":106852490},{\"createdAt\":\"2025-03-24\",\"maxinstalls\":106896533},{\"createdAt\":\"2025-03-27\",\"maxinstalls\":107025769},{\"createdAt\":\"2025-03-28\",\"maxinstalls\":107073681},{\"createdAt\":\"2025-03-29\",\"maxinstalls\":107111949},{\"createdAt\":\"2025-03-30\",\"maxinstalls\":107111949},{\"createdAt\":\"2025-03-30\",\"maxinstalls\":107141928},{\"createdAt\":\"2025-03-31\",\"maxinstalls\":107156448},{\"createdAt\":\"2025-03-31\",\"maxinstalls\":107167925},{\"createdAt\":\"2025-04-01\",\"maxinstalls\":107167925},{\"createdAt\":\"2025-04-01\",\"maxinstalls\":107216765},{\"createdAt\":\"2025-04-02\",\"maxinstalls\":107253699},{\"createdAt\":\"2025-04-02\",\"maxinstalls\":107265652},{\"createdAt\":\"2025-04-03\",\"maxinstalls\":107274500},{\"createdAt\":\"2025-04-05\",\"maxinstalls\":107372539},{\"createdAt\":\"2025-04-06\",\"maxinstalls\":107398635},{\"createdAt\":\"2025-04-07\",\"maxinstalls\":107429993},{\"createdAt\":\"2025-04-07\",\"maxinstalls\":107421388},{\"createdAt\":\"2025-04-08\",\"maxinstalls\":107463932},{\"createdAt\":\"2025-04-08\",\"maxinstalls\":107475328},{\"createdAt\":\"2025-04-09\",\"maxinstalls\":107514013},{\"createdAt\":\"2025-04-09\",\"maxinstalls\":107475328},{\"createdAt\":\"2025-04-10\",\"maxinstalls\":107514013},{\"createdAt\":\"2025-04-10\",\"maxinstalls\":107541606},{\"createdAt\":\"2025-04-11\",\"maxinstalls\":107591226},{\"createdAt\":\"2025-04-11\",\"maxinstalls\":107541606},{\"createdAt\":\"2025-04-12\",\"maxinstalls\":107591226},{\"createdAt\":\"2025-04-12\",\"maxinstalls\":107608359},{\"createdAt\":\"2025-04-13\",\"maxinstalls\":107632676},{\"createdAt\":\"2025-04-14\",\"maxinstalls\":107654691},{\"createdAt\":\"2025-04-14\",\"maxinstalls\":107632676},{\"createdAt\":\"2025-04-15\",\"maxinstalls\":107654691},{\"createdAt\":\"2025-04-15\",\"maxinstalls\":107703474},{\"createdAt\":\"2025-04-16\",\"maxinstalls\":107726376},{\"createdAt\":\"2025-04-17\",\"maxinstalls\":107768838},{\"createdAt\":\"2025-04-18\",\"maxinstalls\":107810638},{\"createdAt\":\"2025-04-19\",\"maxinstalls\":107810638},{\"createdAt\":\"2025-04-20\",\"maxinstalls\":107810638},{\"createdAt\":\"2025-04-21\",\"maxinstalls\":107895758},{\"createdAt\":\"2025-04-22\",\"maxinstalls\":107914885},{\"createdAt\":\"2025-04-23\",\"maxinstalls\":107967694},{\"createdAt\":\"2025-04-24\",\"maxinstalls\":108000653},{\"createdAt\":\"2025-04-25\",\"maxinstalls\":108064303},{\"createdAt\":\"2025-04-26\",\"maxinstalls\":108064303},{\"createdAt\":\"2025-04-27\",\"maxinstalls\":108114435},{\"createdAt\":\"2025-04-28\",\"maxinstalls\":108145366},{\"createdAt\":\"2025-04-29\",\"maxinstalls\":108188586},{\"createdAt\":\"2025-04-30\",\"maxinstalls\":108228838},{\"createdAt\":\"2025-05-01\",\"maxinstalls\":108270206},{\"createdAt\":\"2025-05-02\",\"maxinstalls\":108316026},{\"createdAt\":\"2025-05-03\",\"maxinstalls\":108337562},{\"createdAt\":\"2025-05-04\",\"maxinstalls\":108370136},{\"createdAt\":\"2025-05-05\",\"maxinstalls\":108398326},{\"createdAt\":\"2025-05-06\",\"maxinstalls\":108443461},{\"createdAt\":\"2025-05-07\",\"maxinstalls\":108489130},{\"createdAt\":\"2025-05-08\",\"maxinstalls\":108535553},{\"createdAt\":\"2025-05-09\",\"maxinstalls\":108579286},{\"createdAt\":\"2025-05-10\",\"maxinstalls\":108617759},{\"createdAt\":\"2025-05-11\",\"maxinstalls\":108645903},{\"createdAt\":\"2025-05-12\",\"maxinstalls\":108674163},{\"createdAt\":\"2025-05-13\",\"maxinstalls\":108726577},{\"createdAt\":\"2025-05-14\",\"maxinstalls\":108757694},{\"createdAt\":\"2025-05-15\",\"maxinstalls\":108806061},{\"createdAt\":\"2025-05-16\",\"maxinstalls\":108837928},{\"createdAt\":\"2025-05-17\",\"maxinstalls\":108861355},{\"createdAt\":\"2025-05-18\",\"maxinstalls\":108901316},{\"createdAt\":\"2025-05-19\",\"maxinstalls\":108933732},{\"createdAt\":\"2025-05-20\",\"maxinstalls\":108973406},{\"createdAt\":\"2025-05-21\",\"maxinstalls\":109009264},{\"createdAt\":\"2025-05-22\",\"maxinstalls\":109047030},{\"createdAt\":\"2025-05-23\",\"maxinstalls\":109095293},{\"createdAt\":\"2025-05-24\",\"maxinstalls\":109121800},{\"createdAt\":\"2025-05-25\",\"maxinstalls\":109152444},{\"createdAt\":\"2025-05-26\",\"maxinstalls\":109176165},{\"createdAt\":\"2025-05-27\",\"maxinstalls\":109233287},{\"createdAt\":\"2025-05-28\",\"maxinstalls\":109266672},{\"createdAt\":\"2025-05-29\",\"maxinstalls\":109294489},{\"createdAt\":\"2025-05-30\",\"maxinstalls\":109336732},{\"createdAt\":\"2025-05-31\",\"maxinstalls\":109370089},{\"createdAt\":\"2025-06-01\",\"maxinstalls\":109400043},{\"createdAt\":\"2025-06-02\",\"maxinstalls\":109424412},{\"createdAt\":\"2025-06-03\",\"maxinstalls\":109469742},{\"createdAt\":\"2025-06-04\",\"maxinstalls\":109521545},{\"createdAt\":\"2025-06-05\",\"maxinstalls\":109544721},{\"createdAt\":\"2025-06-06\",\"maxinstalls\":109594991},{\"createdAt\":\"2025-06-07\",\"maxinstalls\":109604446},{\"createdAt\":\"2025-06-08\",\"maxinstalls\":109643588},{\"createdAt\":\"2025-06-09\",\"maxinstalls\":109687397},{\"createdAt\":\"2025-06-10\",\"maxinstalls\":109726953},{\"createdAt\":\"2025-06-11\",\"maxinstalls\":109764182},{\"createdAt\":\"2025-06-12\",\"maxinstalls\":109786884},{\"createdAt\":\"2025-06-13\",\"maxinstalls\":109827217},{\"createdAt\":\"2025-06-14\",\"maxinstalls\":109855460},{\"createdAt\":\"2025-06-15\",\"maxinstalls\":109881184},{\"createdAt\":\"2025-06-16\",\"maxinstalls\":109918955},{\"createdAt\":\"2025-06-17\",\"maxinstalls\":109954889},{\"createdAt\":\"2025-06-18\",\"maxinstalls\":110007447},{\"createdAt\":\"2025-06-19\",\"maxinstalls\":110028289},{\"createdAt\":\"2025-06-20\",\"maxinstalls\":110062382},{\"createdAt\":\"2025-06-21\",\"maxinstalls\":110091293},{\"createdAt\":\"2025-06-22\",\"maxinstalls\":110115327},{\"createdAt\":\"2025-06-23\",\"maxinstalls\":110137328},{\"createdAt\":\"2025-06-24\",\"maxinstalls\":110171416},{\"createdAt\":\"2025-06-25\",\"maxinstalls\":110210205},{\"createdAt\":\"2025-06-26\",\"maxinstalls\":110243405},{\"createdAt\":\"2025-06-27\",\"maxinstalls\":110280928},{\"createdAt\":\"2025-06-28\",\"maxinstalls\":110296205},{\"createdAt\":\"2025-06-29\",\"maxinstalls\":110334586}]},\"category\":{\"name\":\"Activation\",\"slug\":\"ativacao\",\"documentId\":\"cat_ce6a2c91aaed394f0698c06b\"}}",
+              "{\"documentId\":\"doc_0eb5eeb7b5193e013cbd0bc6\",\"name\":\"DISTRIBUIÇÃO POR ESTRELA (BAR CHART)\",\"slug\":\"bar-distribuicao-por-estrela\",\"kind\":\"bar\",\"xField\":\"score\",\"yField\":\"total\",\"description\":\"Distribuição das notas (ratings) que foram atribuídas aos comentários (reviews) no período.\\n\\nPeríodo de atualização Google: D-3\\nPeríodo de atualização Apple: D-3\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"sum\",\"color\":{\"byField\":\"score\",\"mapping\":{\"1\":\"#dc5b57\",\"2\":\"#dd915f\",\"3\":\"#4a8ddc\",\"4\":\"#f3c911\",\"5\":\"#33ae81\"}},\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"legend\":{\"align\":\"left\",\"position\":\"top\",\"symbolType\":\"line\"},\"show-percentage\":\"True\",\"sort\":{\"field\":\"score\",\"order\":\"asc\"},\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"DISTRIBUIÇÃO POR ESTRELA\"},\"tooltip\":{\"format\":\"0\",\"shared\":true},\"xAxis\":{\"format\":\"0\",\"label\":\"Nota\"},\"yAxis\":{\"format\":\"0\",\"label\":\"Total de reviews\"}},\"exampleData\":{\"appId\":[{\"score\":4,\"total\":100},{\"score\":2,\"total\":112},{\"score\":3,\"total\":118},{\"score\":1,\"total\":474},{\"score\":5,\"total\":425}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1651\",\"url\":\"http://api-server:8080/api/pizza/star_distribution\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Store\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"score\":3,\"total\":275},{\"score\":4,\"total\":533},{\"score\":1,\"total\":1406},{\"score\":5,\"total\":10087},{\"score\":2,\"total\":281}]},\"category\":{\"name\":\"Satisfaction\",\"slug\":\"satisfacao\",\"documentId\":\"cat_b642a5bbb89cdfb6851988bc\"}}",
+              "{\"documentId\":\"doc_86b4e2aab582b8c86a277dc4\",\"name\":\"INSTALAÇÕES ACUMULADAS\",\"slug\":\"card-instalacoes-acumuladas\",\"kind\":\"big_number\",\"xField\":\"None\",\"yField\":\"big_number\",\"description\":\"Novas instalações que foram acumuladas durante todo o tempo de vida do app. A cada dia, as novas instalações vão sendo somadas com o histórico.\\n\\nPeríodo de atualização Google: D-1\\nPeríodo de atualização Apple: D-2\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"sum\",\"bigNumber\":{\"fontWeight\":\"bold\",\"format\":\"0.000a\"},\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"True\",\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"INSTALAÇÕES ACUMULADAS\"}},\"exampleData\":{\"appId\":[{\"big_number\":3065076,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"up\",\"value\":1.7},\"year\":{\"type\":\"up\",\"value\":26.4}}}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1064\",\"url\":\"http://api-server:8080/api/big-number/accumulated_installations_metric\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Store\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"big_number\":110334586,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"up\",\"value\":0.79},\"year\":{\"type\":\"up\",\"value\":11.42}}}]},\"category\":{\"name\":\"Activation\",\"slug\":\"ativacao\",\"documentId\":\"cat_ce6a2c91aaed394f0698c06b\"}}",
+              "{\"documentId\":\"doc_705946cb844abf0a09fe0820\",\"name\":\"DISTRIBUIÇÃO POR ESTRELA (PIE CHART)\",\"slug\":\"donut-distribuicao-por-estrela\",\"kind\":\"pie\",\"xField\":\"score\",\"yField\":\"total\",\"description\":\"Distribuição das notas (ratings) que foram atribuídas aos comentários (reviews) no período.\\n\\nPeríodo de atualização Google: D-3\\nPeríodo de atualização Apple: D-3\",\"combineData\":true,\"labels\":{\"labelField\":\"{score}: {total} ({percentage}%)\"},\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"sum\",\"angleField\":\"total\",\"categoryField\":\"score\",\"color\":{\"byField\":\"score\",\"mapping\":{\"1\":\"#dc5b57\",\"2\":\"#dd915f\",\"3\":\"#4a8ddc\",\"4\":\"#f3c911\",\"5\":\"#33ae81\"}},\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"kind\":\"donut\",\"show-percentage\":\"True\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"DISTRIBUIÇÃO POR ESTRELA\"},\"tooltip\":{\"format\":\"0\",\"shared\":true}},\"exampleData\":{\"appId\":[{\"score\":4,\"total\":100},{\"score\":2,\"total\":112},{\"score\":3,\"total\":118},{\"score\":1,\"total\":474},{\"score\":5,\"total\":425}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1148\",\"url\":\"http://api-server:8080/api/pizza/star_distribution\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Store\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"score\":4,\"total\":533},{\"score\":5,\"total\":10087},{\"score\":2,\"total\":281},{\"score\":3,\"total\":275},{\"score\":1,\"total\":1406}]},\"category\":{\"name\":\"Satisfaction\",\"slug\":\"satisfacao\",\"documentId\":\"cat_b642a5bbb89cdfb6851988bc\"}}",
+              "[{\"documentId\":\"doc_1bb3c3a99a4a30e27af28658\",\"name\":\"SESSÕES POR USUÁRIOS (ADJUST)\",\"slug\":\"card-sessoes-por-usuarios-adjust\",\"kind\":\"big_number\",\"xField\":\"None\",\"yField\":\"big_number\",\"description\":\"Média de Sessões comparadas aos Usuários Ativos Diários.\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"average\",\"bigNumber\":{\"fontWeight\":\"bold\",\"format\":\"0\"},\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"SESSÕES POR USUÁRIOS\"}},\"exampleData\":{\"appId\":[{\"big_number\":2,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"up\",\"value\":2.03},\"year\":{\"type\":null,\"value\":null}}}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1639\",\"url\":\"http://api-server:8080/api/big-number/sessions_by_users_service_metric\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Console\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"big_number\":2,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"up\",\"value\":1.94},\"year\":{\"type\":null,\"value\":null}}}]},\"category\":{\"name\":\"Analytics\",\"slug\":\"adjust\",\"documentId\":\"cat_4b76e9f6c3c6c2ccc8890b3a\"}},{\"documentId\":\"doc_74c61ad18d9225f14fccbc2f\",\"name\":\"MÉDIA DE SEGUNDOS POR SESSÃO (ADJUST)\",\"slug\":\"card-media-de-segundos-por-sessao-adjust\",\"kind\":\"big_number\",\"xField\":\"None\",\"yField\":\"big_number\",\"description\":\"Tempo médio que os usuários passaram no app durante o período (em segundos).\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"average\",\"bigNumber\":{\"fontWeight\":\"bold\",\"format\":\"0\"},\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"MÉDIA DE SEGUNDOS POR SESSÃO\"}},\"exampleData\":{\"appId\":[{\"big_number\":11,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"down\",\"value\":-4.88},\"year\":{\"type\":null,\"value\":null}}}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1408\",\"url\":\"http://api-server:8080/api/big-number/average_seconds_per_session_service_metric\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Console\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"big_number\":2,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"down\",\"value\":-100},\"year\":{\"type\":null,\"value\":null}}}]},\"category\":{\"name\":\"Analytics\",\"slug\":\"adjust\",\"documentId\":\"cat_4b76e9f6c3c6c2ccc8890b3a\"}},{\"documentId\":\"doc_c9e1d454e0f15ed7c89fe48c\",\"name\":\"TAXA DE RETENÇÃO MÉDIA (ADJUST)\",\"slug\":\"card-taxa-de-retencao-media-adjust\",\"kind\":\"big_number\",\"xField\":\"None\",\"yField\":\"big_number\",\"description\":\"Média das Taxas de Retenção (calculadas de acordo com os dias D1 até D10 da coorte) do período.\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"average\",\"bigNumber\":{\"fontWeight\":\"bold\",\"format\":\"0.00\",\"suffix\":\"%\"},\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"TAXA DE RETENÇÃO MÉDIA\"}},\"exampleData\":{\"appId\":[{\"big_number\":5.65,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":null,\"value\":null},\"year\":{\"type\":null,\"value\":null}}}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1545\",\"url\":\"http://api-server:8080/api/big-number/average_retention_rate_service_metric\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Console\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"big_number\":20.69,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"down\",\"value\":-65.78},\"year\":{\"type\":null,\"value\":null}}}]},\"category\":{\"name\":\"Analytics\",\"slug\":\"adjust\",\"documentId\":\"cat_4b76e9f6c3c6c2ccc8890b3a\"}},{\"documentId\":\"doc_a5ce3ee9026ef9619b85c5d1\",\"name\":\"TAXA MÉDIA DE FALHAS\",\"slug\":\"card-taxa-media-de-falhas\",\"kind\":\"big_number\",\"xField\":\"None\",\"yField\":\"big_number\",\"description\":\"Média das Taxas de Falhas no período.\\n\\nPeríodo de atualização Google: D-2\\nPeríodo de atualização Apple: D-23\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"average\",\"bigNumber\":{\"fontWeight\":\"bold\",\"format\":\"0.00\",\"suffix\":\"%\"},\"increase-is-positive\":\"False\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"TAXA MÉDIA DE FALHAS\"}},\"exampleData\":{\"appId\":[{\"big_number\":4.32,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"up\",\"value\":12.48},\"year\":{\"type\":\"up\",\"value\":355.25}}}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1082\",\"url\":\"http://api-server:8080/api/big-number/average_crashes_rate_metric\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Console\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"big_number\":1.25,\"percentage\":{\"value\":null},\"variations\":{\"month\":{\"type\":\"up\",\"value\":4.59},\"year\":{\"type\":null,\"value\":null}}}]},\"category\":{\"name\":\"Satisfaction\",\"slug\":\"satisfacao\",\"documentId\":\"cat_b642a5bbb89cdfb6851988bc\"}},{\"documentId\":\"doc_821aa56b0ab684f3ea6dc933\",\"name\":\"SESSÕES VS DAU (ADJUST)\",\"slug\":\"line-sessoes-vs-dau-adjust\",\"kind\":\"line\",\"xField\":\"date\",\"yField\":\"total_sessions, total_daus\",\"description\":\"Evolução dos Usuários Ativos Diários (DAU) e das Sessões ao longo do tempo.\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"average\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"kind\":\"line\",\"legend\":{\"align\":\"left\",\"position\":\"top\",\"symbolType\":\"line\"},\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"SESSÕES VS DAU\"},\"tooltip\":{\"shared\":true,\"xDateFormat\":\"DD/MM/yyyy\"},\"xAxis\":{\"format\":\"DD/MM\",\"label\":\"Date\",\"rotateLabels\":true},\"xField\":\"date\",\"yAxis\":[{\"field\":\"total_sessions\",\"format\":\"0.000a\",\"label\":\"Sessões\"},{\"field\":\"total_daus\",\"format\":\"0.000a\",\"label\":\"DAU\"}],\"yField\":[\"total_sessions\",\"total_daus\"]},\"exampleData\":{\"appId\":[{\"date\":\"2025-08-28\",\"total_daus\":27197,\"total_sessions\":52028},{\"date\":\"2025-08-29\",\"total_daus\":18486,\"total_sessions\":28498}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1525\",\"url\":\"http://api-server:8080/api/line/sessions_vs_dau_service\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Console\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"date\":\"2025-06-26\",\"total_daus\":8546964,\"total_sessions\":16891929},{\"date\":\"2025-06-27\",\"total_daus\":8955342,\"total_sessions\":18682197},{\"date\":\"2025-06-28\",\"total_daus\":8217849,\"total_sessions\":16423827},{\"date\":\"2025-06-29\",\"total_daus\":6964350,\"total_sessions\":12246051},{\"date\":\"2025-06-30\",\"total_daus\":9632379,\"total_sessions\":20795397}]},\"category\":{\"name\":\"Analytics\",\"slug\":\"adjust\",\"documentId\":\"cat_4b76e9f6c3c6c2ccc8890b3a\"}},{\"documentId\":\"doc_1372bd5cd8ccc54303708bc0\",\"name\":\"TEMPO MÉDIO GASTO POR SESSÃO (ADJUST)\",\"slug\":\"line-tempo-medio-gasto-por-sessao-adjust\",\"kind\":\"line\",\"xField\":\"date\",\"yField\":\"avg_time_per_session\",\"description\":\"Evolução da quantidade de segundos que os usuários passam utilizando o app por sessão, em média.\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"average\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"kind\":\"line\",\"legend\":{\"align\":\"left\",\"position\":\"top\",\"symbolType\":\"line\"},\"show-percentage\":\"False\",\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"TEMPO MÉDIO GASTO POR SESSÃO\"},\"tooltip\":{\"shared\":true,\"xDateFormat\":\"DD/MM/yyyy\"},\"xAxis\":{\"format\":\"DD/MM\",\"label\":\"Date\",\"rotateLabels\":true},\"xField\":\"date\",\"yAxis\":[{\"field\":\"avg_time_per_session\",\"format\":\"0.000a\",\"label\":\"Tempo médio gasto por sessão (segundos)\"}],\"yField\":\"avg_time_per_session\"},\"exampleData\":{\"appId\":[{\"avg_time_per_session\":15,\"date\":\"2025-06-01\"},{\"avg_time_per_session\":21,\"date\":\"2025-06-02\"},{\"avg_time_per_session\":8,\"date\":\"2025-06-03\"},{\"avg_time_per_session\":13,\"date\":\"2025-06-04\"},{\"avg_time_per_session\":5,\"date\":\"2025-06-05\"},{\"avg_time_per_session\":12,\"date\":\"2025-06-06\"},{\"avg_time_per_session\":11,\"date\":\"2025-06-07\"},{\"avg_time_per_session\":9,\"date\":\"2025-06-08\"},{\"avg_time_per_session\":8,\"date\":\"2025-06-09\"},{\"avg_time_per_session\":12,\"date\":\"2025-06-10\"},{\"avg_time_per_session\":8,\"date\":\"2025-06-11\"},{\"avg_time_per_session\":13,\"date\":\"2025-06-12\"},{\"avg_time_per_session\":14,\"date\":\"2025-06-13\"},{\"avg_time_per_session\":12,\"date\":\"2025-06-14\"},{\"avg_time_per_session\":9,\"date\":\"2025-06-15\"},{\"avg_time_per_session\":13,\"date\":\"2025-06-16\"},{\"avg_time_per_session\":23,\"date\":\"2025-06-17\"},{\"avg_time_per_session\":8,\"date\":\"2025-06-18\"},{\"avg_time_per_session\":14,\"date\":\"2025-06-19\"},{\"avg_time_per_session\":8,\"date\":\"2025-06-20\"},{\"avg_time_per_session\":6,\"date\":\"2025-06-21\"},{\"avg_time_per_session\":11,\"date\":\"2025-06-22\"},{\"avg_time_per_session\":11,\"date\":\"2025-06-23\"},{\"avg_time_per_session\":9,\"date\":\"2025-06-24\"},{\"avg_time_per_session\":13,\"date\":\"2025-06-25\"},{\"avg_time_per_session\":17,\"date\":\"2025-06-26\"},{\"avg_time_per_session\":8,\"date\":\"2025-06-27\"},{\"avg_time_per_session\":8,\"date\":\"2025-06-28\"},{\"avg_time_per_session\":13,\"date\":\"2025-06-29\"},{\"avg_time_per_session\":13,\"date\":\"2025-06-30\"}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1554\",\"url\":\"http://api-server:8080/api/line/average_time_spent_per_session_service\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Console\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"avg_time_per_session\":2,\"date\":\"2025-06-26\"},{\"avg_time_per_session\":2,\"date\":\"2025-06-27\"},{\"avg_time_per_session\":2,\"date\":\"2025-06-28\"},{\"avg_time_per_session\":2,\"date\":\"2025-06-29\"},{\"avg_time_per_session\":2,\"date\":\"2025-06-30\"}]},\"category\":{\"name\":\"Analytics\",\"slug\":\"adjust\",\"documentId\":\"cat_4b76e9f6c3c6c2ccc8890b3a\"}},{\"documentId\":\"doc_5c19e86d2d74f6772eec46b2\",\"name\":\"TAXA DE RETENÇÃO POR DIA DO COORTE (ADJUST)\",\"slug\":\"table-taxa-de-retencao-por-dia-do-coorte-adjust\",\"kind\":\"table\",\"xField\":\"None\",\"yField\":\"date, columns\",\"description\":\"Tabela que exibe a Taxa de Retenção para os dias D1, D3 e D7 do coorte.\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"average\",\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"kind\":\"table\",\"show-percentage\":\"False\",\"sort\":{\"field\":\"value\",\"order\":\"desc\"},\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"TAXA DE RETENÇÃO POR DIA DO COORTE\"},\"yAxis\":[{\"field\":\"retention_d1\",\"format\":\"0.00\",\"label\":\"Retenção D1\",\"suffix\":\"%\"},{\"field\":\"retention_d3\",\"format\":\"0.00\",\"label\":\"Retenção D3\",\"suffix\":\"%\"},{\"field\":\"retention_d7\",\"format\":\"0.00\",\"label\":\"Retenção D7\",\"suffix\":\"%\"}],\"yField\":[\"retention_d1\",\"retention_d3\",\"retention_d7\"]},\"exampleData\":{\"appId\":[{\"columns\":[{\"field\":\"retention_d1\",\"type\":\"raw\",\"value\":15.43},{\"field\":\"retention_d3\",\"type\":\"raw\",\"value\":9.05},{\"field\":\"retention_d7\",\"type\":\"raw\",\"value\":1.46}],\"date\":\"\"}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1552\",\"url\":\"http://api-server:8080/api/table/retention_rate_by_cohort_service_data\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Console\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"columns\":[{\"field\":\"retention_d1\",\"type\":\"raw\",\"value\":23.95},{\"field\":\"retention_d3\",\"type\":\"raw\",\"value\":22.07},{\"field\":\"retention_d7\",\"type\":\"raw\",\"value\":19.81}],\"date\":\"\"}]},\"category\":{\"name\":\"Analytics\",\"slug\":\"adjust\",\"documentId\":\"cat_4b76e9f6c3c6c2ccc8890b3a\"}},{\"documentId\":\"doc_851d19648fee9acbfa13d0d8\",\"name\":\"INSTALAÇÕES, DESINSTALAÇÕES, USUÁRIOS ATIVOS E ABERTURA DE CONTAS (ADJUST)\",\"slug\":\"table-instalacoes-desinstalacoes-usuarios-ativos-e-abertura-de-contas-adjust\",\"kind\":\"table\",\"xField\":\"None\",\"yField\":\"columns\",\"description\":\"Tabela que exibe a quantidade de Instalações, Desinstalações, DAU (dados do Google Console) e Abertura de contas (Analytics) do aplicativo no período selecionado.\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"average\",\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"kind\":\"table\",\"show-percentage\":\"False\",\"sort\":{\"field\":\"installs\",\"order\":\"desc\"},\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"INSTALAÇÕES, DESINSTALAÇÕES, USUÁRIOS ATIVOS E ABERTURA DE CONTAS\"},\"yAxis\":[{\"field\":\"installs\",\"format\":\"0.000a\",\"label\":\"Instalações\"},{\"field\":\"uninstalls\",\"format\":\"0.000a\",\"label\":\"Desinstalações\"},{\"field\":\"dau\",\"format\":\"0.000a\",\"label\":\"DAU\"},{\"field\":\"account_opening\",\"format\":\"0.000a\",\"label\":\"Abertura de contas\"}],\"yField\":[\"installs\",\"uninstalls\",\"dau\",\"account_opening\"]},\"exampleData\":{\"appId\":[{\"columns\":[{\"field\":\"installs\",\"type\":\"raw\",\"value\":2381849},{\"field\":\"uninstalls\",\"type\":\"raw\",\"value\":3772548},{\"field\":\"dau\",\"type\":\"raw\",\"value\":8123560.714285715},{\"field\":\"account_opening\",\"type\":\"raw\",\"value\":81558}],\"date\":\"\"}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1609\",\"url\":\"http://api-server:8080/api/table/installs_uninstalls_dau_and_account_opening_service_data\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Console\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"columns\":[{\"field\":\"installs\",\"type\":\"raw\",\"value\":934543},{\"field\":\"uninstalls\",\"type\":\"raw\",\"value\":2179435},{\"field\":\"dau\",\"type\":\"raw\",\"value\":8040085.866666666},{\"field\":\"account_opening\",\"type\":\"raw\",\"value\":null}],\"date\":\"\"}]},\"category\":{\"name\":\"Analytics\",\"slug\":\"adjust\",\"documentId\":\"cat_4b76e9f6c3c6c2ccc8890b3a\"}},{\"documentId\":\"doc_796479907c9c4f2c94ec87b9\",\"name\":\"INSTALAÇÕES E ESTIMATIVA DE DESINSTALAÇÕES E USUÁRIOS ATIVOS (PREVISÃO)\",\"slug\":\"table-instalacoes-e-estimativa-de-desinstalacoes-e-usuarios-ativos-previsao\",\"kind\":\"table\",\"xField\":\"None\",\"yField\":\"columns\",\"description\":\"Tabela que exibe a quantidade de Instalações, e dados preditivos de Desinstalações e DAU dos concorrentes no período selecionado.\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"True\",\"aggregationMode\":\"average\",\"increase-is-positive\":\"True\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"False\",\"kind\":\"table\",\"show-percentage\":\"False\",\"sort\":{\"field\":\"installs\",\"order\":\"desc\"},\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"INSTALAÇÕES E ESTIMATIVA DE DESINSTALAÇÕES E USUÁRIOS ATIVOS\"},\"yAxis\":[{\"field\":\"title\",\"format\":\"string\",\"label\":\"Aplicativo\"},{\"field\":\"installs\",\"format\":\"0.000a\",\"label\":\"Instalações\"},{\"field\":\"uninstalls\",\"format\":\"0.000a\",\"label\":\"Desinstalações\"},{\"field\":\"dau\",\"format\":\"0.000a\",\"label\":\"DAU\"}],\"yField\":[\"title\",\"installs\",\"uninstalls\",\"dau\"]},\"exampleData\":{\"appId\":[{\"columns\":[{\"field\":\"title\",\"type\":\"raw\",\"value\":\"Company: Bank, Account, Transfer, Credit\"},{\"field\":\"installs\",\"type\":\"raw\",\"value\":2381849},{\"field\":\"uninstalls\",\"type\":\"raw\",\"value\":3846437},{\"field\":\"dau\",\"type\":\"raw\",\"value\":7322111.253968254}],\"date\":\"\"}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1606\",\"url\":\"http://api-server:8080/api/table/installs_uninstalls_estimation_and_dau_estimation_data\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\"],\"source\":\"Console\",\"data\":{},\"category\":{\"name\":\"Engagement\",\"slug\":\"engajamento\",\"documentId\":\"cat_0aaea2e64753b4099d147448\"}}]",
+              "{\"documentId\":\"doc_ebd0fe1a7cd5f1a11605b4e0\",\"name\":\"ACOMPANHAMENTO DE KEYWORDS\",\"slug\":\"table-acompanhamento-de-keywords\",\"kind\":\"table\",\"xField\":\"None\",\"yField\":\"columns\",\"description\":\"Tabela com dados (do último mês) relacionados às keywords registradas pelo app (moda da posição, média da variação diária da posição, competitividade e volume de busca).\\n\\nPeríodo de atualização Google: D-1\\nPeríodo de atualização Apple: D-1\",\"combineData\":true,\"labels\":null,\"colors\":{\"default\":\"#09738a\"},\"config\":{\"add-competitors\":\"False\",\"aggregationMode\":\"separate\",\"increase-is-positive\":\"False\",\"invert-y-axis\":\"False\",\"is-pro\":\"False\",\"is-public\":\"True\",\"kind\":\"table\",\"labelColorRules\":[{\"color\":\"green\",\"condition\":\"value < 0\",\"field\":\"change_from_previous_day\"},{\"color\":\"red\",\"condition\":\"value > 0\",\"field\":\"change_from_previous_day\"},{\"color\":\"gray\",\"condition\":\"value === 0\",\"field\":\"change_from_previous_day\"}],\"show-percentage\":\"False\",\"sort\":{\"field\":\"position\",\"order\":\"asc\"},\"title\":{\"align\":\"center\",\"position\":\"top\",\"text\":\"ACOMPANHAMENTO DE KEYWORDS\"},\"yAxis\":[{\"field\":\"keyword\",\"format\":\"string\",\"label\":\"Keyword\"},{\"field\":\"position\",\"format\":\"0\",\"label\":\"Posição\"},{\"field\":\"change_from_previous_day\",\"format\":\"0.00\",\"label\":\"Diferença média em comparação ao dia anterior\"},{\"field\":\"competitivity\",\"format\":\"string\",\"label\":\"Competitividade\"},{\"field\":\"search_volume\",\"format\":\"string\",\"label\":\"Volume de busca\"}],\"yField\":[\"keyword\",\"position\",\"change_from_previous_day\",\"competitivity\",\"search_volume\"]},\"exampleData\":{\"appId\":[{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"lca\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":20},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.37},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (75.89%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"rendimento diário\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":8},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.3},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.54%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"reserva de investimentos\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":30},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.1},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (7.63%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"investimentos sem taxas\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":41},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (8.92%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"fundos de investimento\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":6},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.3},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (75.89%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"investimento digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":4},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.13},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.54%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"investir dinheiro\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":7},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.03},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (51.5%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"fundos\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":0},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.77%)\"}],\"date\":\"\"}]},\"dataSource\":{\"type\":\"api\",\"id\":\"1595\",\"url\":\"http://api-server:8080/api/table/ranking_volume_data\",\"method\":\"POST\",\"params\":null,\"body\":{\"appId\":\"{{.AppID}}\",\"country\":\"{{.Country}}\",\"endDate\":\"{{.EndDate}}\",\"internalId\":\"{{.InternalID}}\",\"lang\":\"{{.Lang}}\",\"startDate\":\"{{.StartDate}}\",\"store\":\"{{.Store}}\"},\"headers\":null},\"stores\":[\"google\",\"apple\"],\"source\":\"Store\",\"data\":{\"com.acme.myapp_google_br_pt-BR\":[{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"empréstimo online seguro\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":63},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta sem tarifas\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":7},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta grátis\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":3},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão virtual online\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":81},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":1.32},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"emprestimo consignado\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":20},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pagar boleto\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":19},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão de crédito com conta digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":11},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"transferências\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":60},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"seguro de vida\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":22},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pagar com pix\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":4},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"poupança\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":16},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"abrir conta digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":2},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.14},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"banco digital grátis\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":8},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"banco\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":1},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.11},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"saldo\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":41},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"parcelamento pix\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":21},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.15},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"fazer transferências\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":53},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":1.41},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pagamentos\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":36},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"renda fixa\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":19},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pedir cartão de crédito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":31},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":7},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"empréstimo de dinheiro\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":26},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pedir empréstimo\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":36},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"consulta de saldo\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":23},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"saldo fgts\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":14},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"abrir\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":50},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pagar ipva\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":23},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão de débito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":18},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"abrir conta corrente\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":2},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta pj\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":15},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.11},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"parcelar pix\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":12},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"banco digital pj\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":11},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"extrato\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":6},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"saque aniversario\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":21},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"fundos de investimentos\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":72},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.14},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"organizar finanças\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":86},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.17},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta salario\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":2},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta virtual\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":6},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartões de crédito online\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":43},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"antecipar fgts\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":18},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":45},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"empréstimo para aposentado\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":28},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"investimento\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":111},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cashback\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":48},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta banco\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":2},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"internet banking\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":10},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"consórcio\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":65},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.08},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartao de credito sem anuidade\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":32},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pagar boletos\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":21},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"shopping\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":1},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"carta de credito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":46},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"consultar extratos\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":33},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"rendimento de poupança\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":21},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"tesouro direto\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":12},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"abrir conta banco digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":4},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"abrir conta pj\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":15},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta digital sem taxas\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":22},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta pj gratuita\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":19},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta digital sem anuidade\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":7},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"seguro celular\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":21},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"crédito consignado\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":17},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pasep\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":8},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão sem anuidade\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":29},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"finanças\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":6},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.39},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cash back\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":42},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.32},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pix saque\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":13},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.18},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"ver saldo\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":38},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cdb\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":18},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"empréstimo\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":52},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão débito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":21},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"poupança digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":5},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pix\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":3},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"crédito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":13},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"transferência bancária\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":6},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"nuinvest\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":17},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"abra sua conta\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":5},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"minhas finanças\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":68},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":1},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão crédito online\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":33},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"seguro empréstimo\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":23},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta gratuita\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":5},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"banco digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":13},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta para empresas\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":14},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"investimentos\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":76},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.08},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"investir dinheiro\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":59},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.08},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta digital sem tarifas\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":6},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"financiamento\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":28},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta para mei\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":13},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (25.43%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta digital online\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":5},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"empréstimo consignado\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":18},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"programa desenrola\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":13},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pagar boleto com cartão de crédito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":40},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"poupança caixa\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":5},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"parcelar cartão de crédito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":53},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.71},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão de crédito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":15},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"débito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":26},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"emprestimo pessoal\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":37},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"digital\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":39},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":5},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"saque aniversário\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":21},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"conta corrente\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":2},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"transferencias bancárias\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":3},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"low (28.99%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":16},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"open finance\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":7},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartão sem tarifa\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":50},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"serviços financeiros\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":44},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"fgts\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":14},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"abrir conta\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":3},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"banco digital gratuito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":12},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (17.48%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"consultar saldo\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":33},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"dívidas\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":21},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pagamento\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":30},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pix grátis\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":18},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"banco online\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":6},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pronampe\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":6},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"medium\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"investimentos\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":2},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"abrir conta virtual\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":2},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very low (9.14%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"fundos de investimento\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":62},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.14},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"renda variável\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":45},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"capital de giro\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":14},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"pagar contas\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":40},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.04},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"medium (52.03%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"rendimento poupança\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":5},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":-0.68},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"ipva\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":23},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"transferência\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":63},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"very low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"high (76.24%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"cartao de credito\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":17},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0.07},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"high\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"},{\"columns\":[{\"field\":\"keyword\",\"type\":\"raw\",\"value\":\"investir\"},{\"field\":\"position\",\"type\":\"raw\",\"value\":82},{\"field\":\"change_from_previous_day\",\"type\":\"raw\",\"value\":0},{\"field\":\"competitivity\",\"type\":\"raw\",\"value\":\"low\"},{\"field\":\"search_volume\",\"type\":\"raw\",\"value\":\"very high (93.88%)\"}],\"date\":\"\"}]},\"category\":{\"name\":\"Category5\",\"slug\":\"aquisicao\",\"documentId\":\"cat_2fed4d68f36be1a5be2d24fb\"}}"
+            ],
+            "PROMPT_USER": "Qual grau de satisfação meus clientes tem e oq eu posso melhorar."
+          },
+          "webhookUrl": "https://webhook.digital-ai.tech/webhook/projeto-1-lovable-painel-inteligente",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Dados Lovable": {
+      "main": [
+        [
+          {
+            "node": "Pega Somente body.DADOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "RESPOSTA (ANÁLISE GERAL)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Refina e Agrupa informações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think3": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (ACTIVATION)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think4": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (ANALYTICS)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think5": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (CATEGORY5)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think6": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (ENGAGEMENT)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think7": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (SATISFACTION)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (SATISFACTION)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator3": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (ENGAGEMENT)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator4": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (CATEGORY5)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator5": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (ANALYTICS)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator6": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENTE (ACTIVATION)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ORQUESTRADOR": {
+      "main": [
+        [
+          {
+            "node": "Agrupar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE (ACTIVATION)": {
+      "ai_tool": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE (ANALYTICS)": {
+      "ai_tool": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE (CATEGORY5)": {
+      "ai_tool": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE (SATISFACTION)": {
+      "ai_tool": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE (ENGAGEMENT)": {
+      "ai_tool": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combinar Listas": {
+      "main": [
+        [
+          {
+            "node": "Filtra DADOS vazios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refina e Agrupa informações": {
+      "main": [
+        [
+          {
+            "node": "Se Category5 estiver presente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refina e Agrupa informações Category5": {
+      "main": [
+        [
+          {
+            "node": "Combinar Listas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Se Category5 estiver presente": {
+      "main": [
+        [
+          {
+            "node": "Refina e Agrupa informações Category5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Combinar Listas",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Filtra DADOS vazios": {
+      "main": [
+        [
+          {
+            "node": "DADOS TRATADOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega Somente body.DADOS": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DADOS TRATADOS": {
+      "main": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator1": {
+      "ai_tool": [
+        [
+          {
+            "node": "RESPOSTA (CLIENTE)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar Dados": {
+      "main": [
+        [
+          {
+            "node": "PROMPTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SE HOUVER PROMPT USUÁRIO": {
+      "main": [
+        [
+          {
+            "node": "RESPOSTA (CLIENTE)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RESPOSTA (ANÁLISE GERAL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RESPOSTA": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROMPTS": {
+      "main": [
+        [
+          {
+            "node": "SE HOUVER PROMPT USUÁRIO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AGENTE (ACTIVATION)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AGENTE (ANALYTICS)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AGENTE (CATEGORY5)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AGENTE (SATISFACTION)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AGENTE (ENGAGEMENT)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ORQUESTRADOR",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RESPOSTA (ANÁLISE GERAL)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RESPOSTA (ANÁLISE GERAL)",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model9": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RESPOSTA (CLIENTE)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model10": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RESPOSTA (CLIENTE)",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RESPOSTA (CLIENTE)": {
+      "main": [
+        [
+          {
+            "node": "RESPOSTA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RESPOSTA (ANÁLISE GERAL)": {
+      "main": [
+        [
+          {
+            "node": "RESPOSTA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "332a5950-4f8e-4ad8-b57f-33f390b08e55",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "33738330930e3881dd5571eca013f36ddf8aab20e4ea5c1f2ebaf4a2b4668ac6"
+  },
+  "id": "Vw0Y3N4tqlUiStmJ",
+  "tags": []
+}
