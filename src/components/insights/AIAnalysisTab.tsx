@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Loader2, Sparkles, Send, ArrowDown } from "lucide-react";
+import { Loader2, Sparkles, Send, ArrowDown, ArrowUp } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,9 +23,10 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant', content: string }>>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [showScrollUp, setShowScrollUp] = useState(false);
+  const [showScrollDown, setShowScrollDown] = useState(false);
   
-  const viewportRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const contentEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -64,44 +64,36 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
     fetchInitialAnalysis();
   }, []);
 
-  // Listener de scroll manual para o viewport do ScrollArea
+  // Listener de scroll global da página
   useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-
-    const handleScrollEvent = () => {
-      const { scrollTop, scrollHeight, clientHeight } = viewport;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-      setShowScrollButton(!isNearBottom);
+    const handleScroll = () => {
+      const nearTop = window.scrollY <= 100;
+      const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+      setShowScrollUp(!nearTop);
+      setShowScrollDown(!nearBottom);
     };
 
-    viewport.addEventListener('scroll', handleScrollEvent);
-    return () => viewport.removeEventListener('scroll', handleScrollEvent);
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check initial position
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Auto-scroll quando mensagens mudam
+  // Auto-scroll quando mensagens mudam (apenas se próximo ao fim)
   useEffect(() => {
-    if (!isSending) {
-      const viewport = viewportRef.current;
-      if (viewport) {
-        setTimeout(() => {
-          viewport.scrollTo({
-            top: viewport.scrollHeight,
-            behavior: 'smooth'
-          });
-        }, 100);
-      }
+    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 150;
+    if (nearBottom) {
+      setTimeout(() => {
+        contentEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 80);
     }
   }, [chatMessages, isSending, initialAnalysis]);
 
   const scrollToBottom = () => {
-    const viewport = viewportRef.current;
-    if (viewport) {
-      viewport.scrollTo({
-        top: viewport.scrollHeight,
-        behavior: 'smooth'
-      });
-    }
+    contentEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  };
+
+  const scrollToTop = () => {
+    containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const fetchInitialAnalysis = async () => {
@@ -191,8 +183,9 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
   }
 
   return (
-    <div className="bg-card border border-border rounded-lg overflow-hidden flex flex-col min-h-[400px] max-h-[800px]">
-      {/* Header */}
+    <>
+      <div ref={containerRef} className="bg-card border border-border rounded-lg flex flex-col min-h-[400px]">
+        {/* Header */}
       <div className="flex items-center justify-between border-b border-border p-4 shrink-0">
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
@@ -241,11 +234,9 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
         </div>
       </div>
 
-      {/* Conteúdo com scroll */}
-      <div className="relative flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="p-6 space-y-6" ref={viewportRef}>
-            {/* Análise Inicial */}
+        {/* Conteúdo */}
+        <div className="p-6 space-y-6">
+          {/* Análise Inicial */}
             <div className="prose prose-slate dark:prose-invert max-w-none">
               <ReactMarkdown
                 components={{
@@ -347,49 +338,58 @@ export const AIAnalysisTab = ({ rawJsonStrings }: AIAnalysisTabProps) => {
               </div>
             )}
 
-            {/* Scroll anchor */}
-            <div ref={contentEndRef} />
-          </div>
-        </ScrollArea>
-
-        {/* Botão scroll to bottom */}
-        {showScrollButton && (
-          <Button
-            variant="outline"
-            size="icon"
-            className="absolute bottom-4 right-4 rounded-full shadow-lg z-10"
-            onClick={scrollToBottom}
-          >
-            <ArrowDown className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
-      {/* Input de Chat */}
-      <div className="border-t border-border p-4 shrink-0">
-        <div className="flex gap-2">
-          <Textarea
-            ref={textareaRef}
-            placeholder="Digite sua pergunta..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="min-h-[60px] max-h-[120px] resize-none"
-            disabled={isSending}
-          />
-          <Button
-            onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || isSending}
-            size="icon"
-            className="h-[60px] w-[60px] shrink-0"
-          >
-            <Send className="h-5 w-5" />
-          </Button>
+          {/* Scroll anchor */}
+          <div ref={contentEndRef} />
         </div>
-        <p className="text-xs text-muted-foreground mt-2">
-          Pressione Enter para enviar
-        </p>
+
+        {/* Input de Chat */}
+        <div className="border-t border-border p-4 shrink-0">
+          <div className="flex gap-2">
+            <Textarea
+              ref={textareaRef}
+              placeholder="Digite sua pergunta..."
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="min-h-[60px] max-h-[120px] resize-none"
+              disabled={isSending}
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={!inputMessage.trim() || isSending}
+              size="icon"
+              className="h-[60px] w-[60px] shrink-0"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Pressione Enter para enviar
+          </p>
+        </div>
       </div>
-    </div>
+
+      {/* Botões de scroll flutuantes */}
+      {showScrollUp && (
+        <Button
+          variant="outline"
+          size="icon"
+          className="fixed bottom-20 right-4 rounded-full shadow-lg z-50"
+          onClick={scrollToTop}
+        >
+          <ArrowUp className="h-4 w-4" />
+        </Button>
+      )}
+      {showScrollDown && (
+        <Button
+          variant="outline"
+          size="icon"
+          className="fixed bottom-4 right-4 rounded-full shadow-lg z-50"
+          onClick={scrollToBottom}
+        >
+          <ArrowDown className="h-4 w-4" />
+        </Button>
+      )}
+    </>
   );
 };
