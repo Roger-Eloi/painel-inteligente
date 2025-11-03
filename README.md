@@ -1,3 +1,5 @@
+<img width="1911" height="951" alt="image" src="https://github.com/user-attachments/assets/b5707fd0-92b0-4e65-ae1f-c4b4b6f48775" />
+
 # Painel Inteligente Lovable 
 
 Painel Inteligente desenvolvido com **Lovable** e integração ao **n8n**, focado na análise avançada de dados e automação para equipes de marketing, produto e negócios.  
