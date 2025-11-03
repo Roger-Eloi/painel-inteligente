@@ -28,7 +28,7 @@ O projeto oferece um painel dinâmico para visualização, processamento automat
 
 ## ⚡ Configuração no n8n
 
-### 1. Configure o Webhooks
+### 1. Configure o Webhook
   - 1.1 configure o path do webhook para `projeto-1-lovable-painel-inteligente` no n8n para receber dados do painel Lovable.
   
   - 1.2 Crie uma credencial básica com
