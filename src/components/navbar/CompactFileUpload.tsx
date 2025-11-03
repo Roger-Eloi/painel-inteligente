@@ -1,7 +1,6 @@
 import { useRef } from "react";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 
 interface CompactFileUploadProps {
   onFilesUpload: (files: Array<{ name: string; data: any }>) => void;
@@ -11,7 +10,6 @@ interface CompactFileUploadProps {
 
 export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess, onProcessingStart }: CompactFileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
   const validateJSON = (content: string) => {
     try {
@@ -27,11 +25,6 @@ export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess, onProcessing
 
     for (const file of filesArray) {
       if (file.type !== "application/json") {
-        toast({
-          title: "Erro",
-          description: `${file.name} não é um arquivo JSON válido`,
-          variant: "destructive",
-        });
         continue;
       }
 
@@ -40,11 +33,7 @@ export const CompactFileUpload = ({ onFilesUpload, onUploadSuccess, onProcessing
         const jsonData = validateJSON(content);
         validFiles.push({ name: file.name, data: jsonData });
       } catch (error) {
-        toast({
-          title: "Erro",
-          description: `Falha ao processar ${file.name}`,
-          variant: "destructive",
-        });
+        // Silently skip invalid files
       }
     }
 

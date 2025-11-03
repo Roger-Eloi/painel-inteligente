@@ -5,7 +5,6 @@ import { DashboardTabs } from "@/components/layout/DashboardTabs";
 import { ProcessingToast } from "@/components/navbar/ProcessingToast";
 import { parseJsonData, ParsedWidget } from "@/utils/jsonParser";
 import { useAsyncFileProcessor } from "@/hooks/useAsyncFileProcessor";
-import { useToast } from "@/hooks/use-toast";
 import rankmyappLogo from "@/assets/rankmyapp-logo.svg";
 import rankmyappIcon from "@/assets/rankmyapp-icon.jpg";
 import chartIcon from "@/assets/chart-icon.png";
@@ -14,7 +13,6 @@ const Index = () => {
   const [uploadedData, setUploadedData] = useState<Array<{ name: string; data: any }>>([]);
   const [rawJsonStrings, setRawJsonStrings] = useState<string[]>([]);
   const [showProcessingToast, setShowProcessingToast] = useState(false);
-  const { toast } = useToast();
 
   // Parse all uploaded JSONs into widgets
   const allWidgets = useMemo(() => {
@@ -37,19 +35,6 @@ const Index = () => {
         
         const newRawStrings = results.map(r => JSON.stringify(r.data));
         setRawJsonStrings((prev) => [...prev, ...newRawStrings]);
-
-        toast({
-          title: "Arquivos processados",
-          description: `${results.length} arquivo(s) adicionado(s)${
-            duplicatesCount > 0 ? `, ${duplicatesCount} duplicata(s) ignorada(s)` : ""
-          }`,
-        });
-      } else if (duplicatesCount > 0) {
-        toast({
-          title: "Duplicatas detectadas",
-          description: `${duplicatesCount} widget(s) duplicado(s) foram ignorados`,
-          variant: "default",
-        });
       }
 
       // Auto-dismiss toast after completion
