@@ -63,3 +63,5 @@ O projeto oferece um painel dinâmico para visualização, processamento automat
 - Exportação completa de todo o painel para PDF
 - Cards abaixo dos gráficos com informações de insights gerados pela IA automaticamente
 ---
+
+[🔗 Acessar o painel](https://painel-inteligente.lovable.app/?utm_source=lovable-editor)
