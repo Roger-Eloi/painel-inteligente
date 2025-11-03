@@ -1,4 +1,7 @@
-<img width="1911" height="951" alt="image" src="https://github.com/user-attachments/assets/b5707fd0-92b0-4e65-ae1f-c4b4b6f48775" />
+<img width="1902" height="946" alt="image" src="https://github.com/user-attachments/assets/c5b746ef-324b-43fd-96e1-5cb5e58ba8ac" />
+
+# Página após os dados serem carregados
+<img width="1891" height="947" alt="image" src="https://github.com/user-attachments/assets/5e1c9ec5-de6e-4795-b496-1945e5b80453" />
 
 # Painel Inteligente Lovable 
 
